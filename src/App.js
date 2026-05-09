@@ -1,11 +1,23 @@
 import React, { useState, useEffect } from "react";
-import { auth } from "./firebase";
+import { auth, db } from "./firebase";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged
 } from "firebase/auth";
+import {
+  collection,
+  addDoc,
+  onSnapshot,
+  query,
+  orderBy,
+  doc,
+  updateDoc,
+  increment,
+  setDoc,
+  getDocs
+} from "firebase/firestore";
 
 const GOLD = "#C9972A";
 const GOLD_LIGHT = "#F5E6C0";
@@ -290,13 +302,6 @@ const dailyVerses = [
   { ref: "John 3:16", text: "For God so loved the world that he gave his one and only Son, that whoever believes in him shall not perish but have eternal life." },
 ];
 
-const prayerRequests = [
-  { name: "Anonymous", request: "Please pray for my mother's healing. She has been sick for weeks.", time: "2 min ago", prayed: 14 },
-  { name: "Marcus T.", request: "Pray for my family to find peace. We are going through a difficult season.", time: "15 min ago", prayed: 8 },
-  { name: "Anonymous", request: "Lord I need a job. Please pray I find employment soon.", time: "1 hr ago", prayed: 23 },
-  { name: "Sister Joy", request: "Praying for my son to come back to Christ. He has walked away from the faith.", time: "3 hrs ago", prayed: 41 },
-];
-
 const visionGoals = [
   { id: 1, title: "Read the entire Bible", progress: 34, icon: "📖" },
   { id: 2, title: "Pray daily for 30 days", progress: 12, streak: 12, icon: "🙏" },
@@ -404,7 +409,8 @@ export default function App() {
   const [streak, setStreak] = useState(7);
   const [prayedIds, setPrayedIds] = useState([]);
   const [newPrayer, setNewPrayer] = useState("");
-  const [prayerList, setPrayerList] = useState(prayerRequests);
+  const [prayerList, setPrayerList] = useState([]);
+  const [prayerLoading, setPrayerLoading] = useState(true);
   const [streakLogged, setStreakLogged] = useState(false);
   const [sinner, setSinner] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
@@ -415,6 +421,7 @@ export default function App() {
   const [journalTitle, setJournalTitle] = useState("");
   const [journalEntry, setJournalEntry] = useState("");
   const [journalEntries, setJournalEntries] = useState([]);
+  const [journalLoading, setJournalLoading] = useState(false);
   const [testimony, setTestimony] = useState("");
   const [testimonies, setTestimonies] = useState([
     { text: "God healed my mother after 3 months of prayer. The doctors called it a miracle. God is so faithful!", time: "2 days ago" },
@@ -422,10 +429,37 @@ export default function App() {
     { text: "My marriage was falling apart. We prayed together for the first time in years and God restored everything. To God be the glory!", time: "2 weeks ago" },
   ]);
 
+  // ─── FIREBASE AUTH LISTENER ───────────────────────────────────────────────
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => { setUser(firebaseUser); });
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      setUser(firebaseUser);
+    });
     return () => unsubscribe();
   }, []);
+
+  // ─── LOAD PRAYER WALL FROM FIREBASE ──────────────────────────────────────
+  useEffect(() => {
+    const q = query(collection(db, "prayerWall"), orderBy("createdAt", "desc"));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const prayers = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setPrayerList(prayers);
+      setPrayerLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  // ─── LOAD JOURNAL FROM FIREBASE ───────────────────────────────────────────
+  useEffect(() => {
+    if (!user || user === undefined) { setJournalEntries([]); return; }
+    setJournalLoading(true);
+    const q = query(collection(db, "journals", user.uid, "entries"), orderBy("createdAt", "desc"));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const entries = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setJournalEntries(entries);
+      setJournalLoading(false);
+    });
+    return () => unsubscribe();
+  }, [user]);
 
   const todayVerse = dailyVerses[new Date().getDay() % dailyVerses.length];
 
@@ -450,10 +484,60 @@ export default function App() {
   const openTopic = (topic) => { setSelectedTopic(topic); setTopicContent(getSermonContent(topic)); };
   const filteredCategories = sermonSearch.trim() ? sermonCategories.map(cat => ({ ...cat, topics: cat.topics.filter(t => t.toLowerCase().includes(sermonSearch.toLowerCase())) })).filter(cat => cat.topics.length > 0) : sermonCategories;
   const logPrayer = () => { if (!streakLogged) { setStreak(s => s + 1); setStreakLogged(true); } };
-  const prayFor = (i) => { if (!prayedIds.includes(i)) { setPrayedIds(p => [...p, i]); setPrayerList(list => list.map((r, idx) => idx === i ? { ...r, prayed: r.prayed + 1 } : r)); } };
-  const submitPrayer = () => { if (!newPrayer.trim()) return; setPrayerList(l => [{ name: user ? user.email.split("@")[0] : "Guest", request: newPrayer, time: "Just now", prayed: 0 }, ...l]); setNewPrayer(""); };
-  const submitJournal = () => { if (!journalEntry.trim()) return; const date = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }); setJournalEntries(prev => [{ title: journalTitle || "My Prayer", text: journalEntry, date }, ...prev]); setJournalTitle(""); setJournalEntry(""); };
-  const submitTestimony = () => { if (!testimony.trim()) return; setTestimonies(prev => [{ text: testimony, time: "Just now" }, ...prev]); setTestimony(""); };
+
+  // ─── SUBMIT PRAYER TO FIREBASE ────────────────────────────────────────────
+  const submitPrayer = async () => {
+    if (!newPrayer.trim()) return;
+    try {
+      await addDoc(collection(db, "prayerWall"), {
+        name: user ? user.email.split("@")[0] : "Guest",
+        request: newPrayer.trim(),
+        time: "Just now",
+        prayed: 0,
+        createdAt: new Date(),
+      });
+      setNewPrayer("");
+    } catch (err) {
+      console.error("Error submitting prayer:", err);
+    }
+  };
+
+  // ─── PRAY FOR SOMEONE IN FIREBASE ─────────────────────────────────────────
+  const prayFor = async (id) => {
+    if (prayedIds.includes(id)) return;
+    setPrayedIds(p => [...p, id]);
+    try {
+      await updateDoc(doc(db, "prayerWall", id), { prayed: increment(1) });
+    } catch (err) {
+      console.error("Error updating prayer count:", err);
+    }
+  };
+
+  // ─── SUBMIT JOURNAL TO FIREBASE ───────────────────────────────────────────
+  const submitJournal = async () => {
+    if (!journalEntry.trim()) return;
+    if (!user) { alert("Please sign in to save your prayer journal."); setShowAuth(true); return; }
+    const date = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+    try {
+      await addDoc(collection(db, "journals", user.uid, "entries"), {
+        title: journalTitle || "My Prayer",
+        text: journalEntry.trim(),
+        date,
+        createdAt: new Date(),
+      });
+      setJournalTitle("");
+      setJournalEntry("");
+    } catch (err) {
+      console.error("Error saving journal:", err);
+    }
+  };
+
+  const submitTestimony = () => {
+    if (!testimony.trim()) return;
+    setTestimonies(prev => [{ text: testimony, time: "Just now" }, ...prev]);
+    setTestimony("");
+  };
+
   const handleSignOut = async () => { await signOut(auth); };
 
   const s = {
@@ -588,8 +672,6 @@ export default function App() {
         {activeTab === "prayer" && (
           <div>
             <p style={s.sectionTitle}>🙏 Prayer</p>
-
-            {/* Prayer Sub Nav */}
             <div style={{ display: "flex", background: WHITE, borderRadius: 12, padding: 4, marginBottom: 16, border: `1px solid ${GOLD_LIGHT}` }}>
               {[["how","🙏 How to Pray"],["wall","👥 Wall"],["journal","📓 Journal"],["answered","✅ Answered"]].map(([id, label]) => (
                 <button key={id} onClick={() => setPrayerTab(id)} style={{ flex: 1, padding: "8px 2px", border: "none", borderRadius: 10, background: prayerTab === id ? `linear-gradient(135deg, ${GOLD}, ${BROWN})` : "none", color: prayerTab === id ? WHITE : BROWN, fontSize: 10, fontFamily: "sans-serif", fontWeight: prayerTab === id ? "bold" : "normal", cursor: "pointer", lineHeight: 1.3 }}>
@@ -640,8 +722,18 @@ export default function App() {
                   <button style={s.btn} onClick={submitPrayer}>Submit Prayer Request</button>
                 </div>
                 <p style={{ color: BROWN, fontSize: 13, fontFamily: "sans-serif", marginBottom: 8, fontWeight: "bold" }}>Community Prayer Wall</p>
-                {prayerList.map((r, i) => (
-                  <div key={i} style={s.card}>
+                {prayerLoading && (
+                  <div style={{ ...s.card, textAlign: "center", padding: 24 }}>
+                    <p style={{ color: BROWN, fontStyle: "italic", fontSize: 14 }}>Loading prayers... 🙏</p>
+                  </div>
+                )}
+                {!prayerLoading && prayerList.length === 0 && (
+                  <div style={{ ...s.card, textAlign: "center", padding: 24 }}>
+                    <p style={{ color: BROWN, fontStyle: "italic", fontSize: 14 }}>Be the first to share a prayer request. The community is here for you. 🙏</p>
+                  </div>
+                )}
+                {prayerList.map((r) => (
+                  <div key={r.id} style={s.card}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6 }}>
                       <span style={s.tag}>{r.name}</span>
                       <span style={{ color: BROWN + "99", fontSize: 11, fontFamily: "sans-serif" }}>{r.time}</span>
@@ -649,7 +741,7 @@ export default function App() {
                     <p style={{ color: BROWN_DARK, fontSize: 14, lineHeight: 1.6, margin: "0 0 10px" }}>{r.request}</p>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                       <span style={{ color: BROWN + "99", fontSize: 12, fontFamily: "sans-serif" }}>🙏 {r.prayed} people prayed</span>
-                      <button style={{ ...s.btnOutline, padding: "6px 14px", fontSize: 12 }} onClick={() => prayFor(i)}>{prayedIds.includes(i) ? "✓ Prayed" : "Pray for them"}</button>
+                      <button style={{ ...s.btnOutline, padding: "6px 14px", fontSize: 12 }} onClick={() => prayFor(r.id)}>{prayedIds.includes(r.id) ? "✓ Prayed" : "Pray for them"}</button>
                     </div>
                   </div>
                 ))}
@@ -664,20 +756,30 @@ export default function App() {
                   <h2 style={{ color: WHITE, fontSize: 18, margin: "0 0 6px" }}>📓 Prayer Journal</h2>
                   <p style={{ color: GOLD_LIGHT, fontSize: 13, margin: 0 }}>Write your prayers to God. This is between you and Him.</p>
                 </div>
-                <div style={s.card}>
-                  <p style={{ color: GOLD, fontSize: 13, fontWeight: "bold", marginBottom: 8, fontFamily: "sans-serif" }}>New Prayer Entry</p>
-                  <input style={{ ...s.input, marginBottom: 10 }} placeholder="Title — e.g. Trusting God with my finances" value={journalTitle} onChange={e => setJournalTitle(e.target.value)} />
-                  <textarea style={{ ...s.input, minHeight: 100, resize: "none" }} placeholder="Write your prayer here... be completely honest with God about everything on your heart." value={journalEntry} onChange={e => setJournalEntry(e.target.value)} />
-                  <button style={s.btn} onClick={submitJournal}>Save Prayer Entry</button>
-                </div>
-                {journalEntries.length === 0 && (
+                {!user && (
+                  <div style={{ ...s.card, background: GOLD_LIGHT, border: `2px solid ${GOLD_MID}` }}>
+                    <p style={{ color: BROWN_DARK, fontSize: 14, fontWeight: "bold", margin: "0 0 6px" }}>🔒 Sign In to Use Your Journal</p>
+                    <p style={{ color: BROWN, fontSize: 13, margin: "0 0 10px", lineHeight: 1.5 }}>Create a free account to save your private prayer journal forever.</p>
+                    <button style={s.btn} onClick={() => setShowAuth(true)}>Sign In or Create Account →</button>
+                  </div>
+                )}
+                {user && (
+                  <div style={s.card}>
+                    <p style={{ color: GOLD, fontSize: 13, fontWeight: "bold", marginBottom: 8, fontFamily: "sans-serif" }}>New Prayer Entry</p>
+                    <input style={{ ...s.input, marginBottom: 10 }} placeholder="Title — e.g. Trusting God with my finances" value={journalTitle} onChange={e => setJournalTitle(e.target.value)} />
+                    <textarea style={{ ...s.input, minHeight: 100, resize: "none" }} placeholder="Write your prayer here... be completely honest with God about everything on your heart." value={journalEntry} onChange={e => setJournalEntry(e.target.value)} />
+                    <button style={s.btn} onClick={submitJournal}>Save Prayer Entry</button>
+                  </div>
+                )}
+                {journalLoading && <div style={{ ...s.card, textAlign: "center", padding: 24 }}><p style={{ color: BROWN, fontStyle: "italic" }}>Loading your journal... 🙏</p></div>}
+                {!journalLoading && journalEntries.length === 0 && user && (
                   <div style={{ ...s.card, textAlign: "center", padding: 28 }}>
                     <div style={{ fontSize: 32, marginBottom: 10 }}>📓</div>
                     <p style={{ color: BROWN, fontSize: 14, fontStyle: "italic", lineHeight: 1.6, margin: 0 }}>Your prayer journal is empty. Write your first prayer to God today. He is listening.</p>
                   </div>
                 )}
-                {journalEntries.map((entry, i) => (
-                  <div key={i} style={s.card}>
+                {journalEntries.map((entry) => (
+                  <div key={entry.id} style={s.card}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
                       <p style={{ color: BROWN_DARK, fontSize: 14, fontWeight: "bold", margin: 0 }}>{entry.title}</p>
                       <span style={{ color: BROWN + "99", fontSize: 11, fontFamily: "sans-serif", flexShrink: 0, marginLeft: 8 }}>{entry.date}</span>
