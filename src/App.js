@@ -1,4 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { auth } from "./firebase";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged
+} from "firebase/auth";
 
 const GOLD = "#C9972A";
 const GOLD_LIGHT = "#F5E6C0";
@@ -78,7 +85,7 @@ const sermonContent = {
     scriptures: ["Ephesians 4:32 — Be kind to one another, tenderhearted, forgiving one another as God in Christ forgave you.", "Matthew 6:14-15 — If you forgive others their trespasses, your heavenly Father will also forgive you.", "Colossians 3:13 — Bear with each other and forgive one another if any of you has a grievance against someone."],
     discussionQuestions: ["Is there someone in your life you need to forgive but have been struggling to let go?", "How does remembering how much God has forgiven you help you forgive others?", "What does healthy forgiveness look like in a situation where trust has been broken?"],
     prayer: "Father in the name of Jesus Christ I choose to forgive those who have hurt me. I release every offense and bitterness to you. Heal my heart and fill the space left by unforgiveness with your peace and love. In the name of Jesus Christ. Amen.",
-    journal: "Who do you need to forgive? Write a letter to that person that you will never send — express everything you feel and then write the words 'I choose to forgive you' at the end."
+    journal: "Who do you need to forgive? Write a letter to that person that you will never send — express everything you feel and then write the words I choose to forgive you at the end."
   },
   "Prayer": {
     mainMessage: "Prayer is simply talking to God. It is not a religious ritual but a relationship. God desires to hear from you every day — your joys, your fears, your questions, your praise. Matthew 6 shows us that Jesus taught His disciples to pray not as a performance but as a genuine conversation with the Father. Prayer changes things and it changes us.",
@@ -437,7 +444,118 @@ const tabs = [
   { id: "salvation", label: "Jesus", icon: "✝️" },
 ];
 
+// ─── AUTH SCREENS ────────────────────────────────────────────────────────────
+function AuthScreen({ onAuthSuccess }) {
+  const [mode, setMode] = useState("login");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const s = {
+    screen: { background: `linear-gradient(160deg, ${BROWN_DARK} 0%, ${BROWN} 60%, ${GOLD} 100%)`, minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "24px 20px", fontFamily: "Georgia, serif" },
+    logo: { textAlign: "center", marginBottom: 32 },
+    card: { background: WHITE, borderRadius: 20, padding: "28px 24px", width: "100%", maxWidth: 400, boxShadow: "0 8px 32px rgba(0,0,0,0.3)" },
+    title: { color: BROWN_DARK, fontSize: 22, fontWeight: "bold", margin: "0 0 4px", textAlign: "center" },
+    subtitle: { color: BROWN, fontSize: 13, textAlign: "center", margin: "0 0 24px" },
+    label: { color: BROWN, fontSize: 12, fontFamily: "sans-serif", fontWeight: "bold", letterSpacing: 0.5, marginBottom: 6, display: "block" },
+    input: { width: "100%", padding: "11px 14px", borderRadius: 10, border: `1.5px solid ${GOLD_MID}`, background: CREAM, fontSize: 14, fontFamily: "Georgia, serif", color: BROWN_DARK, boxSizing: "border-box", outline: "none", marginBottom: 14 },
+    btn: { background: `linear-gradient(135deg, ${GOLD}, ${BROWN})`, color: WHITE, border: "none", borderRadius: 10, padding: "12px 20px", fontSize: 15, fontWeight: "bold", cursor: "pointer", fontFamily: "sans-serif", width: "100%", marginTop: 4 },
+    error: { background: "#FFE8E8", border: "1px solid #FFB3B3", borderRadius: 8, padding: "10px 14px", color: "#8B0000", fontSize: 13, marginBottom: 14, fontFamily: "sans-serif" },
+    toggle: { textAlign: "center", marginTop: 18, color: BROWN, fontSize: 13, fontFamily: "sans-serif" },
+    toggleBtn: { background: "none", border: "none", color: GOLD, fontWeight: "bold", cursor: "pointer", fontSize: 13, fontFamily: "sans-serif", textDecoration: "underline" },
+    divider: { display: "flex", alignItems: "center", gap: 10, margin: "16px 0" },
+    dividerLine: { flex: 1, height: 1, background: GOLD_LIGHT },
+    dividerText: { color: BROWN + "88", fontSize: 12, fontFamily: "sans-serif" },
+    guestBtn: { background: "none", border: `1.5px solid ${GOLD_MID}`, color: BROWN, borderRadius: 10, padding: "10px 20px", fontSize: 14, cursor: "pointer", fontFamily: "sans-serif", width: "100%", marginTop: 4 },
+  };
+
+  const handleSubmit = async () => {
+    setError("");
+    if (!email.trim() || !password.trim()) { setError("Please enter your email and password."); return; }
+    if (mode === "signup" && !name.trim()) { setError("Please enter your name."); return; }
+    if (password.length < 6) { setError("Password must be at least 6 characters."); return; }
+    setLoading(true);
+    try {
+      if (mode === "signup") {
+        await createUserWithEmailAndPassword(auth, email.trim(), password);
+      } else {
+        await signInWithEmailAndPassword(auth, email.trim(), password);
+      }
+      onAuthSuccess();
+    } catch (err) {
+      const msgs = {
+        "auth/email-already-in-use": "An account with this email already exists. Please log in.",
+        "auth/invalid-email": "Please enter a valid email address.",
+        "auth/wrong-password": "Incorrect password. Please try again.",
+        "auth/user-not-found": "No account found with this email. Please sign up.",
+        "auth/invalid-credential": "Incorrect email or password. Please try again.",
+        "auth/too-many-requests": "Too many attempts. Please wait a moment and try again.",
+        "auth/network-request-failed": "Network error. Please check your connection.",
+      };
+      setError(msgs[err.code] || "Something went wrong. Please try again.");
+    }
+    setLoading(false);
+  };
+
+  return (
+    <div style={s.screen}>
+      <div style={s.logo}>
+        <div style={{ fontSize: 40, marginBottom: 10 }}>✝️</div>
+        <h1 style={{ color: GOLD_MID, fontSize: 28, fontWeight: "bold", margin: "0 0 4px", letterSpacing: 1 }}>Grace Daily</h1>
+        <p style={{ color: GOLD_LIGHT, fontSize: 14, margin: 0, opacity: 0.9, fontStyle: "italic" }}>His Grace is Sufficient — 2 Corinthians 12:9</p>
+      </div>
+
+      <div style={s.card}>
+        <h2 style={s.title}>{mode === "login" ? "Welcome Back 🙏" : "Join Grace Daily ✝️"}</h2>
+        <p style={s.subtitle}>{mode === "login" ? "Sign in to continue your faith journey." : "Create your free account to get started."}</p>
+
+        {error && <div style={s.error}>⚠️ {error}</div>}
+
+        {mode === "signup" && (
+          <div>
+            <label style={s.label}>YOUR NAME</label>
+            <input style={s.input} type="text" placeholder="Your first name" value={name} onChange={e => setName(e.target.value)} />
+          </div>
+        )}
+
+        <label style={s.label}>EMAIL ADDRESS</label>
+        <input style={s.input} type="email" placeholder="your@email.com" value={email} onChange={e => setEmail(e.target.value)} />
+
+        <label style={s.label}>PASSWORD</label>
+        <input style={s.input} type="password" placeholder={mode === "signup" ? "At least 6 characters" : "Your password"} value={password} onChange={e => setPassword(e.target.value)} onKeyDown={e => e.key === "Enter" && handleSubmit()} />
+
+        <button style={s.btn} onClick={handleSubmit} disabled={loading}>
+          {loading ? "Please wait..." : mode === "login" ? "Sign In →" : "Create Account →"}
+        </button>
+
+        <div style={s.divider}>
+          <div style={s.dividerLine} />
+          <span style={s.dividerText}>or</span>
+          <div style={s.dividerLine} />
+        </div>
+
+        <button style={s.guestBtn} onClick={onAuthSuccess}>
+          Continue as Guest
+        </button>
+
+        <div style={s.toggle}>
+          {mode === "login" ? (
+            <span>Don't have an account? <button style={s.toggleBtn} onClick={() => { setMode("signup"); setError(""); }}>Sign Up</button></span>
+          ) : (
+            <span>Already have an account? <button style={s.toggleBtn} onClick={() => { setMode("login"); setError(""); }}>Sign In</button></span>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── MAIN APP ────────────────────────────────────────────────────────────────
 export default function App() {
+  const [user, setUser] = useState(undefined);
+  const [showAuth, setShowAuth] = useState(false);
   const [activeTab, setActiveTab] = useState("home");
   const [feeling, setFeeling] = useState("");
   const [verseResult, setVerseResult] = useState(null);
@@ -453,6 +571,13 @@ export default function App() {
   const [topicContent, setTopicContent] = useState(null);
   const [sermonSearch, setSermonSearch] = useState("");
 
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      setUser(firebaseUser);
+    });
+    return () => unsubscribe();
+  }, []);
+
   const todayVerse = dailyVerses[new Date().getDay() % dailyVerses.length];
 
   const getVerse = async () => {
@@ -464,9 +589,7 @@ export default function App() {
       const fetchedVerses = [];
       for (const ref of emotion.verses) {
         const verseData = await fetchVerse(ref);
-        if (verseData) {
-          fetchedVerses.push(`${verseData.reference} — ${verseData.text}`);
-        }
+        if (verseData) fetchedVerses.push(`${verseData.reference} — ${verseData.text}`);
       }
       setVerseResult({
         verses: fetchedVerses.length > 0 ? fetchedVerses : emotion.verses,
@@ -483,18 +606,10 @@ export default function App() {
     setLoadingVerse(false);
   };
 
-  const openTopic = (topic) => {
-    setSelectedTopic(topic);
-    setTopicContent(getSermonContent(topic));
-  };
-
+  const openTopic = (topic) => { setSelectedTopic(topic); setTopicContent(getSermonContent(topic)); };
   const filteredCategories = sermonSearch.trim()
-    ? sermonCategories.map(cat => ({
-        ...cat,
-        topics: cat.topics.filter(t => t.toLowerCase().includes(sermonSearch.toLowerCase()))
-      })).filter(cat => cat.topics.length > 0)
+    ? sermonCategories.map(cat => ({ ...cat, topics: cat.topics.filter(t => t.toLowerCase().includes(sermonSearch.toLowerCase())) })).filter(cat => cat.topics.length > 0)
     : sermonCategories;
-
   const logPrayer = () => { if (!streakLogged) { setStreak(s => s + 1); setStreakLogged(true); } };
   const prayFor = (i) => {
     if (!prayedIds.includes(i)) {
@@ -504,13 +619,16 @@ export default function App() {
   };
   const submitPrayer = () => {
     if (!newPrayer.trim()) return;
-    setPrayerList(l => [{ name: "You", request: newPrayer, time: "Just now", prayed: 0 }, ...l]);
+    setPrayerList(l => [{ name: user ? user.email.split("@")[0] : "Guest", request: newPrayer, time: "Just now", prayed: 0 }, ...l]);
     setNewPrayer("");
   };
+  const handleSignOut = async () => { await signOut(auth); };
 
   const s = {
     app: { background: CREAM, minHeight: "100vh", fontFamily: "Georgia, serif", paddingBottom: 80 },
-    header: { background: `linear-gradient(135deg, ${BROWN_DARK} 0%, ${BROWN} 100%)`, padding: "20px 20px 16px", textAlign: "center" },
+    header: { background: `linear-gradient(135deg, ${BROWN_DARK} 0%, ${BROWN} 100%)`, padding: "20px 20px 16px" },
+    headerTop: { display: "flex", justifyContent: "space-between", alignItems: "flex-start" },
+    headerCenter: { textAlign: "center", flex: 1 },
     headerTitle: { color: GOLD_MID, fontSize: 26, fontWeight: "bold", margin: 0, letterSpacing: 1 },
     headerSub: { color: GOLD_LIGHT, fontSize: 13, margin: "4px 0 0", opacity: 0.9 },
     nav: { position: "fixed", bottom: 0, left: 0, right: 0, background: BROWN_DARK, display: "flex", borderTop: `2px solid ${GOLD}` },
@@ -530,15 +648,48 @@ export default function App() {
     stepCard: { display: "flex", gap: 14, marginBottom: 14, alignItems: "flex-start" },
     stepNum: { background: GOLD, color: WHITE, borderRadius: "50%", width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "bold", fontSize: 15, flexShrink: 0, fontFamily: "sans-serif" },
     backBtn: { background: "none", border: "none", color: GOLD, fontSize: 14, cursor: "pointer", fontFamily: "sans-serif", marginBottom: 12, padding: 0, display: "flex", alignItems: "center", gap: 4 },
-    sectionDivider: { height: 1, background: GOLD_LIGHT, margin: "12px 0" },
+    signOutBtn: { background: "none", border: `1px solid ${GOLD_LIGHT}`, borderRadius: 8, padding: "4px 10px", color: GOLD_LIGHT, fontSize: 11, cursor: "pointer", fontFamily: "sans-serif" },
+    signInBtn: { background: GOLD, border: "none", borderRadius: 8, padding: "4px 10px", color: WHITE, fontSize: 11, cursor: "pointer", fontFamily: "sans-serif", fontWeight: "bold" },
   };
+
+  // Show loading while checking auth state
+  if (user === undefined) {
+    return (
+      <div style={{ ...s.app, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column" }}>
+        <div style={{ fontSize: 36, marginBottom: 12 }}>✝️</div>
+        <p style={{ color: BROWN, fontStyle: "italic" }}>Loading Grace Daily...</p>
+      </div>
+    );
+  }
+
+  // Show auth screen if requested
+  if (showAuth) {
+    return <AuthScreen onAuthSuccess={() => setShowAuth(false)} />;
+  }
 
   return (
     <div style={s.app}>
       <div style={s.header}>
-        <div style={{ fontSize: 22, marginBottom: 4 }}>✝️</div>
-        <h1 style={s.headerTitle}>Grace Daily</h1>
-        <p style={s.headerSub}>His Grace is Sufficient — 2 Corinthians 12:9</p>
+        <div style={s.headerTop}>
+          <div style={{ width: 60 }} />
+          <div style={s.headerCenter}>
+            <div style={{ fontSize: 22, marginBottom: 4 }}>✝️</div>
+            <h1 style={s.headerTitle}>Grace Daily</h1>
+            <p style={s.headerSub}>His Grace is Sufficient — 2 Corinthians 12:9</p>
+          </div>
+          <div style={{ width: 60, display: "flex", justifyContent: "flex-end", alignItems: "flex-start", paddingTop: 4 }}>
+            {user ? (
+              <button style={s.signOutBtn} onClick={handleSignOut}>Sign Out</button>
+            ) : (
+              <button style={s.signInBtn} onClick={() => setShowAuth(true)}>Sign In</button>
+            )}
+          </div>
+        </div>
+        {user && (
+          <p style={{ color: GOLD_LIGHT, fontSize: 11, textAlign: "center", margin: "8px 0 0", fontFamily: "sans-serif", opacity: 0.8 }}>
+            Welcome back, {user.email.split("@")[0]} 🙏
+          </p>
+        )}
       </div>
 
       <div style={s.content}>
@@ -563,6 +714,15 @@ export default function App() {
                 </button>
               </div>
             </div>
+
+            {!user && (
+              <div style={{ ...s.card, border: `2px solid ${GOLD_MID}`, background: GOLD_LIGHT }}>
+                <p style={{ color: BROWN_DARK, fontSize: 14, fontWeight: "bold", margin: "0 0 6px" }}>✝️ Save Your Progress</p>
+                <p style={{ color: BROWN, fontSize: 13, margin: "0 0 10px", lineHeight: 1.5 }}>Create a free account to save your prayer streak, journal entries, and more.</p>
+                <button style={s.btn} onClick={() => setShowAuth(true)}>Create Free Account →</button>
+              </div>
+            )}
+
             <div style={s.card}>
               <p style={{ ...s.sectionTitle, fontSize: 15, marginBottom: 8 }}>Quick Actions</p>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
@@ -677,22 +837,17 @@ export default function App() {
         {/* SERMON */}
         {activeTab === "sermon" && (
           <div>
-            {/* Topic Detail View */}
             {selectedTopic && topicContent ? (
               <div>
-                <button style={s.backBtn} onClick={() => { setSelectedTopic(null); setTopicContent(null); }}>
-                  ← Back to Topics
-                </button>
+                <button style={s.backBtn} onClick={() => { setSelectedTopic(null); setTopicContent(null); }}>← Back to Topics</button>
                 <div style={s.cardGold}>
                   <p style={{ color: GOLD_LIGHT, fontSize: 11, fontFamily: "sans-serif", margin: "0 0 6px", letterSpacing: 1, textTransform: "uppercase" }}>Sermon Companion</p>
                   <h2 style={{ color: WHITE, fontSize: 20, margin: 0 }}>{selectedTopic}</h2>
                 </div>
-
                 <div style={s.card}>
                   <p style={{ color: GOLD, fontSize: 13, fontWeight: "bold", marginBottom: 8, fontFamily: "sans-serif" }}>📝 Main Message</p>
                   <p style={{ color: BROWN_DARK, fontSize: 14, lineHeight: 1.7, margin: 0 }}>{topicContent.mainMessage}</p>
                 </div>
-
                 <div style={s.card}>
                   <p style={{ color: GOLD, fontSize: 13, fontWeight: "bold", marginBottom: 8, fontFamily: "sans-serif" }}>🔑 Key Takeaways</p>
                   {topicContent.keyTakeaways.map((t, i) => (
@@ -702,7 +857,6 @@ export default function App() {
                     </div>
                   ))}
                 </div>
-
                 <div style={s.card}>
                   <p style={{ color: GOLD, fontSize: 13, fontWeight: "bold", marginBottom: 8, fontFamily: "sans-serif" }}>📖 Go Deeper — Related Scriptures</p>
                   {topicContent.scriptures.map((sc, i) => (
@@ -711,7 +865,6 @@ export default function App() {
                     </div>
                   ))}
                 </div>
-
                 <div style={s.card}>
                   <p style={{ color: GOLD, fontSize: 13, fontWeight: "bold", marginBottom: 8, fontFamily: "sans-serif" }}>❓ Discussion Questions</p>
                   {topicContent.discussionQuestions.map((q, i) => (
@@ -721,27 +874,19 @@ export default function App() {
                     </div>
                   ))}
                 </div>
-
                 <div style={{ ...s.card, background: GOLD_LIGHT }}>
                   <p style={{ color: BROWN, fontSize: 12, fontFamily: "sans-serif", fontWeight: "bold", marginBottom: 6, letterSpacing: 1, textTransform: "uppercase" }}>🙏 Application Prayer</p>
                   <p style={{ color: BROWN_DARK, fontSize: 14, fontStyle: "italic", lineHeight: 1.7, margin: 0 }}>{topicContent.prayer}</p>
                 </div>
-
                 <div style={s.card}>
                   <p style={{ color: GOLD, fontSize: 13, fontWeight: "bold", marginBottom: 8, fontFamily: "sans-serif" }}>✍️ Journal Prompt</p>
                   <p style={{ color: BROWN_DARK, fontSize: 14, fontStyle: "italic", lineHeight: 1.7, margin: 0 }}>{topicContent.journal}</p>
                 </div>
-
-                <button style={{ ...s.btn, marginBottom: 16 }} onClick={() => { setSelectedTopic(null); setTopicContent(null); }}>
-                  ← Back to Topics
-                </button>
+                <button style={{ ...s.btn, marginBottom: 16 }} onClick={() => { setSelectedTopic(null); setTopicContent(null); }}>← Back to Topics</button>
               </div>
             ) : selectedCategory ? (
-              /* Category Topics View */
               <div>
-                <button style={s.backBtn} onClick={() => setSelectedCategory(null)}>
-                  ← All Categories
-                </button>
+                <button style={s.backBtn} onClick={() => setSelectedCategory(null)}>← All Categories</button>
                 <div style={s.cardGold}>
                   <p style={{ color: GOLD_LIGHT, fontSize: 11, fontFamily: "sans-serif", margin: "0 0 6px", letterSpacing: 1, textTransform: "uppercase" }}>Category</p>
                   <h2 style={{ color: WHITE, fontSize: 20, margin: 0 }}>{selectedCategory.icon} {selectedCategory.category}</h2>
@@ -756,36 +901,24 @@ export default function App() {
                 </div>
               </div>
             ) : (
-              /* Main Sermon View — Categories */
               <div>
                 <p style={s.sectionTitle}>📖 Sermon Companion</p>
                 <div style={s.card}>
                   <p style={{ color: BROWN, fontSize: 13, marginBottom: 10, lineHeight: 1.5 }}>Search any topic or browse by category to go deeper in God's Word.</p>
-                  <input
-                    style={s.input}
-                    placeholder="Search topics — Faith, Fear, Marriage..."
-                    value={sermonSearch}
-                    onChange={e => setSermonSearch(e.target.value)}
-                  />
+                  <input style={s.input} placeholder="Search topics — Faith, Fear, Marriage..." value={sermonSearch} onChange={e => setSermonSearch(e.target.value)} />
                 </div>
                 {filteredCategories.map(cat => (
                   <div key={cat.id} style={s.card}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
                       <p style={{ color: BROWN_DARK, fontSize: 15, fontWeight: "bold", margin: 0 }}>{cat.icon} {cat.category}</p>
-                      {!sermonSearch && (
-                        <button style={{ ...s.btnOutline, padding: "4px 12px", fontSize: 12 }} onClick={() => setSelectedCategory(cat)}>
-                          See All →
-                        </button>
-                      )}
+                      {!sermonSearch && <button style={{ ...s.btnOutline, padding: "4px 12px", fontSize: 12 }} onClick={() => setSelectedCategory(cat)}>See All →</button>}
                     </div>
                     <div style={{ display: "flex", flexWrap: "wrap" }}>
                       {(sermonSearch ? cat.topics : cat.topics.slice(0, 5)).map(topic => (
                         <button key={topic} style={s.btnSmall} onClick={() => openTopic(topic)}>{topic}</button>
                       ))}
                       {!sermonSearch && cat.topics.length > 5 && (
-                        <button style={{ ...s.btnSmall, color: GOLD, fontWeight: "bold" }} onClick={() => setSelectedCategory(cat)}>
-                          +{cat.topics.length - 5} more
-                        </button>
+                        <button style={{ ...s.btnSmall, color: GOLD, fontWeight: "bold" }} onClick={() => setSelectedCategory(cat)}>+{cat.topics.length - 5} more</button>
                       )}
                     </div>
                   </div>
