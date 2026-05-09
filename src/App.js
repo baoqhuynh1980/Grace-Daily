@@ -461,14 +461,15 @@ export default function App() {
     setVerseResult(null);
     try {
       const emotion = getEmotionCategory(feeling);
-      const fetchedVerses = await Promise.all(
-        emotion.verses.map(ref => fetchVerse(ref))
-      );
-      const validVerses = fetchedVerses
-        .filter(v => v !== null)
-        .map(v => `${v.reference} — ${v.text}`);
+      const fetchedVerses = [];
+      for (const ref of emotion.verses) {
+        const verseData = await fetchVerse(ref);
+        if (verseData) {
+          fetchedVerses.push(`${verseData.reference} — ${verseData.text}`);
+        }
+      }
       setVerseResult({
-        verses: validVerses.length > 0 ? validVerses : emotion.verses,
+        verses: fetchedVerses.length > 0 ? fetchedVerses : emotion.verses,
         reflection: emotion.reflection,
         prayer: emotion.prayer
       });
