@@ -200,7 +200,7 @@ const sermonContent = {
     journal: "Write out your own version of the Lord's Prayer — personalized to your life, your circumstances and your relationship with God."
   },
   "When God Feels Silent": {
-    mainMessage: "Every believer goes through seasons where God feels distant or silent. The prayers seem to bounce off the ceiling. The heavens feel like brass. But silence is not absence. God is always with you even when you cannot feel Him. These desert seasons are often where the deepest spiritual growth happens. Jesus Himself cried out on the cross — My God my God why have you forsaken me — yet God was right there.",
+    mainMessage: "Every believer goes through seasons where God feels distant or silent. The prayers seem to bounce off the ceiling. The heavens feel like brass. But silence is not absence. God is always with you even when you cannot feel Him. These desert seasons are often where the deepest spiritual growth happens.",
     keyTakeaways: ["God's silence is not His absence — He is always present even when you cannot feel Him.", "Keep showing up — consistency in seeking God even when it feels dry is a mark of mature faith.", "These seasons always end — your breakthrough is on the other side of your faithfulness."],
     scriptures: ["Psalm 22:1-2 — My God my God why have you forsaken me, yet you are the Holy One.", "Isaiah 45:15 — Truly you are a God who hides himself, O God and Savior of Israel.", "Hebrews 13:5 — Never will I leave you, never will I forsake you."],
     discussionQuestions: ["Have you ever gone through a season where God felt silent and what did you do?", "How do you maintain your faith when you cannot feel God's presence?", "What has God taught you during seasons of silence that you could not have learned any other way?"],
@@ -239,159 +239,36 @@ const getSermonContent = (topic) => {
 
 // ─── EMOTION VERSE DATA ──────────────────────────────────────────────────────
 const emotionVerses = {
-  anxious: {
-    keywords: ["anxious","anxiety","worried","worry","nervous","stress","stressed","overwhelmed","panic"],
-    verses: ["philippians 4:6","isaiah 41:10","matthew 6:34","1 peter 5:7","john 14:27","psalm 34:4","2 timothy 1:7","psalm 23:4","romans 15:13","psalm 94:19"],
-    reflection: "God sees every worry you carry right now. He doesn't want you to face this alone. Cast every anxiety on Him because He cares deeply for you.",
-    prayer: "Father in the name of Jesus Christ I bring every worry and anxiety to you right now. I choose to trust you above my circumstances. Fill me with your peace that surpasses all understanding. In the name of Jesus Christ. Amen."
-  },
-  sad: {
-    keywords: ["sad","sadness","depressed","depression","unhappy","miserable","hopeless","down","discouraged","heartbroken"],
-    verses: ["psalm 34:18","matthew 5:4","revelation 21:4","psalm 147:3","isaiah 61:3","2 corinthians 1:3","john 16:22","psalm 30:5","romans 8:18","isaiah 43:2"],
-    reflection: "God is close to the brokenhearted. Your sadness is not hidden from Him. He sees every tear and He is right there with you in this moment.",
-    prayer: "Father in the name of Jesus Christ I come to you with a heavy heart. Lift me up from this sadness and remind me that your joy comes in the morning. In the name of Jesus Christ. Amen."
-  },
-  grateful: {
-    keywords: ["grateful","thankful","blessed","happy","joyful","joy","praise","amazing","good","wonderful"],
-    verses: ["psalm 100:4","1 thessalonians 5:18","psalm 107:1","philippians 4:4","james 1:17","psalm 136:1","ephesians 5:20","psalm 118:24","colossians 3:17","psalm 9:1"],
-    reflection: "A grateful heart is a powerful heart. When we count our blessings and thank God for His goodness it opens the door for even more of His grace in our lives.",
-    prayer: "Father in the name of Jesus Christ thank you for your goodness and mercy in my life. I praise you for every blessing both big and small. In the name of Jesus Christ. Amen."
-  },
-  lonely: {
-    keywords: ["lonely","alone","abandoned","isolated","forgotten","unloved","rejected","left out","no one"],
-    verses: ["deuteronomy 31:6","psalm 139:7","hebrews 13:5","matthew 28:20","isaiah 43:4","psalm 68:6","john 14:18","zephaniah 3:17","romans 8:38","psalm 27:10"],
-    reflection: "You are never truly alone. God is always with you. Even in your loneliest moment His presence surrounds you.",
-    prayer: "Father in the name of Jesus Christ remind me right now that I am never alone. Fill the empty spaces in my heart with your love and your peace. In the name of Jesus Christ. Amen."
-  },
-  angry: {
-    keywords: ["angry","anger","mad","furious","frustrated","rage","upset","bitter","resentful","annoyed"],
-    verses: ["ephesians 4:26","james 1:19","proverbs 15:1","psalm 37:8","romans 12:19","colossians 3:8","proverbs 29:11","matthew 5:22","ecclesiastes 7:9","psalm 4:4"],
-    reflection: "God understands your anger. He asks you to bring it to Him rather than let it control you.",
-    prayer: "Father in the name of Jesus Christ I give you my anger right now. Help me to respond with grace and wisdom rather than react in anger. In the name of Jesus Christ. Amen."
-  },
-  lost: {
-    keywords: ["lost","confused","don't know","unsure","unclear","wandering","no direction","uncertain","mixed up"],
-    verses: ["proverbs 3:5","psalm 32:8","isaiah 30:21","john 10:27","psalm 119:105","jeremiah 29:11","proverbs 16:9","isaiah 42:16","psalm 25:4","romans 8:14"],
-    reflection: "Even when you feel lost God always knows exactly where you are. He is faithful to guide you step by step.",
-    prayer: "Father in the name of Jesus Christ I need your guidance right now. Show me the path you have for me. In the name of Jesus Christ. Amen."
-  },
-  hopeful: {
-    keywords: ["hopeful","hope","expectant","believing","trusting","faith","optimistic","looking forward"],
-    verses: ["romans 15:13","jeremiah 29:11","hebrews 11:1","lamentations 3:22","psalm 31:24","isaiah 40:31","romans 8:28","psalm 62:5","micah 7:7","habakkuk 2:3"],
-    reflection: "Hope in God is never wasted. He is faithful to fulfill every promise He has made.",
-    prayer: "Father in the name of Jesus Christ fill me with your hope today. I know that you are faithful and your plans for me are good. In the name of Jesus Christ. Amen."
-  },
-  tempted: {
-    keywords: ["tempted","temptation","struggling","addicted","addiction","can't stop","weak","failing","giving in","sin"],
-    verses: ["1 corinthians 10:13","james 4:7","hebrews 4:15","galatians 5:16","romans 6:14","psalm 119:11","matthew 26:41","2 peter 2:9","ephesians 6:11","1 john 4:4"],
-    reflection: "Every person faces temptation. But God always provides a way out. Through Christ you have the power to overcome.",
-    prayer: "Father in the name of Jesus Christ I need your strength right now. Give me the power to resist temptation and walk in freedom. In the name of Jesus Christ. Amen."
-  },
-  grieving: {
-    keywords: ["grieving","grief","loss","death","mourning","miss","missing","died","passed away","hurting"],
-    verses: ["psalm 34:18","revelation 21:4","matthew 5:4","2 corinthians 1:3","isaiah 61:1","john 11:35","romans 8:28","psalm 23:4","1 thessalonians 4:13","psalm 147:3"],
-    reflection: "God sees your grief and He weeps with you. He is the God of all comfort and He will carry you through this season of loss.",
-    prayer: "Father in the name of Jesus Christ comfort me in this time of grief. Hold me close and remind me that you are near to the brokenhearted. In the name of Jesus Christ. Amen."
-  },
-  surrendering: {
-    keywords: ["surrender","surrendering","let go","giving up","giving it to God","release","submit","yield","trust God"],
-    verses: ["matthew 11:28","proverbs 3:5","romans 12:1","galatians 2:20","psalm 46:10","luke 22:42","1 peter 5:6","james 4:7","matthew 16:24","john 12:24"],
-    reflection: "Surrendering to God is not giving up — it is the greatest act of faith.",
-    prayer: "Father in the name of Jesus Christ I surrender everything to you right now. Have your way in me Lord. In the name of Jesus Christ. Amen."
-  },
-  direction: {
-    keywords: ["direction","purpose","calling","what to do","next step","guidance","path","decision","choose","which way"],
-    verses: ["proverbs 16:3","psalm 37:23","isaiah 30:21","jeremiah 29:11","psalm 32:8","proverbs 3:6","romans 8:14","james 1:5","psalm 25:9","isaiah 48:17"],
-    reflection: "God has a specific plan and purpose for your life. When you seek His direction He is faithful to guide you.",
-    prayer: "Father in the name of Jesus Christ I need your direction for my life. Show me clearly the path you have prepared for me. In the name of Jesus Christ. Amen."
-  },
-  spiritualwarfare: {
-    keywords: ["spiritual warfare","attack","enemy","devil","satan","oppressed","under attack","darkness","spiritual battle","fighting"],
-    verses: ["ephesians 6:11","james 4:7","1 peter 5:8","2 corinthians 10:4","revelation 12:11","luke 10:19","romans 8:37","1 john 4:4","psalm 91:1","isaiah 54:17"],
-    reflection: "The battle you are facing is real but the victory has already been won through Jesus Christ.",
-    prayer: "Father in the name of Jesus Christ I stand against every attack of the enemy right now. Greater is He that is in me than he that is in the world. In the name of Jesus Christ. Amen."
-  },
-  tired: {
-    keywords: ["tired","exhausted","weary","worn out","burnt out","drained","no energy","fatigued","rest"],
-    verses: ["matthew 11:28","isaiah 40:31","psalm 23:2","mark 6:31","2 corinthians 12:9","galatians 6:9","psalm 127:2","exodus 33:14","isaiah 41:10","hebrews 12:3"],
-    reflection: "God sees your weariness and He invites you to come to Him for rest. True rest is found in His presence.",
-    prayer: "Father in the name of Jesus Christ I am tired and I need your rest. Restore my strength and renew my spirit. In the name of Jesus Christ. Amen."
-  },
-  fearful: {
-    keywords: ["fearful","fear","scared","afraid","terrified","frightened","dread","phobia"],
-    verses: ["2 timothy 1:7","psalm 27:1","isaiah 41:10","john 14:27","psalm 56:3","deuteronomy 31:6","romans 8:15","1 john 4:18","psalm 34:4","hebrews 13:6"],
-    reflection: "Fear is real but God is greater than every fear you face. You can face anything with God by your side.",
-    prayer: "Father in the name of Jesus Christ I reject the spirit of fear right now. You have given me a spirit of power love and a sound mind. In the name of Jesus Christ. Amen."
-  },
-  doubting: {
-    keywords: ["doubt","doubting","weak faith","don't believe","questioning","not sure","wavering","struggling to believe"],
-    verses: ["mark 9:24","hebrews 11:1","james 1:6","romans 10:17","matthew 14:31","john 20:27","jude 1:22","2 corinthians 5:7","psalm 73:26","luke 17:5"],
-    reflection: "Even the disciples had moments of doubt. Bring your doubts honestly to God. He is not offended by your questions.",
-    prayer: "Father in the name of Jesus Christ I bring my doubts to you honestly right now. Help my unbelief and strengthen my faith. In the name of Jesus Christ. Amen."
-  },
-  peace: {
-    keywords: ["peace","calm","quiet","still","tranquil","settled","serenity"],
-    verses: ["john 14:27","philippians 4:7","isaiah 26:3","psalm 46:10","numbers 6:26","romans 5:1","colossians 3:15","psalm 29:11","2 thessalonians 3:16","isaiah 32:17"],
-    reflection: "The peace of God is available to you right now. It is not dependent on your circumstances.",
-    prayer: "Father in the name of Jesus Christ fill me with your perfect peace right now. Guard my heart and my mind. In the name of Jesus Christ. Amen."
-  },
-  financial: {
-    keywords: ["financial","money","broke","debt","bills","poor","struggling financially","no money","paycheck","provision"],
-    verses: ["philippians 4:19","matthew 6:33","psalm 23:1","luke 12:24","2 corinthians 9:8","proverbs 3:9","malachi 3:10","psalm 37:25","isaiah 58:11","deuteronomy 8:18"],
-    reflection: "God is your provider and He knows every financial need you have.",
-    prayer: "Father in the name of Jesus Christ I trust you as my provider. I release my worry about money and trust that you will provide everything I need. In the name of Jesus Christ. Amen."
-  },
-  strength: {
-    keywords: ["strength","strong","power","courage","bold","brave","overcome","victory","conquer","persevere"],
-    verses: ["philippians 4:13","isaiah 40:29","psalm 46:1","2 corinthians 12:9","ephesians 6:10","joshua 1:9","psalm 18:32","isaiah 41:10","habakkuk 3:19","1 chronicles 16:11"],
-    reflection: "God is your strength when you are weak. His power is made perfect in your weakness.",
-    prayer: "Father in the name of Jesus Christ be my strength today. Fill me with your power and help me to overcome every obstacle. In the name of Jesus Christ. Amen."
-  },
-  worship: {
-    keywords: ["worship","praise","glorify","honor","adore","magnify","exalt","hallelujah","thanksgiving"],
-    verses: ["psalm 100:1","john 4:24","psalm 150:6","hebrews 13:15","revelation 4:11","psalm 95:6","isaiah 6:3","psalm 29:2","1 chronicles 29:11","psalm 34:1"],
-    reflection: "God is worthy of all praise and worship. When we worship Him our perspective shifts from our problems to His greatness.",
-    prayer: "Father in the name of Jesus Christ I worship you today. You are worthy of all praise honor and glory. Receive my worship today Lord. In the name of Jesus Christ. Amen."
-  },
-  unworthy: {
-    keywords: ["unworthy","worthless","not good enough","failure","useless","nobody","don't deserve","inadequate"],
-    verses: ["psalm 139:14","ephesians 2:10","romans 5:8","john 3:16","isaiah 43:4","1 peter 2:9","zephaniah 3:17","romans 8:37","galatians 3:26","1 john 3:1"],
-    reflection: "You are not defined by your failures. God loved you so much that He sent His Son to die for you.",
-    prayer: "Father in the name of Jesus Christ remind me of my worth in your eyes. Help me to see myself the way you see me. In the name of Jesus Christ. Amen."
-  },
-  addiction: {
-    keywords: ["addiction","addicted","substance","alcohol","drugs","pornography","gambling","can't quit","bondage","chains"],
-    verses: ["1 corinthians 10:13","john 8:36","galatians 5:1","romans 6:14","2 corinthians 5:17","philippians 4:13","romans 8:1","1 john 1:9","luke 4:18","psalm 107:14"],
-    reflection: "Jesus came to set the captives free. No addiction is too powerful for God.",
-    prayer: "Father in the name of Jesus Christ set me free from this addiction by the power of your Holy Spirit. In the name of Jesus Christ. Amen."
-  },
-  relationships: {
-    keywords: ["relationship","marriage","husband","wife","family","friend","conflict","broken","divorce","partner"],
-    verses: ["1 corinthians 13:4","colossians 3:13","ephesians 4:32","proverbs 17:17","matthew 18:20","romans 12:18","1 peter 4:8","ecclesiastes 4:9","john 15:13","psalm 133:1"],
-    reflection: "God cares deeply about your relationships. He is the author of love and He can heal and restore what is broken.",
-    prayer: "Father in the name of Jesus Christ I bring this relationship to you. Heal what is broken and help me to love the way you love. In the name of Jesus Christ. Amen."
-  },
-  forgiveness: {
-    keywords: ["forgiveness","forgive","guilty","shame","regret","mistake","failed","messed up","repent"],
-    verses: ["1 john 1:9","psalm 103:12","isaiah 43:25","romans 8:1","micah 7:19","ephesians 1:7","acts 3:19","hebrews 8:12","luke 15:20","psalm 32:5"],
-    reflection: "God's forgiveness is complete and total. You do not have to carry guilt and shame any longer.",
-    prayer: "Father in the name of Jesus Christ I confess my sins and receive your complete forgiveness. Thank you that there is no condemnation in Christ Jesus. In the name of Jesus Christ. Amen."
-  }
+  anxious: { keywords: ["anxious","anxiety","worried","worry","nervous","stress","stressed","overwhelmed","panic"], verses: ["philippians 4:6","isaiah 41:10","matthew 6:34","1 peter 5:7","john 14:27","psalm 34:4","2 timothy 1:7","psalm 23:4","romans 15:13","psalm 94:19"], reflection: "God sees every worry you carry right now. He doesn't want you to face this alone. Cast every anxiety on Him because He cares deeply for you.", prayer: "Father in the name of Jesus Christ I bring every worry and anxiety to you right now. I choose to trust you above my circumstances. Fill me with your peace that surpasses all understanding. In the name of Jesus Christ. Amen." },
+  sad: { keywords: ["sad","sadness","depressed","depression","unhappy","miserable","hopeless","down","discouraged","heartbroken"], verses: ["psalm 34:18","matthew 5:4","revelation 21:4","psalm 147:3","isaiah 61:3","2 corinthians 1:3","john 16:22","psalm 30:5","romans 8:18","isaiah 43:2"], reflection: "God is close to the brokenhearted. Your sadness is not hidden from Him. He sees every tear and He is right there with you in this moment.", prayer: "Father in the name of Jesus Christ I come to you with a heavy heart. Lift me up from this sadness and remind me that your joy comes in the morning. In the name of Jesus Christ. Amen." },
+  grateful: { keywords: ["grateful","thankful","blessed","happy","joyful","joy","praise","amazing","good","wonderful"], verses: ["psalm 100:4","1 thessalonians 5:18","psalm 107:1","philippians 4:4","james 1:17","psalm 136:1","ephesians 5:20","psalm 118:24","colossians 3:17","psalm 9:1"], reflection: "A grateful heart is a powerful heart. When we count our blessings and thank God for His goodness it opens the door for even more of His grace in our lives.", prayer: "Father in the name of Jesus Christ thank you for your goodness and mercy in my life. I praise you for every blessing both big and small. In the name of Jesus Christ. Amen." },
+  lonely: { keywords: ["lonely","alone","abandoned","isolated","forgotten","unloved","rejected","left out","no one"], verses: ["deuteronomy 31:6","psalm 139:7","hebrews 13:5","matthew 28:20","isaiah 43:4","psalm 68:6","john 14:18","zephaniah 3:17","romans 8:38","psalm 27:10"], reflection: "You are never truly alone. God is always with you. Even in your loneliest moment His presence surrounds you.", prayer: "Father in the name of Jesus Christ remind me right now that I am never alone. Fill the empty spaces in my heart with your love and your peace. In the name of Jesus Christ. Amen." },
+  angry: { keywords: ["angry","anger","mad","furious","frustrated","rage","upset","bitter","resentful","annoyed"], verses: ["ephesians 4:26","james 1:19","proverbs 15:1","psalm 37:8","romans 12:19","colossians 3:8","proverbs 29:11","matthew 5:22","ecclesiastes 7:9","psalm 4:4"], reflection: "God understands your anger. He asks you to bring it to Him rather than let it control you.", prayer: "Father in the name of Jesus Christ I give you my anger right now. Help me to respond with grace and wisdom rather than react in anger. In the name of Jesus Christ. Amen." },
+  lost: { keywords: ["lost","confused","don't know","unsure","unclear","wandering","no direction","uncertain","mixed up"], verses: ["proverbs 3:5","psalm 32:8","isaiah 30:21","john 10:27","psalm 119:105","jeremiah 29:11","proverbs 16:9","isaiah 42:16","psalm 25:4","romans 8:14"], reflection: "Even when you feel lost God always knows exactly where you are. He is faithful to guide you step by step.", prayer: "Father in the name of Jesus Christ I need your guidance right now. Show me the path you have for me. In the name of Jesus Christ. Amen." },
+  hopeful: { keywords: ["hopeful","hope","expectant","believing","trusting","faith","optimistic","looking forward"], verses: ["romans 15:13","jeremiah 29:11","hebrews 11:1","lamentations 3:22","psalm 31:24","isaiah 40:31","romans 8:28","psalm 62:5","micah 7:7","habakkuk 2:3"], reflection: "Hope in God is never wasted. He is faithful to fulfill every promise He has made.", prayer: "Father in the name of Jesus Christ fill me with your hope today. I know that you are faithful and your plans for me are good. In the name of Jesus Christ. Amen." },
+  tempted: { keywords: ["tempted","temptation","struggling","addicted","addiction","can't stop","weak","failing","giving in","sin"], verses: ["1 corinthians 10:13","james 4:7","hebrews 4:15","galatians 5:16","romans 6:14","psalm 119:11","matthew 26:41","2 peter 2:9","ephesians 6:11","1 john 4:4"], reflection: "Every person faces temptation. But God always provides a way out. Through Christ you have the power to overcome.", prayer: "Father in the name of Jesus Christ I need your strength right now. Give me the power to resist temptation and walk in freedom. In the name of Jesus Christ. Amen." },
+  grieving: { keywords: ["grieving","grief","loss","death","mourning","miss","missing","died","passed away","hurting"], verses: ["psalm 34:18","revelation 21:4","matthew 5:4","2 corinthians 1:3","isaiah 61:1","john 11:35","romans 8:28","psalm 23:4","1 thessalonians 4:13","psalm 147:3"], reflection: "God sees your grief and He weeps with you. He is the God of all comfort and He will carry you through this season of loss.", prayer: "Father in the name of Jesus Christ comfort me in this time of grief. Hold me close and remind me that you are near to the brokenhearted. In the name of Jesus Christ. Amen." },
+  surrendering: { keywords: ["surrender","surrendering","let go","giving up","giving it to God","release","submit","yield","trust God"], verses: ["matthew 11:28","proverbs 3:5","romans 12:1","galatians 2:20","psalm 46:10","luke 22:42","1 peter 5:6","james 4:7","matthew 16:24","john 12:24"], reflection: "Surrendering to God is not giving up — it is the greatest act of faith.", prayer: "Father in the name of Jesus Christ I surrender everything to you right now. Have your way in me Lord. In the name of Jesus Christ. Amen." },
+  direction: { keywords: ["direction","purpose","calling","what to do","next step","guidance","path","decision","choose","which way"], verses: ["proverbs 16:3","psalm 37:23","isaiah 30:21","jeremiah 29:11","psalm 32:8","proverbs 3:6","romans 8:14","james 1:5","psalm 25:9","isaiah 48:17"], reflection: "God has a specific plan and purpose for your life. When you seek His direction He is faithful to guide you.", prayer: "Father in the name of Jesus Christ I need your direction for my life. Show me clearly the path you have prepared for me. In the name of Jesus Christ. Amen." },
+  tired: { keywords: ["tired","exhausted","weary","worn out","burnt out","drained","no energy","fatigued","rest"], verses: ["matthew 11:28","isaiah 40:31","psalm 23:2","mark 6:31","2 corinthians 12:9","galatians 6:9","psalm 127:2","exodus 33:14","isaiah 41:10","hebrews 12:3"], reflection: "God sees your weariness and He invites you to come to Him for rest. True rest is found in His presence.", prayer: "Father in the name of Jesus Christ I am tired and I need your rest. Restore my strength and renew my spirit. In the name of Jesus Christ. Amen." },
+  fearful: { keywords: ["fearful","fear","scared","afraid","terrified","frightened","dread","phobia"], verses: ["2 timothy 1:7","psalm 27:1","isaiah 41:10","john 14:27","psalm 56:3","deuteronomy 31:6","romans 8:15","1 john 4:18","psalm 34:4","hebrews 13:6"], reflection: "Fear is real but God is greater than every fear you face. You can face anything with God by your side.", prayer: "Father in the name of Jesus Christ I reject the spirit of fear right now. You have given me a spirit of power love and a sound mind. In the name of Jesus Christ. Amen." },
+  doubting: { keywords: ["doubt","doubting","weak faith","don't believe","questioning","not sure","wavering","struggling to believe"], verses: ["mark 9:24","hebrews 11:1","james 1:6","romans 10:17","matthew 14:31","john 20:27","jude 1:22","2 corinthians 5:7","psalm 73:26","luke 17:5"], reflection: "Even the disciples had moments of doubt. Bring your doubts honestly to God. He is not offended by your questions.", prayer: "Father in the name of Jesus Christ I bring my doubts to you honestly right now. Help my unbelief and strengthen my faith. In the name of Jesus Christ. Amen." },
+  peace: { keywords: ["peace","calm","quiet","still","tranquil","settled","serenity"], verses: ["john 14:27","philippians 4:7","isaiah 26:3","psalm 46:10","numbers 6:26","romans 5:1","colossians 3:15","psalm 29:11","2 thessalonians 3:16","isaiah 32:17"], reflection: "The peace of God is available to you right now. It is not dependent on your circumstances.", prayer: "Father in the name of Jesus Christ fill me with your perfect peace right now. Guard my heart and my mind. In the name of Jesus Christ. Amen." },
+  financial: { keywords: ["financial","money","broke","debt","bills","poor","struggling financially","no money","paycheck","provision"], verses: ["philippians 4:19","matthew 6:33","psalm 23:1","luke 12:24","2 corinthians 9:8","proverbs 3:9","malachi 3:10","psalm 37:25","isaiah 58:11","deuteronomy 8:18"], reflection: "God is your provider and He knows every financial need you have.", prayer: "Father in the name of Jesus Christ I trust you as my provider. I release my worry about money and trust that you will provide everything I need. In the name of Jesus Christ. Amen." },
+  strength: { keywords: ["strength","strong","power","courage","bold","brave","overcome","victory","conquer","persevere"], verses: ["philippians 4:13","isaiah 40:29","psalm 46:1","2 corinthians 12:9","ephesians 6:10","joshua 1:9","psalm 18:32","isaiah 41:10","habakkuk 3:19","1 chronicles 16:11"], reflection: "God is your strength when you are weak. His power is made perfect in your weakness.", prayer: "Father in the name of Jesus Christ be my strength today. Fill me with your power and help me to overcome every obstacle. In the name of Jesus Christ. Amen." },
+  worship: { keywords: ["worship","praise","glorify","honor","adore","magnify","exalt","hallelujah","thanksgiving"], verses: ["psalm 100:1","john 4:24","psalm 150:6","hebrews 13:15","revelation 4:11","psalm 95:6","isaiah 6:3","psalm 29:2","1 chronicles 29:11","psalm 34:1"], reflection: "God is worthy of all praise and worship. When we worship Him our perspective shifts from our problems to His greatness.", prayer: "Father in the name of Jesus Christ I worship you today. You are worthy of all praise honor and glory. Receive my worship today Lord. In the name of Jesus Christ. Amen." },
+  unworthy: { keywords: ["unworthy","worthless","not good enough","failure","useless","nobody","don't deserve","inadequate"], verses: ["psalm 139:14","ephesians 2:10","romans 5:8","john 3:16","isaiah 43:4","1 peter 2:9","zephaniah 3:17","romans 8:37","galatians 3:26","1 john 3:1"], reflection: "You are not defined by your failures. God loved you so much that He sent His Son to die for you.", prayer: "Father in the name of Jesus Christ remind me of my worth in your eyes. Help me to see myself the way you see me. In the name of Jesus Christ. Amen." },
+  addiction: { keywords: ["addiction","addicted","substance","alcohol","drugs","pornography","gambling","can't quit","bondage","chains"], verses: ["1 corinthians 10:13","john 8:36","galatians 5:1","romans 6:14","2 corinthians 5:17","philippians 4:13","romans 8:1","1 john 1:9","luke 4:18","psalm 107:14"], reflection: "Jesus came to set the captives free. No addiction is too powerful for God.", prayer: "Father in the name of Jesus Christ set me free from this addiction by the power of your Holy Spirit. In the name of Jesus Christ. Amen." },
+  relationships: { keywords: ["relationship","marriage","husband","wife","family","friend","conflict","broken","divorce","partner"], verses: ["1 corinthians 13:4","colossians 3:13","ephesians 4:32","proverbs 17:17","matthew 18:20","romans 12:18","1 peter 4:8","ecclesiastes 4:9","john 15:13","psalm 133:1"], reflection: "God cares deeply about your relationships. He is the author of love and He can heal and restore what is broken.", prayer: "Father in the name of Jesus Christ I bring this relationship to you. Heal what is broken and help me to love the way you love. In the name of Jesus Christ. Amen." },
+  forgiveness: { keywords: ["forgiveness","forgive","guilty","shame","regret","mistake","failed","messed up","repent"], verses: ["1 john 1:9","psalm 103:12","isaiah 43:25","romans 8:1","micah 7:19","ephesians 1:7","acts 3:19","hebrews 8:12","luke 15:20","psalm 32:5"], reflection: "God's forgiveness is complete and total. You do not have to carry guilt and shame any longer.", prayer: "Father in the name of Jesus Christ I confess my sins and receive your complete forgiveness. Thank you that there is no condemnation in Christ Jesus. In the name of Jesus Christ. Amen." }
 };
 
 const getEmotionCategory = (feeling) => {
   const lowerFeeling = feeling.toLowerCase();
   for (const [category, data] of Object.entries(emotionVerses)) {
-    if (data.keywords.some(keyword => lowerFeeling.includes(keyword))) {
-      return { category, ...data };
-    }
+    if (data.keywords.some(keyword => lowerFeeling.includes(keyword))) return { category, ...data };
   }
-  return {
-    category: "general",
-    verses: ["psalm 46:1","john 3:16","romans 8:28","philippians 4:13","isaiah 41:10"],
-    reflection: "Whatever you are going through right now God sees you and He cares deeply for you. Bring everything to Him and trust that He is working all things together for your good.",
-    prayer: "Father in the name of Jesus Christ I come to you right now with everything on my heart. I trust you completely with my life. In the name of Jesus Christ. Amen."
-  };
+  return { category: "general", verses: ["psalm 46:1","john 3:16","romans 8:28","philippians 4:13","isaiah 41:10"], reflection: "Whatever you are going through right now God sees you and He cares deeply for you. Bring everything to Him and trust that He is working all things together for your good.", prayer: "Father in the name of Jesus Christ I come to you right now with everything on my heart. I trust you completely with my life. In the name of Jesus Christ. Amen." };
 };
 
 const fetchVerse = async (verseRef) => {
@@ -444,7 +321,7 @@ const tabs = [
   { id: "salvation", label: "Jesus", icon: "✝️" },
 ];
 
-// ─── AUTH SCREENS ────────────────────────────────────────────────────────────
+// ─── AUTH SCREEN ─────────────────────────────────────────────────────────────
 function AuthScreen({ onAuthSuccess }) {
   const [mode, setMode] = useState("login");
   const [email, setEmail] = useState("");
@@ -455,7 +332,6 @@ function AuthScreen({ onAuthSuccess }) {
 
   const s = {
     screen: { background: `linear-gradient(160deg, ${BROWN_DARK} 0%, ${BROWN} 60%, ${GOLD} 100%)`, minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "24px 20px", fontFamily: "Georgia, serif" },
-    logo: { textAlign: "center", marginBottom: 32 },
     card: { background: WHITE, borderRadius: 20, padding: "28px 24px", width: "100%", maxWidth: 400, boxShadow: "0 8px 32px rgba(0,0,0,0.3)" },
     title: { color: BROWN_DARK, fontSize: 22, fontWeight: "bold", margin: "0 0 4px", textAlign: "center" },
     subtitle: { color: BROWN, fontSize: 13, textAlign: "center", margin: "0 0 24px" },
@@ -465,9 +341,7 @@ function AuthScreen({ onAuthSuccess }) {
     error: { background: "#FFE8E8", border: "1px solid #FFB3B3", borderRadius: 8, padding: "10px 14px", color: "#8B0000", fontSize: 13, marginBottom: 14, fontFamily: "sans-serif" },
     toggle: { textAlign: "center", marginTop: 18, color: BROWN, fontSize: 13, fontFamily: "sans-serif" },
     toggleBtn: { background: "none", border: "none", color: GOLD, fontWeight: "bold", cursor: "pointer", fontSize: 13, fontFamily: "sans-serif", textDecoration: "underline" },
-    divider: { display: "flex", alignItems: "center", gap: 10, margin: "16px 0" },
     dividerLine: { flex: 1, height: 1, background: GOLD_LIGHT },
-    dividerText: { color: BROWN + "88", fontSize: 12, fontFamily: "sans-serif" },
     guestBtn: { background: "none", border: `1.5px solid ${GOLD_MID}`, color: BROWN, borderRadius: 10, padding: "10px 20px", fontSize: 14, cursor: "pointer", fontFamily: "sans-serif", width: "100%", marginTop: 4 },
   };
 
@@ -485,15 +359,7 @@ function AuthScreen({ onAuthSuccess }) {
       }
       onAuthSuccess();
     } catch (err) {
-      const msgs = {
-        "auth/email-already-in-use": "An account with this email already exists. Please log in.",
-        "auth/invalid-email": "Please enter a valid email address.",
-        "auth/wrong-password": "Incorrect password. Please try again.",
-        "auth/user-not-found": "No account found with this email. Please sign up.",
-        "auth/invalid-credential": "Incorrect email or password. Please try again.",
-        "auth/too-many-requests": "Too many attempts. Please wait a moment and try again.",
-        "auth/network-request-failed": "Network error. Please check your connection.",
-      };
+      const msgs = { "auth/email-already-in-use": "An account with this email already exists.", "auth/invalid-email": "Please enter a valid email address.", "auth/wrong-password": "Incorrect password. Please try again.", "auth/user-not-found": "No account found with this email.", "auth/invalid-credential": "Incorrect email or password.", "auth/too-many-requests": "Too many attempts. Please wait a moment.", "auth/network-request-failed": "Network error. Please check your connection." };
       setError(msgs[err.code] || "Something went wrong. Please try again.");
     }
     setLoading(false);
@@ -501,58 +367,33 @@ function AuthScreen({ onAuthSuccess }) {
 
   return (
     <div style={s.screen}>
-      <div style={s.logo}>
+      <div style={{ textAlign: "center", marginBottom: 32 }}>
         <div style={{ fontSize: 40, marginBottom: 10 }}>✝️</div>
         <h1 style={{ color: GOLD_MID, fontSize: 28, fontWeight: "bold", margin: "0 0 4px", letterSpacing: 1 }}>Grace Daily</h1>
         <p style={{ color: GOLD_LIGHT, fontSize: 14, margin: 0, opacity: 0.9, fontStyle: "italic" }}>His Grace is Sufficient — 2 Corinthians 12:9</p>
       </div>
-
       <div style={s.card}>
         <h2 style={s.title}>{mode === "login" ? "Welcome Back 🙏" : "Join Grace Daily ✝️"}</h2>
         <p style={s.subtitle}>{mode === "login" ? "Sign in to continue your faith journey." : "Create your free account to get started."}</p>
-
         {error && <div style={s.error}>⚠️ {error}</div>}
-
-        {mode === "signup" && (
-          <div>
-            <label style={s.label}>YOUR NAME</label>
-            <input style={s.input} type="text" placeholder="Your first name" value={name} onChange={e => setName(e.target.value)} />
-          </div>
-        )}
-
+        {mode === "signup" && (<div><label style={s.label}>YOUR NAME</label><input style={s.input} type="text" placeholder="Your first name" value={name} onChange={e => setName(e.target.value)} /></div>)}
         <label style={s.label}>EMAIL ADDRESS</label>
         <input style={s.input} type="email" placeholder="your@email.com" value={email} onChange={e => setEmail(e.target.value)} />
-
         <label style={s.label}>PASSWORD</label>
         <input style={s.input} type="password" placeholder={mode === "signup" ? "At least 6 characters" : "Your password"} value={password} onChange={e => setPassword(e.target.value)} onKeyDown={e => e.key === "Enter" && handleSubmit()} />
-
-        <button style={s.btn} onClick={handleSubmit} disabled={loading}>
-          {loading ? "Please wait..." : mode === "login" ? "Sign In →" : "Create Account →"}
-        </button>
-
-        <div style={s.divider}>
-          <div style={s.dividerLine} />
-          <span style={s.dividerText}>or</span>
-          <div style={s.dividerLine} />
+        <button style={s.btn} onClick={handleSubmit} disabled={loading}>{loading ? "Please wait..." : mode === "login" ? "Sign In →" : "Create Account →"}</button>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "16px 0" }}>
+          <div style={s.dividerLine} /><span style={{ color: BROWN + "88", fontSize: 12, fontFamily: "sans-serif" }}>or</span><div style={s.dividerLine} />
         </div>
-
-        <button style={s.guestBtn} onClick={onAuthSuccess}>
-          Continue as Guest
-        </button>
-
+        <button style={s.guestBtn} onClick={onAuthSuccess}>Continue as Guest</button>
         <div style={s.toggle}>
-          {mode === "login" ? (
-            <span>Don't have an account? <button style={s.toggleBtn} onClick={() => { setMode("signup"); setError(""); }}>Sign Up</button></span>
-          ) : (
-            <span>Already have an account? <button style={s.toggleBtn} onClick={() => { setMode("login"); setError(""); }}>Sign In</button></span>
-          )}
+          {mode === "login" ? (<span>Don't have an account? <button style={s.toggleBtn} onClick={() => { setMode("signup"); setError(""); }}>Sign Up</button></span>) : (<span>Already have an account? <button style={s.toggleBtn} onClick={() => { setMode("login"); setError(""); }}>Sign In</button></span>)}
         </div>
       </div>
     </div>
   );
 }
-
-// ─── MAIN APP ────────────────────────────────────────────────────────────────
+// ─── MAIN APP ─────────────────────────────────────────────────────────────────
 export default function App() {
   const [user, setUser] = useState(undefined);
   const [showAuth, setShowAuth] = useState(false);
@@ -570,11 +411,19 @@ export default function App() {
   const [selectedTopic, setSelectedTopic] = useState(null);
   const [topicContent, setTopicContent] = useState(null);
   const [sermonSearch, setSermonSearch] = useState("");
+  const [prayerTab, setPrayerTab] = useState("how");
+  const [journalTitle, setJournalTitle] = useState("");
+  const [journalEntry, setJournalEntry] = useState("");
+  const [journalEntries, setJournalEntries] = useState([]);
+  const [testimony, setTestimony] = useState("");
+  const [testimonies, setTestimonies] = useState([
+    { text: "God healed my mother after 3 months of prayer. The doctors called it a miracle. God is so faithful!", time: "2 days ago" },
+    { text: "I prayed for a job for 6 months. Last week I received an offer beyond what I imagined. God's timing is perfect.", time: "1 week ago" },
+    { text: "My marriage was falling apart. We prayed together for the first time in years and God restored everything. To God be the glory!", time: "2 weeks ago" },
+  ]);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-      setUser(firebaseUser);
-    });
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => { setUser(firebaseUser); });
     return () => unsubscribe();
   }, []);
 
@@ -591,37 +440,20 @@ export default function App() {
         const verseData = await fetchVerse(ref);
         if (verseData) fetchedVerses.push(`${verseData.reference} — ${verseData.text}`);
       }
-      setVerseResult({
-        verses: fetchedVerses.length > 0 ? fetchedVerses : emotion.verses,
-        reflection: emotion.reflection,
-        prayer: emotion.prayer
-      });
+      setVerseResult({ verses: fetchedVerses.length > 0 ? fetchedVerses : emotion.verses, reflection: emotion.reflection, prayer: emotion.prayer });
     } catch {
-      setVerseResult({
-        verses: ["Psalm 46:1 — God is our refuge and strength, an ever-present help in trouble."],
-        reflection: "Whatever you are facing today God is your refuge and strength. Run to Him.",
-        prayer: "Father in the name of Jesus Christ be my refuge and strength today. In the name of Jesus Christ. Amen."
-      });
+      setVerseResult({ verses: ["Psalm 46:1 — God is our refuge and strength, an ever-present help in trouble."], reflection: "Whatever you are facing today God is your refuge and strength.", prayer: "Father in the name of Jesus Christ be my refuge and strength today. In the name of Jesus Christ. Amen." });
     }
     setLoadingVerse(false);
   };
 
   const openTopic = (topic) => { setSelectedTopic(topic); setTopicContent(getSermonContent(topic)); };
-  const filteredCategories = sermonSearch.trim()
-    ? sermonCategories.map(cat => ({ ...cat, topics: cat.topics.filter(t => t.toLowerCase().includes(sermonSearch.toLowerCase())) })).filter(cat => cat.topics.length > 0)
-    : sermonCategories;
+  const filteredCategories = sermonSearch.trim() ? sermonCategories.map(cat => ({ ...cat, topics: cat.topics.filter(t => t.toLowerCase().includes(sermonSearch.toLowerCase())) })).filter(cat => cat.topics.length > 0) : sermonCategories;
   const logPrayer = () => { if (!streakLogged) { setStreak(s => s + 1); setStreakLogged(true); } };
-  const prayFor = (i) => {
-    if (!prayedIds.includes(i)) {
-      setPrayedIds(p => [...p, i]);
-      setPrayerList(list => list.map((r, idx) => idx === i ? { ...r, prayed: r.prayed + 1 } : r));
-    }
-  };
-  const submitPrayer = () => {
-    if (!newPrayer.trim()) return;
-    setPrayerList(l => [{ name: user ? user.email.split("@")[0] : "Guest", request: newPrayer, time: "Just now", prayed: 0 }, ...l]);
-    setNewPrayer("");
-  };
+  const prayFor = (i) => { if (!prayedIds.includes(i)) { setPrayedIds(p => [...p, i]); setPrayerList(list => list.map((r, idx) => idx === i ? { ...r, prayed: r.prayed + 1 } : r)); } };
+  const submitPrayer = () => { if (!newPrayer.trim()) return; setPrayerList(l => [{ name: user ? user.email.split("@")[0] : "Guest", request: newPrayer, time: "Just now", prayed: 0 }, ...l]); setNewPrayer(""); };
+  const submitJournal = () => { if (!journalEntry.trim()) return; const date = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }); setJournalEntries(prev => [{ title: journalTitle || "My Prayer", text: journalEntry, date }, ...prev]); setJournalTitle(""); setJournalEntry(""); };
+  const submitTestimony = () => { if (!testimony.trim()) return; setTestimonies(prev => [{ text: testimony, time: "Just now" }, ...prev]); setTestimony(""); };
   const handleSignOut = async () => { await signOut(auth); };
 
   const s = {
@@ -642,7 +474,6 @@ export default function App() {
     btnOutline: { background: "none", color: GOLD, border: `1.5px solid ${GOLD}`, borderRadius: 10, padding: "8px 16px", fontSize: 13, cursor: "pointer", fontFamily: "sans-serif" },
     btnSmall: { background: CREAM_DARK, border: `1px solid ${GOLD_LIGHT}`, borderRadius: 20, padding: "6px 14px", fontSize: 12, color: BROWN, cursor: "pointer", fontFamily: "sans-serif", margin: "4px" },
     streakBox: { background: `linear-gradient(135deg, ${GOLD}, ${BROWN})`, borderRadius: 14, padding: "14px 16px", display: "flex", alignItems: "center", gap: 14, marginBottom: 14 },
-    streakNum: { fontSize: 36, fontWeight: "bold", color: WHITE },
     progressBg: { height: 8, borderRadius: 6, background: GOLD_LIGHT, marginTop: 8, marginBottom: 4 },
     tag: { display: "inline-block", background: GOLD_LIGHT, color: BROWN, borderRadius: 20, padding: "3px 10px", fontSize: 11, fontFamily: "sans-serif", fontWeight: "bold", marginRight: 6 },
     stepCard: { display: "flex", gap: 14, marginBottom: 14, alignItems: "flex-start" },
@@ -652,7 +483,6 @@ export default function App() {
     signInBtn: { background: GOLD, border: "none", borderRadius: 8, padding: "4px 10px", color: WHITE, fontSize: 11, cursor: "pointer", fontFamily: "sans-serif", fontWeight: "bold" },
   };
 
-  // Show loading while checking auth state
   if (user === undefined) {
     return (
       <div style={{ ...s.app, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column" }}>
@@ -662,10 +492,7 @@ export default function App() {
     );
   }
 
-  // Show auth screen if requested
-  if (showAuth) {
-    return <AuthScreen onAuthSuccess={() => setShowAuth(false)} />;
-  }
+  if (showAuth) return <AuthScreen onAuthSuccess={() => setShowAuth(false)} />;
 
   return (
     <div style={s.app}>
@@ -678,18 +505,10 @@ export default function App() {
             <p style={s.headerSub}>His Grace is Sufficient — 2 Corinthians 12:9</p>
           </div>
           <div style={{ width: 60, display: "flex", justifyContent: "flex-end", alignItems: "flex-start", paddingTop: 4 }}>
-            {user ? (
-              <button style={s.signOutBtn} onClick={handleSignOut}>Sign Out</button>
-            ) : (
-              <button style={s.signInBtn} onClick={() => setShowAuth(true)}>Sign In</button>
-            )}
+            {user ? <button style={s.signOutBtn} onClick={handleSignOut}>Sign Out</button> : <button style={s.signInBtn} onClick={() => setShowAuth(true)}>Sign In</button>}
           </div>
         </div>
-        {user && (
-          <p style={{ color: GOLD_LIGHT, fontSize: 11, textAlign: "center", margin: "8px 0 0", fontFamily: "sans-serif", opacity: 0.8 }}>
-            Welcome back, {user.email.split("@")[0]} 🙏
-          </p>
-        )}
+        {user && <p style={{ color: GOLD_LIGHT, fontSize: 11, textAlign: "center", margin: "8px 0 0", fontFamily: "sans-serif", opacity: 0.8 }}>Welcome back, {user.email.split("@")[0]} 🙏</p>}
       </div>
 
       <div style={s.content}>
@@ -704,17 +523,14 @@ export default function App() {
             </div>
             <div style={s.streakBox}>
               <div>
-                <div style={s.streakNum}>{streak}</div>
+                <div style={{ fontSize: 36, fontWeight: "bold", color: WHITE }}>{streak}</div>
                 <div style={{ color: GOLD_LIGHT, fontSize: 11, fontFamily: "sans-serif" }}>day streak 🔥</div>
               </div>
               <div style={{ flex: 1 }}>
                 <p style={{ color: WHITE, fontSize: 13, margin: "0 0 8px", fontFamily: "sans-serif" }}>Keep your prayer streak going!</p>
-                <button style={{ ...s.btnOutline, color: WHITE, borderColor: WHITE, fontSize: 12, padding: "6px 14px" }} onClick={logPrayer}>
-                  {streakLogged ? "✓ Logged today" : "Log today's prayer"}
-                </button>
+                <button style={{ ...s.btnOutline, color: WHITE, borderColor: WHITE, fontSize: 12, padding: "6px 14px" }} onClick={logPrayer}>{streakLogged ? "✓ Logged today" : "Log today's prayer"}</button>
               </div>
             </div>
-
             {!user && (
               <div style={{ ...s.card, border: `2px solid ${GOLD_MID}`, background: GOLD_LIGHT }}>
                 <p style={{ color: BROWN_DARK, fontSize: 14, fontWeight: "bold", margin: "0 0 6px" }}>✝️ Save Your Progress</p>
@@ -722,7 +538,6 @@ export default function App() {
                 <button style={s.btn} onClick={() => setShowAuth(true)}>Create Free Account →</button>
               </div>
             )}
-
             <div style={s.card}>
               <p style={{ ...s.sectionTitle, fontSize: 15, marginBottom: 8 }}>Quick Actions</p>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
@@ -751,12 +566,7 @@ export default function App() {
               <textarea style={{ ...s.input, minHeight: 80, resize: "none" }} placeholder="I am feeling anxious about tomorrow..." value={feeling} onChange={e => setFeeling(e.target.value)} />
               <button style={s.btn} onClick={getVerse} disabled={loadingVerse}>{loadingVerse ? "Finding your verse..." : "Find My Verse →"}</button>
             </div>
-            {loadingVerse && (
-              <div style={{ ...s.card, textAlign: "center", padding: 24 }}>
-                <div style={{ fontSize: 28, marginBottom: 8 }}>🙏</div>
-                <p style={{ color: BROWN, fontSize: 14, fontStyle: "italic" }}>Seeking a word from the Lord for you...</p>
-              </div>
-            )}
+            {loadingVerse && (<div style={{ ...s.card, textAlign: "center", padding: 24 }}><div style={{ fontSize: 28, marginBottom: 8 }}>🙏</div><p style={{ color: BROWN, fontSize: 14, fontStyle: "italic" }}>Seeking a word from the Lord for you...</p></div>)}
             {verseResult && (
               <div>
                 <div style={s.cardGold}>
@@ -767,14 +577,8 @@ export default function App() {
                     </div>
                   ))}
                 </div>
-                <div style={s.card}>
-                  <p style={{ color: GOLD, fontSize: 13, fontWeight: "bold", marginBottom: 6, fontFamily: "sans-serif" }}>Reflection</p>
-                  <p style={{ color: BROWN_DARK, fontSize: 14, lineHeight: 1.7, margin: 0 }}>{verseResult.reflection}</p>
-                </div>
-                <div style={{ ...s.card, background: GOLD_LIGHT }}>
-                  <p style={{ color: BROWN, fontSize: 12, fontFamily: "sans-serif", fontWeight: "bold", marginBottom: 6, letterSpacing: 1, textTransform: "uppercase" }}>Prayer for You</p>
-                  <p style={{ color: BROWN_DARK, fontSize: 14, fontStyle: "italic", lineHeight: 1.7, margin: 0 }}>{verseResult.prayer}</p>
-                </div>
+                <div style={s.card}><p style={{ color: GOLD, fontSize: 13, fontWeight: "bold", marginBottom: 6, fontFamily: "sans-serif" }}>Reflection</p><p style={{ color: BROWN_DARK, fontSize: 14, lineHeight: 1.7, margin: 0 }}>{verseResult.reflection}</p></div>
+                <div style={{ ...s.card, background: GOLD_LIGHT }}><p style={{ color: BROWN, fontSize: 12, fontFamily: "sans-serif", fontWeight: "bold", marginBottom: 6, letterSpacing: 1, textTransform: "uppercase" }}>Prayer for You</p><p style={{ color: BROWN_DARK, fontSize: 14, fontStyle: "italic", lineHeight: 1.7, margin: 0 }}>{verseResult.prayer}</p></div>
               </div>
             )}
           </div>
@@ -783,26 +587,131 @@ export default function App() {
         {/* PRAYER */}
         {activeTab === "prayer" && (
           <div>
-            <p style={s.sectionTitle}>🙏 Pray With Me</p>
-            <div style={s.card}>
-              <p style={{ color: BROWN, fontSize: 13, marginBottom: 10 }}>Submit a prayer request or pray for someone else.</p>
-              <textarea style={{ ...s.input, minHeight: 70, resize: "none" }} placeholder="Share your prayer request..." value={newPrayer} onChange={e => setNewPrayer(e.target.value)} />
-              <button style={s.btn} onClick={submitPrayer}>Submit Prayer Request</button>
+            <p style={s.sectionTitle}>🙏 Prayer</p>
+
+            {/* Prayer Sub Nav */}
+            <div style={{ display: "flex", background: WHITE, borderRadius: 12, padding: 4, marginBottom: 16, border: `1px solid ${GOLD_LIGHT}` }}>
+              {[["how","🙏 How to Pray"],["wall","👥 Wall"],["journal","📓 Journal"],["answered","✅ Answered"]].map(([id, label]) => (
+                <button key={id} onClick={() => setPrayerTab(id)} style={{ flex: 1, padding: "8px 2px", border: "none", borderRadius: 10, background: prayerTab === id ? `linear-gradient(135deg, ${GOLD}, ${BROWN})` : "none", color: prayerTab === id ? WHITE : BROWN, fontSize: 10, fontFamily: "sans-serif", fontWeight: prayerTab === id ? "bold" : "normal", cursor: "pointer", lineHeight: 1.3 }}>
+                  {label}
+                </button>
+              ))}
             </div>
-            <p style={{ color: BROWN, fontSize: 13, fontFamily: "sans-serif", marginBottom: 8, fontWeight: "bold" }}>Community Prayer Wall</p>
-            {prayerList.map((r, i) => (
-              <div key={i} style={s.card}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6 }}>
-                  <span style={s.tag}>{r.name}</span>
-                  <span style={{ color: BROWN + "99", fontSize: 11, fontFamily: "sans-serif" }}>{r.time}</span>
+
+            {/* HOW TO PRAY */}
+            {prayerTab === "how" && (
+              <div>
+                <div style={s.cardGold}>
+                  <p style={{ color: GOLD_LIGHT, fontSize: 11, fontFamily: "sans-serif", margin: "0 0 6px", letterSpacing: 1, textTransform: "uppercase" }}>The Lord's Prayer</p>
+                  <h2 style={{ color: WHITE, fontSize: 18, margin: "0 0 8px" }}>Matthew 6:9-13</h2>
+                  <p style={{ color: GOLD_LIGHT, fontSize: 13, fontStyle: "italic", lineHeight: 1.7, margin: 0 }}>"Our Father in heaven, hallowed be your name, your kingdom come, your will be done, on earth as it is in heaven. Give us today our daily bread. And forgive us our debts, as we also have forgiven our debtors. And lead us not into temptation, but deliver us from the evil one."</p>
                 </div>
-                <p style={{ color: BROWN_DARK, fontSize: 14, lineHeight: 1.6, margin: "0 0 10px" }}>{r.request}</p>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <span style={{ color: BROWN + "99", fontSize: 12, fontFamily: "sans-serif" }}>🙏 {r.prayed} people prayed</span>
-                  <button style={{ ...s.btnOutline, padding: "6px 14px", fontSize: 12 }} onClick={() => prayFor(i)}>{prayedIds.includes(i) ? "✓ Prayed" : "Pray for them"}</button>
+                {[
+                  { phrase: "Our Father in heaven", section: "ADORATION", icon: "👑", explanation: "Begin by acknowledging who God is — your Father, your Creator, the One who loves you unconditionally. Start every prayer with worship before requests. Simply say: Father, I love you. You are holy and worthy of all praise." },
+                  { phrase: "Your kingdom come, your will be done", section: "SURRENDER", icon: "🙌", explanation: "This is where you surrender your plans to God's plans. You are saying: God, I trust you more than I trust myself. Have your way in my life today. This is one of the most powerful things you can pray." },
+                  { phrase: "Give us today our daily bread", section: "PETITION", icon: "🙏", explanation: "Bring your needs to God — provision, health, relationships, finances, direction. God invites you to ask specifically. He is your Father and He delights in providing for His children. Be bold and be specific." },
+                  { phrase: "Forgive us our debts as we forgive others", section: "CONFESSION", icon: "💛", explanation: "Confession keeps communication open between you and God. Be honest about where you have fallen short. Then choose to forgive anyone who has wronged you — releasing them is what frees you." },
+                  { phrase: "Lead us not into temptation", section: "PROTECTION", icon: "🛡️", explanation: "Ask God for protection over your mind, your family, your home and your future. Declare His protection over your life. The enemy is real but God is greater than anything you face." },
+                ].map((item, i) => (
+                  <div key={i} style={s.card}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
+                      <span style={{ fontSize: 24 }}>{item.icon}</span>
+                      <div>
+                        <p style={{ color: GOLD, fontSize: 11, fontFamily: "sans-serif", fontWeight: "bold", letterSpacing: 1, margin: 0 }}>{item.section}</p>
+                        <p style={{ color: BROWN_DARK, fontSize: 13, fontWeight: "bold", margin: "2px 0 0", fontStyle: "italic" }}>"{item.phrase}"</p>
+                      </div>
+                    </div>
+                    <p style={{ color: BROWN, fontSize: 13, lineHeight: 1.7, margin: 0 }}>{item.explanation}</p>
+                  </div>
+                ))}
+                <div style={{ ...s.card, background: GOLD_LIGHT }}>
+                  <p style={{ color: BROWN, fontSize: 13, fontWeight: "bold", fontFamily: "sans-serif", marginBottom: 8 }}>🙏 Pray This Now</p>
+                  <p style={{ color: BROWN_DARK, fontSize: 14, fontStyle: "italic", lineHeight: 1.8, margin: 0 }}>"Father in the name of Jesus Christ I come to you right now. You are holy and worthy of all praise. I surrender my plans to your perfect will. I bring my needs before you and trust you to provide. I confess my sins and I choose to forgive those who have wronged me. Protect my mind, my family and my future. Your kingdom come, your will be done in my life today. In the name of Jesus Christ. Amen."</p>
                 </div>
               </div>
-            ))}
+            )}
+
+            {/* PRAYER WALL */}
+            {prayerTab === "wall" && (
+              <div>
+                <div style={s.card}>
+                  <p style={{ color: BROWN, fontSize: 13, marginBottom: 10, lineHeight: 1.5 }}>Share your prayer request with the community. You are not alone. 🙏</p>
+                  <textarea style={{ ...s.input, minHeight: 70, resize: "none" }} placeholder="Share your prayer request..." value={newPrayer} onChange={e => setNewPrayer(e.target.value)} />
+                  <button style={s.btn} onClick={submitPrayer}>Submit Prayer Request</button>
+                </div>
+                <p style={{ color: BROWN, fontSize: 13, fontFamily: "sans-serif", marginBottom: 8, fontWeight: "bold" }}>Community Prayer Wall</p>
+                {prayerList.map((r, i) => (
+                  <div key={i} style={s.card}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6 }}>
+                      <span style={s.tag}>{r.name}</span>
+                      <span style={{ color: BROWN + "99", fontSize: 11, fontFamily: "sans-serif" }}>{r.time}</span>
+                    </div>
+                    <p style={{ color: BROWN_DARK, fontSize: 14, lineHeight: 1.6, margin: "0 0 10px" }}>{r.request}</p>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <span style={{ color: BROWN + "99", fontSize: 12, fontFamily: "sans-serif" }}>🙏 {r.prayed} people prayed</span>
+                      <button style={{ ...s.btnOutline, padding: "6px 14px", fontSize: 12 }} onClick={() => prayFor(i)}>{prayedIds.includes(i) ? "✓ Prayed" : "Pray for them"}</button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* PRAYER JOURNAL */}
+            {prayerTab === "journal" && (
+              <div>
+                <div style={s.cardGold}>
+                  <p style={{ color: GOLD_LIGHT, fontSize: 11, fontFamily: "sans-serif", margin: "0 0 6px", letterSpacing: 1, textTransform: "uppercase" }}>Your Private Space</p>
+                  <h2 style={{ color: WHITE, fontSize: 18, margin: "0 0 6px" }}>📓 Prayer Journal</h2>
+                  <p style={{ color: GOLD_LIGHT, fontSize: 13, margin: 0 }}>Write your prayers to God. This is between you and Him.</p>
+                </div>
+                <div style={s.card}>
+                  <p style={{ color: GOLD, fontSize: 13, fontWeight: "bold", marginBottom: 8, fontFamily: "sans-serif" }}>New Prayer Entry</p>
+                  <input style={{ ...s.input, marginBottom: 10 }} placeholder="Title — e.g. Trusting God with my finances" value={journalTitle} onChange={e => setJournalTitle(e.target.value)} />
+                  <textarea style={{ ...s.input, minHeight: 100, resize: "none" }} placeholder="Write your prayer here... be completely honest with God about everything on your heart." value={journalEntry} onChange={e => setJournalEntry(e.target.value)} />
+                  <button style={s.btn} onClick={submitJournal}>Save Prayer Entry</button>
+                </div>
+                {journalEntries.length === 0 && (
+                  <div style={{ ...s.card, textAlign: "center", padding: 28 }}>
+                    <div style={{ fontSize: 32, marginBottom: 10 }}>📓</div>
+                    <p style={{ color: BROWN, fontSize: 14, fontStyle: "italic", lineHeight: 1.6, margin: 0 }}>Your prayer journal is empty. Write your first prayer to God today. He is listening.</p>
+                  </div>
+                )}
+                {journalEntries.map((entry, i) => (
+                  <div key={i} style={s.card}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
+                      <p style={{ color: BROWN_DARK, fontSize: 14, fontWeight: "bold", margin: 0 }}>{entry.title}</p>
+                      <span style={{ color: BROWN + "99", fontSize: 11, fontFamily: "sans-serif", flexShrink: 0, marginLeft: 8 }}>{entry.date}</span>
+                    </div>
+                    <p style={{ color: BROWN, fontSize: 13, lineHeight: 1.7, margin: 0, fontStyle: "italic" }}>{entry.text}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* ANSWERED PRAYERS */}
+            {prayerTab === "answered" && (
+              <div>
+                <div style={s.cardGold}>
+                  <p style={{ color: GOLD_LIGHT, fontSize: 11, fontFamily: "sans-serif", margin: "0 0 6px", letterSpacing: 1, textTransform: "uppercase" }}>God is Faithful</p>
+                  <h2 style={{ color: WHITE, fontSize: 18, margin: "0 0 6px" }}>✅ Answered Prayers</h2>
+                  <p style={{ color: GOLD_LIGHT, fontSize: 13, margin: 0 }}>Share how God answered your prayer and encourage the whole community.</p>
+                </div>
+                <div style={s.card}>
+                  <p style={{ color: GOLD, fontSize: 13, fontWeight: "bold", marginBottom: 8, fontFamily: "sans-serif" }}>Share Your Testimony</p>
+                  <textarea style={{ ...s.input, minHeight: 80, resize: "none" }} placeholder="How did God answer your prayer? Share your testimony to encourage others..." value={testimony} onChange={e => setTestimony(e.target.value)} />
+                  <button style={s.btn} onClick={submitTestimony}>Share Testimony 🙌</button>
+                </div>
+                {testimonies.map((t, i) => (
+                  <div key={i} style={{ ...s.card, border: `1.5px solid ${GOLD_MID}` }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+                      <span style={{ ...s.tag, background: GOLD, color: WHITE }}>✅ God Answered</span>
+                      <span style={{ color: BROWN + "99", fontSize: 11, fontFamily: "sans-serif" }}>{t.time}</span>
+                    </div>
+                    <p style={{ color: BROWN_DARK, fontSize: 14, lineHeight: 1.6, margin: 0 }}>{t.text}</p>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 
@@ -810,9 +719,7 @@ export default function App() {
         {activeTab === "vision" && (
           <div>
             <p style={s.sectionTitle}>📋 Faith Vision Board</p>
-            <div style={s.card}>
-              <p style={{ color: BROWN, fontSize: 13, lineHeight: 1.5, margin: 0 }}>Set your spiritual goals and track your journey with God. Every step forward is a victory. 🙌</p>
-            </div>
+            <div style={s.card}><p style={{ color: BROWN, fontSize: 13, lineHeight: 1.5, margin: 0 }}>Set your spiritual goals and track your journey with God. Every step forward is a victory. 🙌</p></div>
             {visionGoals.map(g => (
               <div key={g.id} style={s.card}>
                 <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
@@ -823,14 +730,10 @@ export default function App() {
                   </div>
                   <span style={{ color: GOLD, fontSize: 14, fontWeight: "bold", fontFamily: "sans-serif" }}>{g.progress}%</span>
                 </div>
-                <div style={s.progressBg}>
-                  <div style={{ height: 8, borderRadius: 6, background: `linear-gradient(90deg, ${GOLD}, ${BROWN})`, width: `${g.progress}%` }} />
-                </div>
+                <div style={s.progressBg}><div style={{ height: 8, borderRadius: 6, background: `linear-gradient(90deg, ${GOLD}, ${BROWN})`, width: `${g.progress}%` }} /></div>
               </div>
             ))}
-            <div style={{ ...s.card, textAlign: "center", border: `2px dashed ${GOLD_MID}` }}>
-              <p style={{ color: BROWN, fontSize: 14, fontStyle: "italic" }}>+ Add a new spiritual goal</p>
-            </div>
+            <div style={{ ...s.card, textAlign: "center", border: `2px dashed ${GOLD_MID}` }}><p style={{ color: BROWN, fontSize: 14, fontStyle: "italic" }}>+ Add a new spiritual goal</p></div>
           </div>
         )}
 
@@ -844,44 +747,21 @@ export default function App() {
                   <p style={{ color: GOLD_LIGHT, fontSize: 11, fontFamily: "sans-serif", margin: "0 0 6px", letterSpacing: 1, textTransform: "uppercase" }}>Sermon Companion</p>
                   <h2 style={{ color: WHITE, fontSize: 20, margin: 0 }}>{selectedTopic}</h2>
                 </div>
-                <div style={s.card}>
-                  <p style={{ color: GOLD, fontSize: 13, fontWeight: "bold", marginBottom: 8, fontFamily: "sans-serif" }}>📝 Main Message</p>
-                  <p style={{ color: BROWN_DARK, fontSize: 14, lineHeight: 1.7, margin: 0 }}>{topicContent.mainMessage}</p>
-                </div>
+                <div style={s.card}><p style={{ color: GOLD, fontSize: 13, fontWeight: "bold", marginBottom: 8, fontFamily: "sans-serif" }}>📝 Main Message</p><p style={{ color: BROWN_DARK, fontSize: 14, lineHeight: 1.7, margin: 0 }}>{topicContent.mainMessage}</p></div>
                 <div style={s.card}>
                   <p style={{ color: GOLD, fontSize: 13, fontWeight: "bold", marginBottom: 8, fontFamily: "sans-serif" }}>🔑 Key Takeaways</p>
-                  {topicContent.keyTakeaways.map((t, i) => (
-                    <div key={i} style={{ display: "flex", gap: 10, marginBottom: 8, alignItems: "flex-start" }}>
-                      <div style={{ ...s.stepNum, width: 24, height: 24, fontSize: 12 }}>{i + 1}</div>
-                      <p style={{ color: BROWN_DARK, fontSize: 14, lineHeight: 1.6, margin: 0, flex: 1 }}>{t}</p>
-                    </div>
-                  ))}
+                  {topicContent.keyTakeaways.map((t, i) => (<div key={i} style={{ display: "flex", gap: 10, marginBottom: 8, alignItems: "flex-start" }}><div style={{ ...s.stepNum, width: 24, height: 24, fontSize: 12 }}>{i + 1}</div><p style={{ color: BROWN_DARK, fontSize: 14, lineHeight: 1.6, margin: 0, flex: 1 }}>{t}</p></div>))}
                 </div>
                 <div style={s.card}>
-                  <p style={{ color: GOLD, fontSize: 13, fontWeight: "bold", marginBottom: 8, fontFamily: "sans-serif" }}>📖 Go Deeper — Related Scriptures</p>
-                  {topicContent.scriptures.map((sc, i) => (
-                    <div key={i} style={{ marginBottom: 8, paddingBottom: 8, borderBottom: i < topicContent.scriptures.length - 1 ? `1px solid ${GOLD_LIGHT}` : "none" }}>
-                      <p style={{ color: BROWN_DARK, fontSize: 13, lineHeight: 1.5, margin: 0 }}>📌 {sc}</p>
-                    </div>
-                  ))}
+                  <p style={{ color: GOLD, fontSize: 13, fontWeight: "bold", marginBottom: 8, fontFamily: "sans-serif" }}>📖 Related Scriptures</p>
+                  {topicContent.scriptures.map((sc, i) => (<div key={i} style={{ marginBottom: 8, paddingBottom: 8, borderBottom: i < topicContent.scriptures.length - 1 ? `1px solid ${GOLD_LIGHT}` : "none" }}><p style={{ color: BROWN_DARK, fontSize: 13, lineHeight: 1.5, margin: 0 }}>📌 {sc}</p></div>))}
                 </div>
                 <div style={s.card}>
                   <p style={{ color: GOLD, fontSize: 13, fontWeight: "bold", marginBottom: 8, fontFamily: "sans-serif" }}>❓ Discussion Questions</p>
-                  {topicContent.discussionQuestions.map((q, i) => (
-                    <div key={i} style={{ display: "flex", gap: 10, marginBottom: 10, alignItems: "flex-start" }}>
-                      <div style={{ ...s.stepNum, width: 24, height: 24, fontSize: 12 }}>{i + 1}</div>
-                      <p style={{ color: BROWN_DARK, fontSize: 14, lineHeight: 1.6, margin: 0, flex: 1 }}>{q}</p>
-                    </div>
-                  ))}
+                  {topicContent.discussionQuestions.map((q, i) => (<div key={i} style={{ display: "flex", gap: 10, marginBottom: 10, alignItems: "flex-start" }}><div style={{ ...s.stepNum, width: 24, height: 24, fontSize: 12 }}>{i + 1}</div><p style={{ color: BROWN_DARK, fontSize: 14, lineHeight: 1.6, margin: 0, flex: 1 }}>{q}</p></div>))}
                 </div>
-                <div style={{ ...s.card, background: GOLD_LIGHT }}>
-                  <p style={{ color: BROWN, fontSize: 12, fontFamily: "sans-serif", fontWeight: "bold", marginBottom: 6, letterSpacing: 1, textTransform: "uppercase" }}>🙏 Application Prayer</p>
-                  <p style={{ color: BROWN_DARK, fontSize: 14, fontStyle: "italic", lineHeight: 1.7, margin: 0 }}>{topicContent.prayer}</p>
-                </div>
-                <div style={s.card}>
-                  <p style={{ color: GOLD, fontSize: 13, fontWeight: "bold", marginBottom: 8, fontFamily: "sans-serif" }}>✍️ Journal Prompt</p>
-                  <p style={{ color: BROWN_DARK, fontSize: 14, fontStyle: "italic", lineHeight: 1.7, margin: 0 }}>{topicContent.journal}</p>
-                </div>
+                <div style={{ ...s.card, background: GOLD_LIGHT }}><p style={{ color: BROWN, fontSize: 12, fontFamily: "sans-serif", fontWeight: "bold", marginBottom: 6, letterSpacing: 1, textTransform: "uppercase" }}>🙏 Application Prayer</p><p style={{ color: BROWN_DARK, fontSize: 14, fontStyle: "italic", lineHeight: 1.7, margin: 0 }}>{topicContent.prayer}</p></div>
+                <div style={s.card}><p style={{ color: GOLD, fontSize: 13, fontWeight: "bold", marginBottom: 8, fontFamily: "sans-serif" }}>✍️ Journal Prompt</p><p style={{ color: BROWN_DARK, fontSize: 14, fontStyle: "italic", lineHeight: 1.7, margin: 0 }}>{topicContent.journal}</p></div>
                 <button style={{ ...s.btn, marginBottom: 16 }} onClick={() => { setSelectedTopic(null); setTopicContent(null); }}>← Back to Topics</button>
               </div>
             ) : selectedCategory ? (
@@ -893,11 +773,7 @@ export default function App() {
                 </div>
                 <div style={s.card}>
                   <p style={{ color: BROWN, fontSize: 13, marginBottom: 12, fontFamily: "sans-serif" }}>Select a topic to go deeper:</p>
-                  <div style={{ display: "flex", flexWrap: "wrap" }}>
-                    {selectedCategory.topics.map(topic => (
-                      <button key={topic} style={s.btnSmall} onClick={() => openTopic(topic)}>{topic}</button>
-                    ))}
-                  </div>
+                  <div style={{ display: "flex", flexWrap: "wrap" }}>{selectedCategory.topics.map(topic => (<button key={topic} style={s.btnSmall} onClick={() => openTopic(topic)}>{topic}</button>))}</div>
                 </div>
               </div>
             ) : (
@@ -914,12 +790,8 @@ export default function App() {
                       {!sermonSearch && <button style={{ ...s.btnOutline, padding: "4px 12px", fontSize: 12 }} onClick={() => setSelectedCategory(cat)}>See All →</button>}
                     </div>
                     <div style={{ display: "flex", flexWrap: "wrap" }}>
-                      {(sermonSearch ? cat.topics : cat.topics.slice(0, 5)).map(topic => (
-                        <button key={topic} style={s.btnSmall} onClick={() => openTopic(topic)}>{topic}</button>
-                      ))}
-                      {!sermonSearch && cat.topics.length > 5 && (
-                        <button style={{ ...s.btnSmall, color: GOLD, fontWeight: "bold" }} onClick={() => setSelectedCategory(cat)}>+{cat.topics.length - 5} more</button>
-                      )}
+                      {(sermonSearch ? cat.topics : cat.topics.slice(0, 5)).map(topic => (<button key={topic} style={s.btnSmall} onClick={() => openTopic(topic)}>{topic}</button>))}
+                      {!sermonSearch && cat.topics.length > 5 && (<button style={{ ...s.btnSmall, color: GOLD, fontWeight: "bold" }} onClick={() => setSelectedCategory(cat)}>+{cat.topics.length - 5} more</button>)}
                     </div>
                   </div>
                 ))}
@@ -941,18 +813,13 @@ export default function App() {
               {salvationSteps.map((st, i) => (
                 <div key={i} style={s.stepCard}>
                   <div style={s.stepNum}>{st.step}</div>
-                  <div>
-                    <p style={{ color: BROWN_DARK, fontSize: 14, fontWeight: "bold", margin: "0 0 4px" }}>{st.title}</p>
-                    <p style={{ color: BROWN, fontSize: 13, lineHeight: 1.6, margin: 0 }}>{st.desc}</p>
-                  </div>
+                  <div><p style={{ color: BROWN_DARK, fontSize: 14, fontWeight: "bold", margin: "0 0 4px" }}>{st.title}</p><p style={{ color: BROWN, fontSize: 13, lineHeight: 1.6, margin: 0 }}>{st.desc}</p></div>
                 </div>
               ))}
             </div>
             <div style={{ ...s.card, background: GOLD_LIGHT }}>
               <p style={{ color: BROWN, fontSize: 13, fontWeight: "bold", fontFamily: "sans-serif", marginBottom: 8 }}>Receive Salvation</p>
-              <p style={{ color: BROWN_DARK, fontSize: 14, fontStyle: "italic", lineHeight: 1.8 }}>
-                "Father in the name of Jesus Christ I confess with my mouth that Jesus is Lord and I believe in my heart that God raised Him from the dead. I repent of my sins and I receive Jesus Christ as my Lord and Savior. I commit to deny myself pick up my cross daily and follow Him. In the name of Jesus Christ. Amen."
-              </p>
+              <p style={{ color: BROWN_DARK, fontSize: 14, fontStyle: "italic", lineHeight: 1.8 }}>"Father in the name of Jesus Christ I confess with my mouth that Jesus is Lord and I believe in my heart that God raised Him from the dead. I repent of my sins and I receive Jesus Christ as my Lord and Savior. I commit to deny myself pick up my cross daily and follow Him. In the name of Jesus Christ. Amen."</p>
               {!sinner ? (
                 <button style={s.btn} onClick={() => setSinner(true)}>I Prayed This Prayer 🙏</button>
               ) : (
