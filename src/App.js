@@ -461,16 +461,20 @@ export default function App() {
     setVerseResult(null);
     try {
       const emotion = getEmotionCategory(feeling);
-      const randomVerseRef = emotion.verses[Math.floor(Math.random() * emotion.verses.length)];
-      const verseData = await fetchVerse(randomVerseRef);
+      const fetchedVerses = await Promise.all(
+        emotion.verses.map(ref => fetchVerse(ref))
+      );
+      const validVerses = fetchedVerses
+        .filter(v => v !== null)
+        .map(v => `${v.reference} — ${v.text}`);
       setVerseResult({
-        verse: verseData ? `${verseData.reference} — ${verseData.text}` : randomVerseRef,
+        verses: validVerses.length > 0 ? validVerses : emotion.verses,
         reflection: emotion.reflection,
         prayer: emotion.prayer
       });
     } catch {
       setVerseResult({
-        verse: "Psalm 46:1 — God is our refuge and strength, an ever-present help in trouble.",
+        verses: ["Psalm 46:1 — God is our refuge and strength, an ever-present help in trouble."],
         reflection: "Whatever you are facing today God is your refuge and strength. Run to Him.",
         prayer: "Father in the name of Jesus Christ be my refuge and strength today. In the name of Jesus Christ. Amen."
       });
@@ -595,8 +599,12 @@ export default function App() {
             {verseResult && (
               <div>
                 <div style={s.cardGold}>
-                  <p style={{ color: GOLD_LIGHT, fontSize: 11, fontFamily: "sans-serif", margin: "0 0 8px", letterSpacing: 1, textTransform: "uppercase" }}>Your Verse</p>
-                  <p style={{ color: WHITE, fontSize: 15, fontStyle: "italic", lineHeight: 1.7, margin: 0 }}>"{verseResult.verse}"</p>
+                  <p style={{ color: GOLD_LIGHT, fontSize: 11, fontFamily: "sans-serif", margin: "0 0 8px", letterSpacing: 1, textTransform: "uppercase" }}>Scriptures for You</p>
+                  {verseResult.verses.map((v, i) => (
+                    <div key={i} style={{ borderBottom: i < verseResult.verses.length - 1 ? `1px solid ${GOLD}44` : "none", paddingBottom: i < verseResult.verses.length - 1 ? 12 : 0, marginBottom: i < verseResult.verses.length - 1 ? 12 : 0 }}>
+                      <p style={{ color: WHITE, fontSize: 14, fontStyle: "italic", lineHeight: 1.7, margin: 0 }}>"{v}"</p>
+                    </div>
+                  ))}
                 </div>
                 <div style={s.card}>
                   <p style={{ color: GOLD, fontSize: 13, fontWeight: "bold", marginBottom: 6, fontFamily: "sans-serif" }}>Reflection</p>
