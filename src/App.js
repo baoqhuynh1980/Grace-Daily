@@ -1049,7 +1049,7 @@ export default function App() {
                     <span style={{ fontSize: 26 }}>{g.icon}</span>
                     <div style={{ flex: 1 }}>
                       <p style={{ color: BROWN_DARK, fontSize: 14, fontWeight: "bold", margin: 0 }}>{g.title}</p>
-                      {isBibleGoal && <p style={{ color: GOLD, fontSize: 11, fontFamily: "sans-serif", margin: "2px 0 0" }}>📖 Auto-tracked from Bible Reader</p>}
+                      {isBibleGoal && <p style={{ color: GOLD, fontSize: 11, fontFamily: "sans-serif", margin: "2px 0 0" }}>📖 Auto-tracked — {totalRead} of {TOTAL_CHAPTERS} chapters read</p>}
                       {milestone && <span style={{ display: "inline-block", background: milestone.bg, color: milestone.color, borderRadius: 20, padding: "2px 10px", fontSize: 11, fontFamily: "sans-serif", fontWeight: "bold", marginTop: 4 }}>{milestone.label}</span>}
                     </div>
                     <span style={{ color: GOLD, fontSize: 16, fontWeight: "bold", fontFamily: "sans-serif" }}>{g.progress}%</span>
