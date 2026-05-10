@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { auth, db } from "./firebase";
+import { auth, db, messaging, requestNotificationPermission, onMessage } from "./firebase";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -32,7 +32,6 @@ const WHITE = "#FFFDF7";
 const TOTAL_CHAPTERS = 1189;
 const MEMORY_GOAL = 10;
 
-// ─── STREAK HELPERS ───────────────────────────────────────────────────────────
 const getTodayString = () => {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
@@ -44,7 +43,6 @@ const getYesterdayString = () => {
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 };
 
-// ─── FASTING DATA ─────────────────────────────────────────────────────────────
 const fastingFoundation = [
   {
     icon: "🙏",
@@ -100,7 +98,6 @@ const getFastingMilestone = (count) => {
   return current;
 };
 
-// ─── SCRIPTURE MEMORY SYSTEM ──────────────────────────────────────────────────
 const memoryMilestones = [
   { count: 1, label: "First Word 🌱", color: "#4CAF50", bg: "#F1F8E9" },
   { count: 3, label: "Growing Strong 🌿", color: "#388E3C", bg: "#E8F5E9" },
@@ -147,7 +144,6 @@ const checkAnswers = (words, blankIndices, userAnswers) => {
   return { correct, total: blankIndices.length, score, passed: score >= 70 };
 };
 
-// ─── BIBLE BOOKS ──────────────────────────────────────────────────────────────
 const bibleBooks = [
   { name: "Genesis", chapters: 50, testament: "OT", abbrev: "gen" },
   { name: "Exodus", chapters: 40, testament: "OT", abbrev: "exo" },
@@ -238,20 +234,12 @@ const sermonContent = {
   "Grace": { mainMessage: "Grace is the unmerited favor of God — His love and blessing extended to us not because of what we have done but because of who He is.", keyTakeaways: ["Grace is not earned — you cannot work for what God freely gives.", "Grace empowers you to live holy.", "Extend to others the same grace God has extended to you."], scriptures: ["Ephesians 2:8-9 — For by grace you have been saved through faith.", "2 Corinthians 12:9 — My grace is sufficient for you.", "Romans 5:20 — Where sin increased, grace increased all the more."], discussionQuestions: ["How does understanding God's grace change the way you view yourself?", "Is there an area where you are trying to earn God's favor?", "How can you extend grace to someone this week?"], prayer: "Father in the name of Jesus Christ thank you for your grace that covers every mistake. In the name of Jesus Christ. Amen.", journal: "Reflect on a moment when you experienced God's grace in a powerful way." },
   "Forgiveness": { mainMessage: "Forgiveness is at the heart of the Gospel. Unforgiveness is a prison that keeps us bound. When we forgive we release ourselves from the burden of bitterness.", keyTakeaways: ["Forgiveness is a choice, not a feeling.", "Unforgiveness hurts you more than the person who wronged you.", "You can forgive someone and still have healthy boundaries."], scriptures: ["Ephesians 4:32 — Be kind to one another, tenderhearted, forgiving one another.", "Matthew 6:14-15 — If you forgive others your heavenly Father will also forgive you.", "Colossians 3:13 — Bear with each other and forgive one another."], discussionQuestions: ["Is there someone in your life you need to forgive?", "How does remembering how much God has forgiven you help you forgive others?"], prayer: "Father in the name of Jesus Christ I choose to forgive those who have hurt me. In the name of Jesus Christ. Amen.", journal: "Who do you need to forgive? Write a letter you will never send." },
   "Prayer": { mainMessage: "Prayer is simply talking to God. It is not a religious ritual but a relationship. Prayer changes things and it changes us.", keyTakeaways: ["Prayer is a conversation — learn to listen as much as you speak.", "Consistency in prayer builds intimacy with God.", "Pray with faith and expectation."], scriptures: ["Philippians 4:6-7 — Do not be anxious about anything but in everything by prayer.", "Matthew 7:7-8 — Ask and it will be given to you.", "1 Thessalonians 5:17 — Pray without ceasing."], discussionQuestions: ["What does your current prayer life look like?", "What has been your most powerful answered prayer?"], prayer: "Father in the name of Jesus Christ teach me to pray with an open and honest heart. In the name of Jesus Christ. Amen.", journal: "Write out a prayer to God about something you have never prayed about before." },
-  "Love": { mainMessage: "God is love. Love is not just a feeling — it is a decision and an action.", keyTakeaways: ["Love is an action not just an emotion.", "You can only truly love others when you first receive God's love.", "The world will know we are Christians by our love."], scriptures: ["1 Corinthians 13:4-7 — Love is patient, love is kind.", "John 3:16 — For God so loved the world.", "1 John 4:19 — We love because He first loved us."], discussionQuestions: ["What does it look like to love someone who is difficult to love?", "In what relationship do you need to show more love?"], prayer: "Father in the name of Jesus Christ fill me with your love today. In the name of Jesus Christ. Amen.", journal: "Think of someone hard to love. How can you show them love this week?" },
   "Fear": { mainMessage: "Fear is one of the enemy's most powerful weapons. God has not given us a spirit of fear but of power, love and a sound mind.", keyTakeaways: ["Fear is a spirit that must be resisted in the name of Jesus.", "The antidote to fear is a deep trust in God.", "Stop feeding your fears and start feeding your faith."], scriptures: ["2 Timothy 1:7 — God has not given us a spirit of fear but of power.", "Isaiah 41:10 — Fear not for I am with you.", "Psalm 27:1 — The Lord is my light and salvation."], discussionQuestions: ["What fear has been controlling your life?", "What would you do differently if you were not afraid?"], prayer: "Father in the name of Jesus Christ I reject the spirit of fear. In the name of Jesus Christ. Amen.", journal: "Name your biggest fear. Write every truth from God's Word that contradicts it." },
-  "Anxiety": { mainMessage: "Anxiety is the result of trying to carry tomorrow's burdens with today's strength.", keyTakeaways: ["Anxiety is a signal to pray not a sentence to suffer.", "You cannot control everything but you can trust the One who controls all things.", "Cast your anxiety on God daily."], scriptures: ["Philippians 4:6-7 — Do not be anxious about anything but in everything by prayer.", "1 Peter 5:7 — Cast all your anxiety on Him.", "Matthew 6:34 — Do not worry about tomorrow."], discussionQuestions: ["What triggers your anxiety the most?", "How would your life look different if you truly trusted God?"], prayer: "Father in the name of Jesus Christ I bring every anxious thought to you. Fill me with your peace. In the name of Jesus Christ. Amen.", journal: "List every worry. Next to each write a truth from God's Word that speaks to it." },
-  "Hope": { mainMessage: "Hope in God is an anchor for the soul.", keyTakeaways: ["Hope is rooted in God's character not your circumstances.", "You are never without hope because you are never without God."], scriptures: ["Romans 15:13 — May the God of hope fill you with joy and peace.", "Jeremiah 29:11 — For I know the plans I have for you.", "Lamentations 3:22-23 — His mercies are new every morning."], discussionQuestions: ["Where have you lost hope recently?", "What promise from God's Word gives you the most hope?"], prayer: "Father in the name of Jesus Christ restore my hope today. In the name of Jesus Christ. Amen.", journal: "Write about a season when all hope seemed lost but God came through." },
-  "The Gospel": { mainMessage: "The Gospel is the greatest news the world has ever heard. Jesus Christ came to restore our relationship with God through His death and resurrection.", keyTakeaways: ["The Gospel is the power of God for salvation to everyone who believes.", "The Gospel compels us to go and tell others."], scriptures: ["Romans 1:16 — I am not ashamed of the gospel.", "1 Corinthians 15:3-4 — Christ died for our sins and was raised.", "John 14:6 — I am the way the truth and the life."], discussionQuestions: ["How would you explain the Gospel to someone who has never heard it?", "Who in your life needs to hear the Gospel?"], prayer: "Father in the name of Jesus Christ help me to never lose my wonder at what you did for me. In the name of Jesus Christ. Amen.", journal: "Write out the Gospel in your own words as if explaining it for the first time." },
-  "Spiritual Warfare": { mainMessage: "Every believer is in a spiritual battle. The battle is real but the victory has already been won through Jesus Christ.", keyTakeaways: ["Your battle is not against people but against spiritual forces.", "The enemy has already been defeated — you enforce a victory Christ already won."], scriptures: ["Ephesians 6:11 — Put on the full armor of God.", "1 Peter 5:8 — Your adversary the devil prowls like a roaring lion.", "James 4:7 — Resist the devil and he will flee."], discussionQuestions: ["What area of your life feels under spiritual attack?", "What does it look like practically to resist the devil?"], prayer: "Father in the name of Jesus Christ I put on the full armor of God. In the name of Jesus Christ. Amen.", journal: "Identify one area of spiritual attack. Write a battle plan using scripture." },
-  "God's Timing": { mainMessage: "God is never late and He is never early — He is always right on time.", keyTakeaways: ["Waiting on God is not wasted time.", "God's delays are not God's denials."], scriptures: ["Ecclesiastes 3:1 — There is a time for everything.", "Isaiah 40:31 — Those who wait on the Lord will renew their strength.", "Habakkuk 2:3 — The vision awaits an appointed time."], discussionQuestions: ["What are you currently waiting on God for?", "What is God trying to develop in you during this waiting season?"], prayer: "Father in the name of Jesus Christ I trust your timing even when I do not understand it. In the name of Jesus Christ. Amen.", journal: "Write about what you are waiting on God for. What might He be building in you?" },
-  "Identity in Christ": { mainMessage: "Your true identity is found in who God says you are. In Christ you are loved, chosen, redeemed, forgiven, and called.", keyTakeaways: ["Your identity is rooted in whose you are not what you do.", "Replace lies you believe with what God's Word says about you."], scriptures: ["2 Corinthians 5:17 — If anyone is in Christ the new creation has come.", "Ephesians 1:4-5 — He chose us before the creation of the world.", "1 Peter 2:9 — You are a chosen people, a royal priesthood."], discussionQuestions: ["What lies have you believed about yourself?", "What truth about your identity in Christ do you need to declare today?"], prayer: "Father in the name of Jesus Christ I declare who I am in you. I am loved, chosen, redeemed and called. In the name of Jesus Christ. Amen.", journal: "List 10 things God says about you. Read them out loud every morning this week." },
   "Fasting": { mainMessage: "Fasting is one of the most powerful spiritual disciplines. When we fast we deny the flesh and say knowing God is more important than physical comfort. Prayer and fasting always go hand in hand.", keyTakeaways: ["Start small — a meal fast is a powerful starting point.", "Fasting is about drawing closer to God not impressing Him.", "Prayer and fasting together unlock breakthroughs that prayer alone does not."], scriptures: ["Matthew 6:16-17 — When you fast do not look somber.", "Isaiah 58:6 — To loose the chains of injustice.", "Acts 13:2-3 — While fasting the Holy Spirit spoke."], discussionQuestions: ["Have you ever fasted before?", "What breakthrough requires fasting and prayer?"], prayer: "Father in the name of Jesus Christ as I fast and pray I draw closer to you. In the name of Jesus Christ. Amen.", journal: "Write about something you are believing God for. Commit to a specific fast." },
-  "The Armor of God": { mainMessage: "The Armor of God in Ephesians 6 is essential equipment for every believer in spiritual battle.", keyTakeaways: ["Every piece of armor is essential.", "The only offensive weapon is the sword of the Spirit — the Word of God."], scriptures: ["Ephesians 6:11 — Put on the full armor of God.", "Ephesians 6:17 — The sword of the Spirit which is the Word of God.", "Romans 13:12 — Put on the armor of light."], discussionQuestions: ["Which piece of armor do you feel weakest in?", "How do you practically put on the armor each morning?"], prayer: "Father in the name of Jesus Christ I put on the full armor right now. In the name of Jesus Christ. Amen.", journal: "Go through each piece of armor. Write what it means in your daily life." },
-  "How to Pray": { mainMessage: "Jesus gave us a model in Matthew 6 — the Lord's Prayer — that covers every element of powerful prayer.", keyTakeaways: ["Start with praise — acknowledge who God is before bringing requests.", "Be specific in your prayers.", "End with surrender — your will not mine be done."], scriptures: ["Matthew 6:9-13 — Our Father in heaven hallowed be your name.", "Jeremiah 33:3 — Call to me and I will answer you.", "James 5:16 — The prayer of a righteous person is powerful."], discussionQuestions: ["What has been the biggest obstacle to your prayer life?", "What is one thing you want to start praying about consistently?"], prayer: "Father in the name of Jesus Christ teach me to pray. Help me to be consistent, specific and expectant. In the name of Jesus Christ. Amen.", journal: "Write your own version of the Lord's Prayer — personalized to your life." },
-  "Faith Over Fear": { mainMessage: "Fear and faith cannot occupy the same space. Faith over fear is a daily choice to trust God above every threat.", keyTakeaways: ["Acknowledge your fear but do not give it authority.", "Faith is not the absence of fear — it is moving forward in spite of it."], scriptures: ["Joshua 1:9 — Be strong and courageous.", "Psalm 56:3 — When I am afraid I put my trust in you.", "Isaiah 41:10 — Fear not for I am with you."], discussionQuestions: ["What fear is trying to stop you right now?", "How do you practically choose faith over fear?"], prayer: "Father in the name of Jesus Christ I choose faith over fear today. In the name of Jesus Christ. Amen.", journal: "Name the fear controlling you most. Write a declaration of faith against it." },
-  "Jesus Changes Everything": { mainMessage: "An encounter with Jesus Christ changes everything. He transforms life from the inside out.", keyTakeaways: ["Jesus does not just fix broken things — He makes all things new.", "Your past does not define you — your encounter with Jesus does."], scriptures: ["2 Corinthians 5:17 — If anyone is in Christ the new creation has come.", "John 10:10 — I have come that they may have life to the full.", "Galatians 2:20 — I have been crucified with Christ."], discussionQuestions: ["How has your encounter with Jesus changed your life?", "Who needs to know that Jesus changes everything?"], prayer: "Father in the name of Jesus Christ thank you that Jesus changed everything for me. In the name of Jesus Christ. Amen.", journal: "Write your before and after story. Who were you before Jesus and who are you now?" },
+  "Hope": { mainMessage: "Hope in God is an anchor for the soul.", keyTakeaways: ["Hope is rooted in God's character not your circumstances.", "You are never without hope because you are never without God."], scriptures: ["Romans 15:13 — May the God of hope fill you with joy and peace.", "Jeremiah 29:11 — For I know the plans I have for you.", "Lamentations 3:22-23 — His mercies are new every morning."], discussionQuestions: ["Where have you lost hope recently?", "What promise from God's Word gives you the most hope?"], prayer: "Father in the name of Jesus Christ restore my hope today. In the name of Jesus Christ. Amen.", journal: "Write about a season when all hope seemed lost but God came through." },
+  "Identity in Christ": { mainMessage: "Your true identity is found in who God says you are. In Christ you are loved, chosen, redeemed, forgiven, and called.", keyTakeaways: ["Your identity is rooted in whose you are not what you do.", "Replace lies you believe with what God's Word says about you."], scriptures: ["2 Corinthians 5:17 — If anyone is in Christ the new creation has come.", "Ephesians 1:4-5 — He chose us before the creation of the world.", "1 Peter 2:9 — You are a chosen people, a royal priesthood."], discussionQuestions: ["What lies have you believed about yourself?", "What truth about your identity in Christ do you need to declare today?"], prayer: "Father in the name of Jesus Christ I declare who I am in you. I am loved, chosen, redeemed and called. In the name of Jesus Christ. Amen.", journal: "List 10 things God says about you. Read them out loud every morning this week." },
   "Marriage": { mainMessage: "Marriage is God's design and a powerful picture of Christ's relationship with the Church.", keyTakeaways: ["A strong marriage requires three — you, your spouse and God.", "Love in marriage is a covenant not a feeling."], scriptures: ["Ephesians 5:25 — Husbands love your wives as Christ loved the church.", "Genesis 2:24 — A man shall be united to his wife.", "Ecclesiastes 4:12 — A cord of three strands is not quickly broken."], discussionQuestions: ["What does it look like to put God at the center of your marriage?", "What is one thing you can do this week to strengthen your marriage?"], prayer: "Father in the name of Jesus Christ I bring my marriage to you. Strengthen our bond. In the name of Jesus Christ. Amen.", journal: "Write about what you love most about your spouse and one way you will show them love." },
+  "Jesus Changes Everything": { mainMessage: "An encounter with Jesus Christ changes everything. He transforms life from the inside out.", keyTakeaways: ["Jesus does not just fix broken things — He makes all things new.", "Your past does not define you — your encounter with Jesus does."], scriptures: ["2 Corinthians 5:17 — If anyone is in Christ the new creation has come.", "John 10:10 — I have come that they may have life to the full.", "Galatians 2:20 — I have been crucified with Christ."], discussionQuestions: ["How has your encounter with Jesus changed your life?", "Who needs to know that Jesus changes everything?"], prayer: "Father in the name of Jesus Christ thank you that Jesus changed everything for me. In the name of Jesus Christ. Amen.", journal: "Write your before and after story. Who were you before Jesus and who are you now?" },
   "When God Feels Silent": { mainMessage: "Every believer goes through seasons where God feels distant. But silence is not absence.", keyTakeaways: ["God's silence is not His absence.", "Keep showing up — consistency in dry seasons is a mark of mature faith."], scriptures: ["Psalm 22:1-2 — My God why have you forsaken me.", "Isaiah 45:15 — Truly you are a God who hides himself.", "Hebrews 13:5 — Never will I leave you."], discussionQuestions: ["Have you gone through a season where God felt silent?", "How do you maintain faith when you cannot feel God?"], prayer: "Father in the name of Jesus Christ even in silence I choose to trust you. In the name of Jesus Christ. Amen.", journal: "Write an honest letter to God about this silent season. Then write what you believe is true about Him." }
 };
 
@@ -273,21 +261,11 @@ const emotionVerses = {
   grateful: { keywords: ["grateful","thankful","blessed","happy","joyful","joy","praise","amazing","good","wonderful"], verses: ["psalm 100:4","1 thessalonians 5:18","psalm 107:1","philippians 4:4","james 1:17","psalm 136:1","ephesians 5:20","psalm 118:24","colossians 3:17","psalm 9:1"], reflection: "A grateful heart is a powerful heart. Counting blessings opens the door for even more grace.", prayer: "Father in the name of Jesus Christ thank you for your goodness and mercy. In the name of Jesus Christ. Amen." },
   lonely: { keywords: ["lonely","alone","abandoned","isolated","forgotten","unloved","rejected","left out","no one"], verses: ["deuteronomy 31:6","psalm 139:7","hebrews 13:5","matthew 28:20","isaiah 43:4","psalm 68:6","john 14:18","zephaniah 3:17","romans 8:38","psalm 27:10"], reflection: "You are never truly alone. Even in your loneliest moment God's presence surrounds you.", prayer: "Father in the name of Jesus Christ remind me I am never alone. Fill my heart with your love. In the name of Jesus Christ. Amen." },
   angry: { keywords: ["angry","anger","mad","furious","frustrated","rage","upset","bitter","resentful","annoyed"], verses: ["ephesians 4:26","james 1:19","proverbs 15:1","psalm 37:8","romans 12:19","colossians 3:8","proverbs 29:11","matthew 5:22","ecclesiastes 7:9","psalm 4:4"], reflection: "God understands your anger. He asks you to bring it to Him rather than let it control you.", prayer: "Father in the name of Jesus Christ I give you my anger. Help me respond with grace and wisdom. In the name of Jesus Christ. Amen." },
-  lost: { keywords: ["lost","confused","don't know","unsure","unclear","wandering","no direction","uncertain","mixed up"], verses: ["proverbs 3:5","psalm 32:8","isaiah 30:21","john 10:27","psalm 119:105","jeremiah 29:11","proverbs 16:9","isaiah 42:16","psalm 25:4","romans 8:14"], reflection: "Even when you feel lost God always knows exactly where you are. He is faithful to guide you.", prayer: "Father in the name of Jesus Christ I need your guidance. Show me the path you have for me. In the name of Jesus Christ. Amen." },
-  hopeful: { keywords: ["hopeful","hope","expectant","believing","trusting","faith","optimistic","looking forward"], verses: ["romans 15:13","jeremiah 29:11","hebrews 11:1","lamentations 3:22","psalm 31:24","isaiah 40:31","romans 8:28","psalm 62:5","micah 7:7","habakkuk 2:3"], reflection: "Hope in God is never wasted. He is faithful to fulfill every promise He has made.", prayer: "Father in the name of Jesus Christ fill me with your hope today. In the name of Jesus Christ. Amen." },
-  tempted: { keywords: ["tempted","temptation","struggling","addicted","addiction","can't stop","weak","failing","giving in","sin"], verses: ["1 corinthians 10:13","james 4:7","hebrews 4:15","galatians 5:16","romans 6:14","psalm 119:11","matthew 26:41","2 peter 2:9","ephesians 6:11","1 john 4:4"], reflection: "God always provides a way out. Through Christ you have the power to overcome.", prayer: "Father in the name of Jesus Christ give me the power to resist temptation and walk in freedom. In the name of Jesus Christ. Amen." },
-  grieving: { keywords: ["grieving","grief","loss","death","mourning","miss","missing","died","passed away","hurting"], verses: ["psalm 34:18","revelation 21:4","matthew 5:4","2 corinthians 1:3","isaiah 61:1","john 11:35","romans 8:28","psalm 23:4","1 thessalonians 4:13","psalm 147:3"], reflection: "God sees your grief and He weeps with you. He is the God of all comfort.", prayer: "Father in the name of Jesus Christ comfort me in this grief. Hold me close. In the name of Jesus Christ. Amen." },
-  tired: { keywords: ["tired","exhausted","weary","worn out","burnt out","drained","no energy","fatigued","rest"], verses: ["matthew 11:28","isaiah 40:31","psalm 23:2","mark 6:31","2 corinthians 12:9","galatians 6:9","psalm 127:2","exodus 33:14","isaiah 41:10","hebrews 12:3"], reflection: "God sees your weariness and invites you to come to Him for rest.", prayer: "Father in the name of Jesus Christ I am tired and need your rest. Restore my strength. In the name of Jesus Christ. Amen." },
   fearful: { keywords: ["fearful","fear","scared","afraid","terrified","frightened","dread","phobia"], verses: ["2 timothy 1:7","psalm 27:1","isaiah 41:10","john 14:27","psalm 56:3","deuteronomy 31:6","romans 8:15","1 john 4:18","psalm 34:4","hebrews 13:6"], reflection: "Fear is real but God is greater than every fear you face.", prayer: "Father in the name of Jesus Christ I reject the spirit of fear. In the name of Jesus Christ. Amen." },
-  doubting: { keywords: ["doubt","doubting","weak faith","don't believe","questioning","not sure","wavering","struggling to believe"], verses: ["mark 9:24","hebrews 11:1","james 1:6","romans 10:17","matthew 14:31","john 20:27","jude 1:22","2 corinthians 5:7","psalm 73:26","luke 17:5"], reflection: "Bring your doubts honestly to God. He is not offended by your questions.", prayer: "Father in the name of Jesus Christ I bring my doubts to you. Help my unbelief. In the name of Jesus Christ. Amen." },
+  tired: { keywords: ["tired","exhausted","weary","worn out","burnt out","drained","no energy","fatigued","rest"], verses: ["matthew 11:28","isaiah 40:31","psalm 23:2","mark 6:31","2 corinthians 12:9","galatians 6:9","psalm 127:2","exodus 33:14","isaiah 41:10","hebrews 12:3"], reflection: "God sees your weariness and invites you to come to Him for rest.", prayer: "Father in the name of Jesus Christ I am tired and need your rest. Restore my strength. In the name of Jesus Christ. Amen." },
+  hopeful: { keywords: ["hopeful","hope","expectant","believing","trusting","faith","optimistic","looking forward"], verses: ["romans 15:13","jeremiah 29:11","hebrews 11:1","lamentations 3:22","psalm 31:24","isaiah 40:31","romans 8:28","psalm 62:5","micah 7:7","habakkuk 2:3"], reflection: "Hope in God is never wasted. He is faithful to fulfill every promise He has made.", prayer: "Father in the name of Jesus Christ fill me with your hope today. In the name of Jesus Christ. Amen." },
   peace: { keywords: ["peace","calm","quiet","still","tranquil","settled","serenity"], verses: ["john 14:27","philippians 4:7","isaiah 26:3","psalm 46:10","numbers 6:26","romans 5:1","colossians 3:15","psalm 29:11","2 thessalonians 3:16","isaiah 32:17"], reflection: "The peace of God is available to you right now. It is not dependent on your circumstances.", prayer: "Father in the name of Jesus Christ fill me with your perfect peace. In the name of Jesus Christ. Amen." },
-  financial: { keywords: ["financial","money","broke","debt","bills","poor","struggling financially","no money","paycheck","provision"], verses: ["philippians 4:19","matthew 6:33","psalm 23:1","luke 12:24","2 corinthians 9:8","proverbs 3:9","malachi 3:10","psalm 37:25","isaiah 58:11","deuteronomy 8:18"], reflection: "God is your provider and He knows every financial need you have.", prayer: "Father in the name of Jesus Christ I trust you as my provider. In the name of Jesus Christ. Amen." },
   strength: { keywords: ["strength","strong","power","courage","bold","brave","overcome","victory","conquer","persevere"], verses: ["philippians 4:13","isaiah 40:29","psalm 46:1","2 corinthians 12:9","ephesians 6:10","joshua 1:9","psalm 18:32","isaiah 41:10","habakkuk 3:19","1 chronicles 16:11"], reflection: "God is your strength when you are weak. His power is made perfect in weakness.", prayer: "Father in the name of Jesus Christ be my strength today. In the name of Jesus Christ. Amen." },
-  worship: { keywords: ["worship","praise","glorify","honor","adore","magnify","exalt","hallelujah","thanksgiving"], verses: ["psalm 100:1","john 4:24","psalm 150:6","hebrews 13:15","revelation 4:11","psalm 95:6","isaiah 6:3","psalm 29:2","1 chronicles 29:11","psalm 34:1"], reflection: "God is worthy of all praise. When we worship Him our perspective shifts from problems to His greatness.", prayer: "Father in the name of Jesus Christ I worship you today. You are worthy of all praise. In the name of Jesus Christ. Amen." },
-  unworthy: { keywords: ["unworthy","worthless","not good enough","failure","useless","nobody","don't deserve","inadequate"], verses: ["psalm 139:14","ephesians 2:10","romans 5:8","john 3:16","isaiah 43:4","1 peter 2:9","zephaniah 3:17","romans 8:37","galatians 3:26","1 john 3:1"], reflection: "You are not defined by your failures. God loved you so much that He sent His Son to die for you.", prayer: "Father in the name of Jesus Christ remind me of my worth in your eyes. In the name of Jesus Christ. Amen." },
-  surrendering: { keywords: ["surrender","surrendering","let go","giving up","giving it to God","release","submit","yield","trust God"], verses: ["matthew 11:28","proverbs 3:5","romans 12:1","galatians 2:20","psalm 46:10","luke 22:42","1 peter 5:6","james 4:7","matthew 16:24","john 12:24"], reflection: "Surrendering to God is not giving up — it is the greatest act of faith.", prayer: "Father in the name of Jesus Christ I surrender everything to you. Have your way in me. In the name of Jesus Christ. Amen." },
-  addiction: { keywords: ["addiction","addicted","substance","alcohol","drugs","pornography","gambling","can't quit","bondage","chains"], verses: ["1 corinthians 10:13","john 8:36","galatians 5:1","romans 6:14","2 corinthians 5:17","philippians 4:13","romans 8:1","1 john 1:9","luke 4:18","psalm 107:14"], reflection: "Jesus came to set the captives free. No addiction is too powerful for God.", prayer: "Father in the name of Jesus Christ set me free from this addiction by the power of your Holy Spirit. In the name of Jesus Christ. Amen." },
-  forgiveness: { keywords: ["forgiveness","forgive","guilty","shame","regret","mistake","failed","messed up","repent"], verses: ["1 john 1:9","psalm 103:12","isaiah 43:25","romans 8:1","micah 7:19","ephesians 1:7","acts 3:19","hebrews 8:12","luke 15:20","psalm 32:5"], reflection: "God's forgiveness is complete and total. You do not have to carry guilt and shame any longer.", prayer: "Father in the name of Jesus Christ I confess my sins and receive your complete forgiveness. In the name of Jesus Christ. Amen." }
 };
 
 const getEmotionCategory = (feeling) => {
@@ -346,7 +324,6 @@ const getMilestone = (progress) => {
   return null;
 };
 
-// ─── AUTH SCREEN ──────────────────────────────────────────────────────────────
 function AuthScreen({ onAuthSuccess }) {
   const [mode, setMode] = useState("login");
   const [email, setEmail] = useState("");
@@ -418,7 +395,6 @@ function AuthScreen({ onAuthSuccess }) {
     </div>
   );
 }
-// ─── MAIN APP ─────────────────────────────────────────────────────────────────
 export default function App() {
   const [user, setUser] = useState(undefined);
   const [showAuth, setShowAuth] = useState(false);
@@ -447,13 +423,13 @@ export default function App() {
     { text: "My marriage was falling apart. We prayed together for the first time in years and God restored everything. To God be the glory!", time: "2 weeks ago" },
   ]);
 
-  // ─── FIREBASE STREAK STATE ────────────────────────────────────────────────
   const [streak, setStreak] = useState(0);
   const [streakLogged, setStreakLogged] = useState(false);
   const [streakLoading, setStreakLoading] = useState(true);
   const [streakCelebration, setStreakCelebration] = useState(false);
+  const [notifEnabled, setNotifEnabled] = useState(false);
+  const [showNotifBanner, setShowNotifBanner] = useState(true);
 
-  // ─── FASTING STATE ────────────────────────────────────────────────────────
   const [fastingTab, setFastingTab] = useState("foundation");
   const [fastingLog, setFastingLog] = useState([]);
   const [fastingLoading, setFastingLoading] = useState(true);
@@ -466,7 +442,6 @@ export default function App() {
   const [advancedGoalLoading, setAdvancedGoalLoading] = useState(true);
   const [customFastDays, setCustomFastDays] = useState("3");
 
-  // Vision Board State
   const [visionGoals, setVisionGoals] = useState([]);
   const [visionLoading, setVisionLoading] = useState(true);
   const [showAddGoal, setShowAddGoal] = useState(false);
@@ -474,7 +449,6 @@ export default function App() {
   const [newGoalIcon, setNewGoalIcon] = useState("🎯");
   const [celebration, setCelebration] = useState(null);
 
-  // Bible Reader State
   const [bibleTestament, setBibleTestament] = useState("NT");
   const [selectedBook, setSelectedBook] = useState(null);
   const [selectedChapter, setSelectedChapter] = useState(null);
@@ -485,7 +459,6 @@ export default function App() {
   const [readChaptersLoading, setReadChaptersLoading] = useState(true);
   const [totalRead, setTotalRead] = useState(0);
 
-  // Scripture Memory State
   const [memoryVerses, setMemoryVerses] = useState([]);
   const [memoryLoading, setMemoryLoading] = useState(true);
   const [memoryTab, setMemoryTab] = useState("list");
@@ -510,7 +483,15 @@ export default function App() {
     return () => unsubscribe();
   }, []);
 
-  // ─── LOAD STREAK FROM FIREBASE ────────────────────────────────────────────
+  // ─── REQUEST NOTIFICATIONS ────────────────────────────────────────────────
+  useEffect(() => {
+    if (!user) return;
+    requestNotificationPermission().then(token => {
+      if (token) { setNotifEnabled(true); setShowNotifBanner(false); }
+    });
+  }, [user]);
+
+  // ─── LOAD STREAK ──────────────────────────────────────────────────────────
   useEffect(() => {
     if (!user) { setStreak(0); setStreakLogged(false); setStreakLoading(false); return; }
     setStreakLoading(true);
@@ -533,7 +514,6 @@ export default function App() {
     loadStreak();
   }, [user]);
 
-  // ─── LOG PRAYER STREAK ────────────────────────────────────────────────────
   const logPrayer = async () => {
     if (streakLogged) return;
     if (!user) { setShowAuth(true); return; }
@@ -554,7 +534,6 @@ export default function App() {
     } catch (err) { console.error(err); }
   };
 
-  // ─── LOAD FASTING LOG ─────────────────────────────────────────────────────
   useEffect(() => {
     if (!user) { setFastingLog([]); setTotalFasts(0); setFastingLoading(false); return; }
     setFastingLoading(true);
@@ -568,7 +547,6 @@ export default function App() {
     return () => unsubscribe();
   }, [user]);
 
-  // ─── LOAD ADVANCED FASTING GOAL ───────────────────────────────────────────
   useEffect(() => {
     if (!user) { setAdvancedGoal(null); setAdvancedGoalLoading(false); return; }
     setAdvancedGoalLoading(true);
@@ -580,7 +558,6 @@ export default function App() {
     return () => unsubscribe();
   }, [user]);
 
-  // ─── LOG A FAST ───────────────────────────────────────────────────────────
   const logFast = async () => {
     if (!selectedFastLevel) return;
     if (!user) { setShowAuth(true); return; }
@@ -604,7 +581,6 @@ export default function App() {
     } catch (err) { console.error(err); }
   };
 
-  // ─── SET ADVANCED GOAL ────────────────────────────────────────────────────
   const setAdvancedFastingGoal = async (level) => {
     if (!user) { setShowAuth(true); return; }
     try {
@@ -614,7 +590,6 @@ export default function App() {
     } catch (err) { console.error(err); }
   };
 
-  // ─── LOAD PRAYER WALL ─────────────────────────────────────────────────────
   useEffect(() => {
     const q = query(collection(db, "prayerWall"), orderBy("createdAt", "desc"));
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -624,7 +599,6 @@ export default function App() {
     return () => unsubscribe();
   }, []);
 
-  // ─── LOAD JOURNAL ─────────────────────────────────────────────────────────
   useEffect(() => {
     if (!user) { setJournalEntries([]); return; }
     setJournalLoading(true);
@@ -636,7 +610,6 @@ export default function App() {
     return () => unsubscribe();
   }, [user]);
 
-  // ─── LOAD VISION GOALS ────────────────────────────────────────────────────
   useEffect(() => {
     if (!user) {
       setVisionGoals([{ id: "1", title: "Read the entire Bible", progress: 0, icon: "📖" }, { id: "2", title: "Pray daily for 30 days", progress: 0, icon: "🙏" }, { id: "3", title: "Memorize 10 scriptures", progress: 0, icon: "✝️" }, { id: "4", title: "Fast once a week", progress: 0, icon: "⚡" }]);
@@ -656,7 +629,6 @@ export default function App() {
     return () => unsubscribe();
   }, [user]);
 
-  // ─── LOAD READ CHAPTERS ───────────────────────────────────────────────────
   useEffect(() => {
     if (!user) { setReadChapters({}); setTotalRead(0); setReadChaptersLoading(false); return; }
     setReadChaptersLoading(true);
@@ -668,7 +640,6 @@ export default function App() {
     return () => unsubscribe();
   }, [user]);
 
-  // ─── LOAD MEMORY VERSES ───────────────────────────────────────────────────
   useEffect(() => {
     if (!user) { setMemoryVerses([]); setTotalMemorized(0); setMemoryLoading(false); return; }
     setMemoryLoading(true);
@@ -682,7 +653,6 @@ export default function App() {
     return () => unsubscribe();
   }, [user]);
 
-  // ─── AUTO UPDATE BIBLE & MEMORY PROGRESS ──────────────────────────────────
   useEffect(() => {
     if (!user || visionGoals.length === 0) return;
     const bibleGoal = visionGoals.find(g => g.title === "Read the entire Bible");
@@ -904,6 +874,20 @@ export default function App() {
   return (
     <div style={s.app}>
 
+      {/* NOTIFICATION BANNER */}
+      {user && showNotifBanner && !notifEnabled && (
+        <div style={{ background: `linear-gradient(135deg, ${BROWN_DARK}, ${BROWN})`, padding: "12px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
+          <div>
+            <p style={{ color: GOLD_MID, fontSize: 13, fontWeight: "bold", margin: "0 0 2px", fontFamily: "sans-serif" }}>🔔 Enable Daily Reminders</p>
+            <p style={{ color: GOLD_LIGHT, fontSize: 11, margin: 0, fontFamily: "sans-serif" }}>Get daily prayer, streak and verse reminders!</p>
+          </div>
+          <div style={{ display: "flex", gap: 8 }}>
+            <button style={{ background: GOLD, border: "none", borderRadius: 8, padding: "6px 12px", color: WHITE, fontSize: 12, cursor: "pointer", fontFamily: "sans-serif", fontWeight: "bold" }} onClick={() => { requestNotificationPermission().then(token => { if (token) { setNotifEnabled(true); setShowNotifBanner(false); } }); }}>Enable 🔔</button>
+            <button style={{ background: "none", border: `1px solid ${GOLD_LIGHT}`, borderRadius: 8, padding: "6px 10px", color: GOLD_LIGHT, fontSize: 11, cursor: "pointer", fontFamily: "sans-serif" }} onClick={() => setShowNotifBanner(false)}>Later</button>
+          </div>
+        </div>
+      )}
+
       {/* BADGE CELEBRATION */}
       {newSticker && (
         <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.7)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -960,8 +944,6 @@ export default function App() {
       </div>
 
       <div style={s.content}>
-
-        {/* HOME */}
         {activeTab === "home" && (
           <div>
             <div style={s.cardGold}>
@@ -998,9 +980,7 @@ export default function App() {
             <div style={s.card}><p style={{ ...s.sectionTitle, fontSize: 15, marginBottom: 6 }}>✝️ New to Jesus?</p><p style={{ color: BROWN, fontSize: 13, margin: "0 0 10px", lineHeight: 1.5 }}>Find out who Jesus is and how He can transform your life.</p><button style={s.btn} onClick={() => setActiveTab("salvation")}>Learn About Jesus →</button></div>
           </div>
         )}
-
-        {/* BIBLE READER */}
-        {activeTab === "bible" && (
+{activeTab === "bible" && (
           <div>
             {selectedBook && selectedChapter && (
               <div>
@@ -1047,7 +1027,6 @@ export default function App() {
           </div>
         )}
 
-        {/* SCRIPTURE MEMORY */}
         {activeTab === "memory" && (
           <div>
             <p style={s.sectionTitle}>✍️ Scripture Memory</p>
@@ -1065,7 +1044,6 @@ export default function App() {
           </div>
         )}
 
-        {/* VERSE */}
         {activeTab === "verse" && (
           <div>
             <p style={s.sectionTitle}>✨ Verse of the Moment</p>
@@ -1075,7 +1053,6 @@ export default function App() {
           </div>
         )}
 
-        {/* PRAYER */}
         {activeTab === "prayer" && (
           <div>
             <p style={s.sectionTitle}>🙏 Prayer</p>
@@ -1084,293 +1061,27 @@ export default function App() {
                 <button key={id} onClick={() => setPrayerTab(id)} style={{ flex: 1, minWidth: 60, padding: "8px 4px", border: "none", borderRadius: 10, background: prayerTab === id ? `linear-gradient(135deg, ${GOLD}, ${BROWN})` : "none", color: prayerTab === id ? WHITE : BROWN, fontSize: 10, fontFamily: "sans-serif", fontWeight: prayerTab === id ? "bold" : "normal", cursor: "pointer", lineHeight: 1.3, whiteSpace: "nowrap" }}>{label}</button>
               ))}
             </div>
+            {prayerTab === "how" && (<div><div style={s.cardGold}><p style={{ color: GOLD_LIGHT, fontSize: 11, fontFamily: "sans-serif", margin: "0 0 6px", letterSpacing: 1, textTransform: "uppercase" }}>The Lord's Prayer</p><h2 style={{ color: WHITE, fontSize: 18, margin: "0 0 8px" }}>Matthew 6:9-13</h2><p style={{ color: GOLD_LIGHT, fontSize: 13, fontStyle: "italic", lineHeight: 1.7, margin: 0 }}>"Our Father in heaven, hallowed be your name, your kingdom come, your will be done, on earth as it is in heaven. Give us today our daily bread. And forgive us our debts, as we also have forgiven our debtors. And lead us not into temptation, but deliver us from the evil one."</p></div>{[{ phrase: "Our Father in heaven", section: "ADORATION", icon: "👑", explanation: "Begin by acknowledging who God is — your Father, your Creator, the One who loves you unconditionally. Start every prayer with worship before requests." },{ phrase: "Your kingdom come, your will be done", section: "SURRENDER", icon: "🙌", explanation: "Surrender your plans to God's plans. God, I trust you more than I trust myself. Have your way in my life today." },{ phrase: "Give us today our daily bread", section: "PETITION", icon: "🙏", explanation: "Bring your needs to God — provision, health, relationships, finances, direction. Be bold and be specific." },{ phrase: "Forgive us our debts as we forgive others", section: "CONFESSION", icon: "💛", explanation: "Be honest about where you have fallen short. Then choose to forgive anyone who has wronged you." },{ phrase: "Lead us not into temptation", section: "PROTECTION", icon: "🛡️", explanation: "Ask God for protection over your mind, your family, your home and your future." }].map((item, i) => (<div key={i} style={s.card}><div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}><span style={{ fontSize: 24 }}>{item.icon}</span><div><p style={{ color: GOLD, fontSize: 11, fontFamily: "sans-serif", fontWeight: "bold", letterSpacing: 1, margin: 0 }}>{item.section}</p><p style={{ color: BROWN_DARK, fontSize: 13, fontWeight: "bold", margin: "2px 0 0", fontStyle: "italic" }}>"{item.phrase}"</p></div></div><p style={{ color: BROWN, fontSize: 13, lineHeight: 1.7, margin: 0 }}>{item.explanation}</p></div>))}<div style={{ ...s.card, background: GOLD_LIGHT }}><p style={{ color: BROWN, fontSize: 13, fontWeight: "bold", fontFamily: "sans-serif", marginBottom: 8 }}>🙏 Pray This Now</p><p style={{ color: BROWN_DARK, fontSize: 14, fontStyle: "italic", lineHeight: 1.8, margin: 0 }}>"Father in the name of Jesus Christ I come to you right now. You are holy and worthy of all praise. I surrender my plans to your perfect will. I bring my needs before you and trust you to provide. I confess my sins and I choose to forgive those who have wronged me. Protect my mind, my family and my future. Your kingdom come, your will be done in my life today. In the name of Jesus Christ. Amen."</p></div></div>)}
+            {prayerTab === "wall" && (<div><div style={s.card}><p style={{ color: BROWN, fontSize: 13, marginBottom: 10, lineHeight: 1.5 }}>Share your prayer request with the community. You are not alone. 🙏</p><textarea style={{ ...s.input, minHeight: 70, resize: "none" }} placeholder="Share your prayer request..." value={newPrayer} onChange={e => setNewPrayer(e.target.value)} /><button style={s.btn} onClick={submitPrayer}>Submit Prayer Request</button></div><p style={{ color: BROWN, fontSize: 13, fontFamily: "sans-serif", marginBottom: 8, fontWeight: "bold" }}>Community Prayer Wall</p>{prayerLoading && <div style={{ ...s.card, textAlign: "center", padding: 24 }}><p style={{ color: BROWN, fontStyle: "italic" }}>Loading prayers... 🙏</p></div>}{!prayerLoading && prayerList.length === 0 && <div style={{ ...s.card, textAlign: "center", padding: 24 }}><p style={{ color: BROWN, fontStyle: "italic" }}>Be the first to share a prayer request. 🙏</p></div>}{prayerList.map((r) => (<div key={r.id} style={s.card}><div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6 }}><span style={s.tag}>{r.name}</span><span style={{ color: BROWN + "99", fontSize: 11, fontFamily: "sans-serif" }}>{r.time}</span></div><p style={{ color: BROWN_DARK, fontSize: 14, lineHeight: 1.6, margin: "0 0 10px" }}>{r.request}</p><div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}><span style={{ color: BROWN + "99", fontSize: 12, fontFamily: "sans-serif" }}>🙏 {r.prayed} people prayed</span><button style={{ ...s.btnOutline, padding: "6px 14px", fontSize: 12 }} onClick={() => prayFor(r.id)}>{prayedIds.includes(r.id) ? "✓ Prayed" : "Pray for them"}</button></div></div>))}</div>)}
+            {prayerTab === "journal" && (<div><div style={s.cardGold}><p style={{ color: GOLD_LIGHT, fontSize: 11, fontFamily: "sans-serif", margin: "0 0 6px", letterSpacing: 1, textTransform: "uppercase" }}>Your Private Space</p><h2 style={{ color: WHITE, fontSize: 18, margin: "0 0 6px" }}>📓 Prayer Journal</h2><p style={{ color: GOLD_LIGHT, fontSize: 13, margin: 0 }}>Write your prayers to God. This is between you and Him.</p></div>{!user && (<div style={{ ...s.card, background: GOLD_LIGHT, border: `2px solid ${GOLD_MID}` }}><p style={{ color: BROWN_DARK, fontSize: 14, fontWeight: "bold", margin: "0 0 6px" }}>🔒 Sign In to Use Your Journal</p><p style={{ color: BROWN, fontSize: 13, margin: "0 0 10px" }}>Create a free account to save your private prayer journal forever.</p><button style={s.btn} onClick={() => setShowAuth(true)}>Sign In or Create Account →</button></div>)}{user && (<div style={s.card}><p style={{ color: GOLD, fontSize: 13, fontWeight: "bold", marginBottom: 8, fontFamily: "sans-serif" }}>New Prayer Entry</p><input style={{ ...s.input, marginBottom: 10 }} placeholder="Title — e.g. Trusting God with my finances" value={journalTitle} onChange={e => setJournalTitle(e.target.value)} /><textarea style={{ ...s.input, minHeight: 100, resize: "none" }} placeholder="Write your prayer here..." value={journalEntry} onChange={e => setJournalEntry(e.target.value)} /><button style={s.btn} onClick={submitJournal}>Save Prayer Entry</button></div>)}{journalLoading && <div style={{ ...s.card, textAlign: "center", padding: 24 }}><p style={{ color: BROWN, fontStyle: "italic" }}>Loading your journal... 🙏</p></div>}{!journalLoading && journalEntries.length === 0 && user && (<div style={{ ...s.card, textAlign: "center", padding: 28 }}><div style={{ fontSize: 32, marginBottom: 10 }}>📓</div><p style={{ color: BROWN, fontSize: 14, fontStyle: "italic", lineHeight: 1.6, margin: 0 }}>Your prayer journal is empty. Write your first prayer today. He is listening.</p></div>)}{journalEntries.map((entry) => (<div key={entry.id} style={s.card}><div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}><p style={{ color: BROWN_DARK, fontSize: 14, fontWeight: "bold", margin: 0 }}>{entry.title}</p><span style={{ color: BROWN + "99", fontSize: 11, fontFamily: "sans-serif", flexShrink: 0, marginLeft: 8 }}>{entry.date}</span></div><p style={{ color: BROWN, fontSize: 13, lineHeight: 1.7, margin: 0, fontStyle: "italic" }}>{entry.text}</p></div>))}</div>)}
+            {prayerTab === "answered" && (<div><div style={s.cardGold}><p style={{ color: GOLD_LIGHT, fontSize: 11, fontFamily: "sans-serif", margin: "0 0 6px", letterSpacing: 1, textTransform: "uppercase" }}>God is Faithful</p><h2 style={{ color: WHITE, fontSize: 18, margin: "0 0 6px" }}>✅ Answered Prayers</h2><p style={{ color: GOLD_LIGHT, fontSize: 13, margin: 0 }}>Share how God answered your prayer and encourage the whole community.</p></div><div style={s.card}><p style={{ color: GOLD, fontSize: 13, fontWeight: "bold", marginBottom: 8, fontFamily: "sans-serif" }}>Share Your Testimony</p><textarea style={{ ...s.input, minHeight: 80, resize: "none" }} placeholder="How did God answer your prayer?" value={testimony} onChange={e => setTestimony(e.target.value)} /><button style={s.btn} onClick={submitTestimony}>Share Testimony 🙌</button></div>{testimonies.map((t, i) => (<div key={i} style={{ ...s.card, border: `1.5px solid ${GOLD_MID}` }}><div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}><span style={{ ...s.tag, background: GOLD, color: WHITE }}>✅ God Answered</span><span style={{ color: BROWN + "99", fontSize: 11, fontFamily: "sans-serif" }}>{t.time}</span></div><p style={{ color: BROWN_DARK, fontSize: 14, lineHeight: 1.6, margin: 0 }}>{t.text}</p></div>))}</div>)}
 
-            {/* HOW TO PRAY */}
-            {prayerTab === "how" && (
-              <div>
-                <div style={s.cardGold}><p style={{ color: GOLD_LIGHT, fontSize: 11, fontFamily: "sans-serif", margin: "0 0 6px", letterSpacing: 1, textTransform: "uppercase" }}>The Lord's Prayer</p><h2 style={{ color: WHITE, fontSize: 18, margin: "0 0 8px" }}>Matthew 6:9-13</h2><p style={{ color: GOLD_LIGHT, fontSize: 13, fontStyle: "italic", lineHeight: 1.7, margin: 0 }}>"Our Father in heaven, hallowed be your name, your kingdom come, your will be done, on earth as it is in heaven. Give us today our daily bread. And forgive us our debts, as we also have forgiven our debtors. And lead us not into temptation, but deliver us from the evil one."</p></div>
-                {[{ phrase: "Our Father in heaven", section: "ADORATION", icon: "👑", explanation: "Begin by acknowledging who God is — your Father, your Creator, the One who loves you unconditionally. Start every prayer with worship before requests." },{ phrase: "Your kingdom come, your will be done", section: "SURRENDER", icon: "🙌", explanation: "Surrender your plans to God's plans. God, I trust you more than I trust myself. Have your way in my life today." },{ phrase: "Give us today our daily bread", section: "PETITION", icon: "🙏", explanation: "Bring your needs to God — provision, health, relationships, finances, direction. Be bold and be specific." },{ phrase: "Forgive us our debts as we forgive others", section: "CONFESSION", icon: "💛", explanation: "Be honest about where you have fallen short. Then choose to forgive anyone who has wronged you." },{ phrase: "Lead us not into temptation", section: "PROTECTION", icon: "🛡️", explanation: "Ask God for protection over your mind, your family, your home and your future." }].map((item, i) => (<div key={i} style={s.card}><div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}><span style={{ fontSize: 24 }}>{item.icon}</span><div><p style={{ color: GOLD, fontSize: 11, fontFamily: "sans-serif", fontWeight: "bold", letterSpacing: 1, margin: 0 }}>{item.section}</p><p style={{ color: BROWN_DARK, fontSize: 13, fontWeight: "bold", margin: "2px 0 0", fontStyle: "italic" }}>"{item.phrase}"</p></div></div><p style={{ color: BROWN, fontSize: 13, lineHeight: 1.7, margin: 0 }}>{item.explanation}</p></div>))}
-                <div style={{ ...s.card, background: GOLD_LIGHT }}><p style={{ color: BROWN, fontSize: 13, fontWeight: "bold", fontFamily: "sans-serif", marginBottom: 8 }}>🙏 Pray This Now</p><p style={{ color: BROWN_DARK, fontSize: 14, fontStyle: "italic", lineHeight: 1.8, margin: 0 }}>"Father in the name of Jesus Christ I come to you right now. You are holy and worthy of all praise. I surrender my plans to your perfect will. I bring my needs before you and trust you to provide. I confess my sins and I choose to forgive those who have wronged me. Protect my mind, my family and my future. Your kingdom come, your will be done in my life today. In the name of Jesus Christ. Amen."</p></div>
-              </div>
-            )}
-
-            {/* PRAYER WALL */}
-            {prayerTab === "wall" && (
-              <div>
-                <div style={s.card}><p style={{ color: BROWN, fontSize: 13, marginBottom: 10, lineHeight: 1.5 }}>Share your prayer request with the community. You are not alone. 🙏</p><textarea style={{ ...s.input, minHeight: 70, resize: "none" }} placeholder="Share your prayer request..." value={newPrayer} onChange={e => setNewPrayer(e.target.value)} /><button style={s.btn} onClick={submitPrayer}>Submit Prayer Request</button></div>
-                <p style={{ color: BROWN, fontSize: 13, fontFamily: "sans-serif", marginBottom: 8, fontWeight: "bold" }}>Community Prayer Wall</p>
-                {prayerLoading && <div style={{ ...s.card, textAlign: "center", padding: 24 }}><p style={{ color: BROWN, fontStyle: "italic" }}>Loading prayers... 🙏</p></div>}
-                {!prayerLoading && prayerList.length === 0 && <div style={{ ...s.card, textAlign: "center", padding: 24 }}><p style={{ color: BROWN, fontStyle: "italic" }}>Be the first to share a prayer request. 🙏</p></div>}
-                {prayerList.map((r) => (<div key={r.id} style={s.card}><div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6 }}><span style={s.tag}>{r.name}</span><span style={{ color: BROWN + "99", fontSize: 11, fontFamily: "sans-serif" }}>{r.time}</span></div><p style={{ color: BROWN_DARK, fontSize: 14, lineHeight: 1.6, margin: "0 0 10px" }}>{r.request}</p><div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}><span style={{ color: BROWN + "99", fontSize: 12, fontFamily: "sans-serif" }}>🙏 {r.prayed} people prayed</span><button style={{ ...s.btnOutline, padding: "6px 14px", fontSize: 12 }} onClick={() => prayFor(r.id)}>{prayedIds.includes(r.id) ? "✓ Prayed" : "Pray for them"}</button></div></div>))}
-              </div>
-            )}
-
-            {/* JOURNAL */}
-            {prayerTab === "journal" && (
-              <div>
-                <div style={s.cardGold}><p style={{ color: GOLD_LIGHT, fontSize: 11, fontFamily: "sans-serif", margin: "0 0 6px", letterSpacing: 1, textTransform: "uppercase" }}>Your Private Space</p><h2 style={{ color: WHITE, fontSize: 18, margin: "0 0 6px" }}>📓 Prayer Journal</h2><p style={{ color: GOLD_LIGHT, fontSize: 13, margin: 0 }}>Write your prayers to God. This is between you and Him.</p></div>
-                {!user && (<div style={{ ...s.card, background: GOLD_LIGHT, border: `2px solid ${GOLD_MID}` }}><p style={{ color: BROWN_DARK, fontSize: 14, fontWeight: "bold", margin: "0 0 6px" }}>🔒 Sign In to Use Your Journal</p><p style={{ color: BROWN, fontSize: 13, margin: "0 0 10px" }}>Create a free account to save your private prayer journal forever.</p><button style={s.btn} onClick={() => setShowAuth(true)}>Sign In or Create Account →</button></div>)}
-                {user && (<div style={s.card}><p style={{ color: GOLD, fontSize: 13, fontWeight: "bold", marginBottom: 8, fontFamily: "sans-serif" }}>New Prayer Entry</p><input style={{ ...s.input, marginBottom: 10 }} placeholder="Title — e.g. Trusting God with my finances" value={journalTitle} onChange={e => setJournalTitle(e.target.value)} /><textarea style={{ ...s.input, minHeight: 100, resize: "none" }} placeholder="Write your prayer here..." value={journalEntry} onChange={e => setJournalEntry(e.target.value)} /><button style={s.btn} onClick={submitJournal}>Save Prayer Entry</button></div>)}
-                {journalLoading && <div style={{ ...s.card, textAlign: "center", padding: 24 }}><p style={{ color: BROWN, fontStyle: "italic" }}>Loading your journal... 🙏</p></div>}
-                {!journalLoading && journalEntries.length === 0 && user && (<div style={{ ...s.card, textAlign: "center", padding: 28 }}><div style={{ fontSize: 32, marginBottom: 10 }}>📓</div><p style={{ color: BROWN, fontSize: 14, fontStyle: "italic", lineHeight: 1.6, margin: 0 }}>Your prayer journal is empty. Write your first prayer today. He is listening.</p></div>)}
-                {journalEntries.map((entry) => (<div key={entry.id} style={s.card}><div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}><p style={{ color: BROWN_DARK, fontSize: 14, fontWeight: "bold", margin: 0 }}>{entry.title}</p><span style={{ color: BROWN + "99", fontSize: 11, fontFamily: "sans-serif", flexShrink: 0, marginLeft: 8 }}>{entry.date}</span></div><p style={{ color: BROWN, fontSize: 13, lineHeight: 1.7, margin: 0, fontStyle: "italic" }}>{entry.text}</p></div>))}
-              </div>
-            )}
-
-            {/* ANSWERED PRAYERS */}
-            {prayerTab === "answered" && (
-              <div>
-                <div style={s.cardGold}><p style={{ color: GOLD_LIGHT, fontSize: 11, fontFamily: "sans-serif", margin: "0 0 6px", letterSpacing: 1, textTransform: "uppercase" }}>God is Faithful</p><h2 style={{ color: WHITE, fontSize: 18, margin: "0 0 6px" }}>✅ Answered Prayers</h2><p style={{ color: GOLD_LIGHT, fontSize: 13, margin: 0 }}>Share how God answered your prayer and encourage the whole community.</p></div>
-                <div style={s.card}><p style={{ color: GOLD, fontSize: 13, fontWeight: "bold", marginBottom: 8, fontFamily: "sans-serif" }}>Share Your Testimony</p><textarea style={{ ...s.input, minHeight: 80, resize: "none" }} placeholder="How did God answer your prayer?" value={testimony} onChange={e => setTestimony(e.target.value)} /><button style={s.btn} onClick={submitTestimony}>Share Testimony 🙌</button></div>
-                {testimonies.map((t, i) => (<div key={i} style={{ ...s.card, border: `1.5px solid ${GOLD_MID}` }}><div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}><span style={{ ...s.tag, background: GOLD, color: WHITE }}>✅ God Answered</span><span style={{ color: BROWN + "99", fontSize: 11, fontFamily: "sans-serif" }}>{t.time}</span></div><p style={{ color: BROWN_DARK, fontSize: 14, lineHeight: 1.6, margin: 0 }}>{t.text}</p></div>))}
-              </div>
-            )}
-
-            {/* ─── FASTING TAB ─────────────────────────────────────────────── */}
             {prayerTab === "fasting" && (
               <div>
-                {/* FASTING SUB-TABS */}
                 <div style={{ display: "flex", background: WHITE, borderRadius: 12, padding: 4, marginBottom: 14, border: `1px solid ${GOLD_LIGHT}` }}>
                   {[["foundation","📖 Foundation"],["beginner","🌱 Beginner"],["advanced","👑 Advanced"],["history","📋 History"]].map(([id, label]) => (
                     <button key={id} onClick={() => setFastingTab(id)} style={{ flex: 1, padding: "8px 2px", border: "none", borderRadius: 10, background: fastingTab === id ? `linear-gradient(135deg, ${GOLD}, ${BROWN})` : "none", color: fastingTab === id ? WHITE : BROWN, fontSize: 10, fontFamily: "sans-serif", fontWeight: fastingTab === id ? "bold" : "normal", cursor: "pointer", lineHeight: 1.3 }}>{label}</button>
                   ))}
                 </div>
-
-                {/* FOUNDATION */}
-                {fastingTab === "foundation" && (
-                  <div>
-                    <div style={s.cardGold}>
-                      <p style={{ color: GOLD_LIGHT, fontSize: 11, fontFamily: "sans-serif", margin: "0 0 6px", letterSpacing: 1, textTransform: "uppercase" }}>Biblical Fasting</p>
-                      <h2 style={{ color: WHITE, fontSize: 20, margin: "0 0 8px" }}>⚡ The Power of Fasting</h2>
-                      <p style={{ color: GOLD_LIGHT, fontSize: 13, margin: 0, lineHeight: 1.6 }}>Jesus said "when you fast" — not "if you fast." Prayer and fasting always go hand in hand. This is a discipline that changes everything.</p>
-                    </div>
-                    {fastingFoundation.map((section, i) => (
-                      <div key={i} style={s.card}>
-                        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
-                          <span style={{ fontSize: 28 }}>{section.icon}</span>
-                          <div>
-                            <p style={{ color: GOLD, fontSize: 12, fontFamily: "sans-serif", fontWeight: "bold", letterSpacing: 1, margin: 0, textTransform: "uppercase" }}>{section.scripture}</p>
-                            <p style={{ color: BROWN_DARK, fontSize: 15, fontWeight: "bold", margin: "2px 0 0" }}>{section.title}</p>
-                          </div>
-                        </div>
-                        <p style={{ color: BROWN_DARK, fontSize: 14, lineHeight: 1.7, margin: "0 0 10px" }}>{section.content}</p>
-                        <div style={{ background: GOLD_LIGHT, borderRadius: 10, padding: "10px 12px", marginBottom: 10 }}>
-                          <p style={{ color: BROWN, fontSize: 12, fontFamily: "sans-serif", fontWeight: "bold", margin: "0 0 4px", letterSpacing: 1, textTransform: "uppercase" }}>🔑 Key Truth</p>
-                          <p style={{ color: BROWN_DARK, fontSize: 13, lineHeight: 1.6, margin: 0, fontStyle: "italic" }}>{section.key}</p>
-                        </div>
-                        {section.verses.map((v, j) => (
-                          <p key={j} style={{ color: BROWN, fontSize: 12, lineHeight: 1.5, margin: "0 0 4px", fontFamily: "sans-serif" }}>📌 {v}</p>
-                        ))}
-                      </div>
-                    ))}
-                    <div style={{ ...s.card, background: GOLD_LIGHT }}>
-                      <p style={{ color: BROWN_DARK, fontSize: 13, fontWeight: "bold", margin: "0 0 8px" }}>🙏 A Prayer Before You Fast</p>
-                      <p style={{ color: BROWN_DARK, fontSize: 14, fontStyle: "italic", lineHeight: 1.8, margin: 0 }}>"Father in the name of Jesus Christ I consecrate this fast to you. I deny my flesh and choose to seek your face. Speak to me clearly during this time. Break every chain and release every breakthrough you have prepared for me. I fast and pray believing you are faithful. In the name of Jesus Christ. Amen."</p>
-                    </div>
-                  </div>
-                )}
-
-                {/* BEGINNER FASTING */}
-                {fastingTab === "beginner" && (
-                  <div>
-                    <div style={s.cardGold}>
-                      <p style={{ color: GOLD_LIGHT, fontSize: 11, fontFamily: "sans-serif", margin: "0 0 6px", letterSpacing: 1, textTransform: "uppercase" }}>Start Your Journey</p>
-                      <h2 style={{ color: WHITE, fontSize: 20, margin: "0 0 8px" }}>🌱 Beginner Fasting Track</h2>
-                      <p style={{ color: GOLD_LIGHT, fontSize: 13, margin: 0, lineHeight: 1.6 }}>Every great faster started with one meal. Start small, stay consistent, and always combine your fast with prayer. Prayer and fasting go hand in hand — never do one without the other!</p>
-                    </div>
-
-                    {/* STATS */}
-                    {user && (
-                      <div style={{ ...s.card, background: CREAM_DARK }}>
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                          <div>
-                            <p style={{ color: BROWN, fontSize: 11, fontFamily: "sans-serif", margin: "0 0 4px", letterSpacing: 1, textTransform: "uppercase" }}>Total Fasts Completed</p>
-                            <p style={{ color: BROWN_DARK, fontSize: 28, fontWeight: "bold", margin: 0, fontFamily: "sans-serif" }}>{totalFasts}</p>
-                          </div>
-                          {getFastingMilestone(totalFasts) && (
-                            <div style={{ background: getFastingMilestone(totalFasts).bg, border: `2px solid ${getFastingMilestone(totalFasts).color}`, borderRadius: 12, padding: "8px 14px", textAlign: "center" }}>
-                              <p style={{ color: getFastingMilestone(totalFasts).color, fontSize: 13, fontWeight: "bold", margin: 0, fontFamily: "sans-serif" }}>{getFastingMilestone(totalFasts).label}</p>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    )}
-
-                    {beginnerFastingLevels.map(level => (
-                      <div key={level.id} style={{ ...s.card, border: `2px solid ${level.color}22` }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 10 }}>
-                          <span style={{ fontSize: 28 }}>{level.icon}</span>
-                          <div style={{ flex: 1 }}>
-                            <p style={{ color: BROWN_DARK, fontSize: 15, fontWeight: "bold", margin: "0 0 2px" }}>{level.label}</p>
-                            <span style={{ background: level.bg, color: level.color, borderRadius: 20, padding: "2px 10px", fontSize: 11, fontFamily: "sans-serif", fontWeight: "bold" }}>{level.badge}</span>
-                          </div>
-                        </div>
-                        <p style={{ color: BROWN, fontSize: 13, lineHeight: 1.7, margin: "0 0 12px" }}>{level.description}</p>
-                        <button style={{ ...s.btn, marginTop: 0, background: `linear-gradient(135deg, ${level.color}, ${BROWN_DARK})` }} onClick={() => { setSelectedFastLevel(level); setShowLogFast(true); }}>
-                          ✅ Log This Fast
-                        </button>
-                      </div>
-                    ))}
-
-                    {/* LOG FAST MODAL */}
-                    {showLogFast && selectedFastLevel && (
-                      <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.7)", zIndex: 500, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                        <div style={{ background: WHITE, borderRadius: 20, padding: 28, margin: 20, width: "100%", maxWidth: 400 }}>
-                          <p style={{ color: GOLD, fontSize: 18, fontWeight: "bold", margin: "0 0 8px", fontFamily: "sans-serif" }}>{selectedFastLevel.icon} Log: {selectedFastLevel.label}</p>
-                          <p style={{ color: BROWN, fontSize: 13, margin: "0 0 14px", lineHeight: 1.5 }}>Remember — prayer and fasting always go hand in hand. Did you pray during this fast? 🙏</p>
-                          <textarea style={{ ...s.input, minHeight: 70, resize: "none", marginBottom: 12 }} placeholder="Optional: What did you pray for? What did God show you?" value={fastNote} onChange={e => setFastNote(e.target.value)} />
-                          <button style={s.btn} onClick={logFast}>✅ Complete This Fast!</button>
-                          <button style={{ ...s.btnOutline, width: "100%", marginTop: 8, textAlign: "center" }} onClick={() => { setShowLogFast(false); setSelectedFastLevel(null); setFastNote(""); }}>Cancel</button>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* BEGINNER BADGES */}
-                    <div style={{ ...s.card, background: GOLD_LIGHT }}>
-                      <p style={{ color: BROWN_DARK, fontSize: 13, fontWeight: "bold", margin: "0 0 10px" }}>🏆 Fasting Milestone Badges</p>
-                      {fastingMilestones.map(m => {
-                        const earned = totalFasts >= m.count;
-                        return (
-                          <div key={m.count} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8, opacity: earned ? 1 : 0.5 }}>
-                            <div style={{ width: 32, height: 32, borderRadius: "50%", background: earned ? m.color : GOLD_LIGHT, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14 }}>
-                              {earned ? "✅" : m.count}
-                            </div>
-                            <div style={{ flex: 1 }}>
-                              <p style={{ color: earned ? m.color : BROWN, fontSize: 13, fontWeight: "bold", margin: 0, fontFamily: "sans-serif" }}>{m.label}</p>
-                              <p style={{ color: BROWN, fontSize: 11, margin: 0, fontFamily: "sans-serif" }}>{m.count} fast{m.count !== 1 ? "s" : ""} completed</p>
-                            </div>
-                            {earned && <span style={{ color: m.color, fontSize: 12, fontFamily: "sans-serif", fontWeight: "bold" }}>Earned!</span>}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-
-                {/* ADVANCED FASTING */}
-                {fastingTab === "advanced" && (
-                  <div>
-                    <div style={s.cardGold}>
-                      <p style={{ color: GOLD_LIGHT, fontSize: 11, fontFamily: "sans-serif", margin: "0 0 6px", letterSpacing: 1, textTransform: "uppercase" }}>For the Committed Faster</p>
-                      <h2 style={{ color: WHITE, fontSize: 20, margin: "0 0 8px" }}>👑 Advanced Fasting Track</h2>
-                      <p style={{ color: GOLD_LIGHT, fontSize: 13, margin: 0, lineHeight: 1.6 }}>Prayer and fasting always go hand in hand. The greatest men and women of God in scripture were people of consistent fasting and prayer. Set your goal and grow into it.</p>
-                    </div>
-
-                    <div style={{ ...s.card, background: CREAM_DARK }}>
-                      <p style={{ color: BROWN_DARK, fontSize: 14, fontWeight: "bold", margin: "0 0 4px" }}>⚡ Matthew 17:21</p>
-                      <p style={{ color: BROWN, fontSize: 13, fontStyle: "italic", lineHeight: 1.6, margin: 0 }}>"This kind does not go out except by prayer and fasting." — Some breakthroughs only come through the combination of prayer AND fasting together. 🙏</p>
-                    </div>
-
-                    {/* CURRENT GOAL */}
-                    {user && advancedGoal && (
-                      <div style={{ ...s.card, border: `2px solid ${GOLD}` }}>
-                        <p style={{ color: GOLD, fontSize: 13, fontWeight: "bold", margin: "0 0 6px", fontFamily: "sans-serif" }}>🎯 Your Current Goal</p>
-                        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
-                          <span style={{ fontSize: 24 }}>{advancedGoal.icon}</span>
-                          <div>
-                            <p style={{ color: BROWN_DARK, fontSize: 15, fontWeight: "bold", margin: "0 0 2px" }}>{advancedGoal.label}</p>
-                            <p style={{ color: BROWN, fontSize: 12, fontFamily: "sans-serif", margin: 0 }}>Target: {advancedGoal.targetDays} {advancedGoal.id === "extended" ? "day" : "time"}s per month</p>
-                          </div>
-                        </div>
-                        <button style={{ ...s.btn, marginTop: 0 }} onClick={() => { setSelectedFastLevel(advancedFastingLevels.find(l => l.id === advancedGoal.id) || advancedFastingLevels[0]); setShowLogFast(true); }}>✅ Log a Fast for This Goal</button>
-                      </div>
-                    )}
-
-                    <p style={{ color: BROWN_DARK, fontSize: 14, fontWeight: "bold", margin: "0 0 10px", fontFamily: "sans-serif" }}>Set Your Advanced Fasting Goal:</p>
-
-                    {advancedFastingLevels.map(level => (
-                      <div key={level.id} style={{ ...s.card, border: advancedGoal?.id === level.id ? `2px solid ${GOLD}` : `1px solid ${GOLD_LIGHT}`, background: advancedGoal?.id === level.id ? "#FFFDF0" : WHITE }}>
-                        <div style={{ display: "flex", alignItems: "flex-start", gap: 12, marginBottom: 10 }}>
-                          <span style={{ fontSize: 28 }}>{level.icon}</span>
-                          <div style={{ flex: 1 }}>
-                            <p style={{ color: BROWN_DARK, fontSize: 15, fontWeight: "bold", margin: "0 0 4px" }}>{level.label}</p>
-                            <span style={{ background: level.bg, color: level.color, borderRadius: 20, padding: "2px 10px", fontSize: 11, fontFamily: "sans-serif", fontWeight: "bold" }}>{level.badge}</span>
-                          </div>
-                          {advancedGoal?.id === level.id && <span style={{ color: GOLD, fontSize: 12, fontFamily: "sans-serif", fontWeight: "bold" }}>✅ Active</span>}
-                        </div>
-                        <p style={{ color: BROWN, fontSize: 13, lineHeight: 1.7, margin: "0 0 12px" }}>{level.description}</p>
-                        {level.id === "extended" && (
-                          <div style={{ marginBottom: 10 }}>
-                            <p style={{ color: BROWN, fontSize: 12, fontFamily: "sans-serif", marginBottom: 6 }}>Set your goal (days):</p>
-                            <div style={{ display: "flex", gap: 8 }}>
-                              {["3","7","14","21","40"].map(d => (
-                                <button key={d} onClick={() => setCustomFastDays(d)} style={{ flex: 1, padding: "8px 4px", background: customFastDays === d ? `linear-gradient(135deg, ${GOLD}, ${BROWN})` : CREAM_DARK, border: customFastDays === d ? "none" : `1px solid ${GOLD_LIGHT}`, borderRadius: 10, color: customFastDays === d ? WHITE : BROWN, fontSize: 13, fontWeight: "bold", cursor: "pointer", fontFamily: "sans-serif" }}>{d}</button>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                        <button style={{ ...s.btn, marginTop: 0, background: user ? `linear-gradient(135deg, ${level.color}, ${BROWN_DARK})` : `linear-gradient(135deg, ${GOLD_MID}, ${BROWN})` }} onClick={() => user ? setAdvancedFastingGoal(level) : setShowAuth(true)}>
-                          {user ? (advancedGoal?.id === level.id ? "✅ Goal Set!" : "Set This Goal →") : "Sign In to Set Goal →"}
-                        </button>
-                      </div>
-                    ))}
-
-                    <div style={{ ...s.card, background: GOLD_LIGHT }}>
-                      <p style={{ color: BROWN_DARK, fontSize: 13, fontWeight: "bold", margin: "0 0 8px" }}>📖 The Daniel Fast</p>
-                      <p style={{ color: BROWN, fontSize: 13, lineHeight: 1.7, margin: "0 0 8px" }}>Daniel 1:12 — "Please test your servants for ten days: Give us nothing but vegetables to eat and water to drink." Daniel fasted and prayed and God gave him wisdom beyond all others in Babylon.</p>
-                      <p style={{ color: BROWN_DARK, fontSize: 13, fontStyle: "italic", lineHeight: 1.6, margin: 0 }}>The Daniel Fast: 21 days of vegetables, fruits and water only — combined with daily prayer and God's Word. Prayer and fasting together — this is how breakthrough comes. 🔥</p>
-                    </div>
-                  </div>
-                )}
-
-                {/* FASTING HISTORY */}
-                {fastingTab === "history" && (
-                  <div>
-                    <div style={s.cardGold}>
-                      <p style={{ color: GOLD_LIGHT, fontSize: 11, fontFamily: "sans-serif", margin: "0 0 6px", letterSpacing: 1, textTransform: "uppercase" }}>Your Fasting Record</p>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                        <div>
-                          <p style={{ color: WHITE, fontSize: 28, fontWeight: "bold", margin: 0, fontFamily: "sans-serif" }}>{totalFasts}</p>
-                          <p style={{ color: GOLD_LIGHT, fontSize: 13, margin: 0 }}>total fasts completed</p>
-                        </div>
-                        {getFastingMilestone(totalFasts) && (
-                          <div style={{ textAlign: "right" }}>
-                            <p style={{ color: GOLD_MID, fontSize: 14, fontWeight: "bold", margin: 0, fontFamily: "sans-serif" }}>{getFastingMilestone(totalFasts).label}</p>
-                            <p style={{ color: GOLD_LIGHT, fontSize: 11, margin: 0, fontFamily: "sans-serif" }}>Current badge</p>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    {!user && (<div style={{ ...s.card, background: GOLD_LIGHT, border: `2px solid ${GOLD_MID}` }}><p style={{ color: BROWN_DARK, fontSize: 14, fontWeight: "bold", margin: "0 0 6px" }}>🔒 Sign In to Track Your Fasting</p><p style={{ color: BROWN, fontSize: 13, margin: "0 0 10px" }}>Create a free account to log and track your fasting journey.</p><button style={s.btn} onClick={() => setShowAuth(true)}>Sign In or Create Account →</button></div>)}
-
-                    {user && fastingLoading && <div style={{ ...s.card, textAlign: "center", padding: 24 }}><p style={{ color: BROWN, fontStyle: "italic" }}>Loading your fasting history... 🙏</p></div>}
-
-                    {user && !fastingLoading && fastingLog.length === 0 && (
-                      <div style={{ ...s.card, textAlign: "center", padding: 32 }}>
-                        <div style={{ fontSize: 36, marginBottom: 12 }}>⚡</div>
-                        <p style={{ color: BROWN_DARK, fontSize: 15, fontWeight: "bold", margin: "0 0 8px" }}>Begin Your Fasting Journey</p>
-                        <p style={{ color: BROWN, fontSize: 13, lineHeight: 1.6, margin: "0 0 16px" }}>This kind does not go out except by prayer and fasting. — Matthew 17:21</p>
-                        <button style={s.btn} onClick={() => setFastingTab("beginner")}>Start with Beginner Track →</button>
-                      </div>
-                    )}
-
-                    {user && fastingLog.map(log => (
-                      <div key={log.id} style={s.card}>
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6 }}>
-                          <div>
-                            <p style={{ color: BROWN_DARK, fontSize: 14, fontWeight: "bold", margin: "0 0 2px" }}>{log.label}</p>
-                            <span style={s.tag}>✅ Completed</span>
-                          </div>
-                          <span style={{ color: BROWN + "99", fontSize: 11, fontFamily: "sans-serif" }}>{log.date}</span>
-                        </div>
-                        {log.note && <p style={{ color: BROWN, fontSize: 13, lineHeight: 1.6, margin: "8px 0 0", fontStyle: "italic" }}>🙏 "{log.note}"</p>}
-                      </div>
-                    ))}
-
-                    {user && fastingLog.length > 0 && (
-                      <button style={{ ...s.btn, background: `linear-gradient(135deg, ${GOLD}, ${BROWN})` }} onClick={() => { setSelectedFastLevel(beginnerFastingLevels[0]); setShowLogFast(true); }}>
-                        + Log Another Fast
-                      </button>
-                    )}
-                  </div>
-                )}
+                {fastingTab === "foundation" && (<div><div style={s.cardGold}><p style={{ color: GOLD_LIGHT, fontSize: 11, fontFamily: "sans-serif", margin: "0 0 6px", letterSpacing: 1, textTransform: "uppercase" }}>Biblical Fasting</p><h2 style={{ color: WHITE, fontSize: 20, margin: "0 0 8px" }}>⚡ The Power of Fasting</h2><p style={{ color: GOLD_LIGHT, fontSize: 13, margin: 0, lineHeight: 1.6 }}>Jesus said "when you fast" — not "if you fast." Prayer and fasting always go hand in hand. This is a discipline that changes everything.</p></div>{fastingFoundation.map((section, i) => (<div key={i} style={s.card}><div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}><span style={{ fontSize: 28 }}>{section.icon}</span><div><p style={{ color: GOLD, fontSize: 12, fontFamily: "sans-serif", fontWeight: "bold", letterSpacing: 1, margin: 0, textTransform: "uppercase" }}>{section.scripture}</p><p style={{ color: BROWN_DARK, fontSize: 15, fontWeight: "bold", margin: "2px 0 0" }}>{section.title}</p></div></div><p style={{ color: BROWN_DARK, fontSize: 14, lineHeight: 1.7, margin: "0 0 10px" }}>{section.content}</p><div style={{ background: GOLD_LIGHT, borderRadius: 10, padding: "10px 12px", marginBottom: 10 }}><p style={{ color: BROWN, fontSize: 12, fontFamily: "sans-serif", fontWeight: "bold", margin: "0 0 4px", letterSpacing: 1, textTransform: "uppercase" }}>🔑 Key Truth</p><p style={{ color: BROWN_DARK, fontSize: 13, lineHeight: 1.6, margin: 0, fontStyle: "italic" }}>{section.key}</p></div>{section.verses.map((v, j) => (<p key={j} style={{ color: BROWN, fontSize: 12, lineHeight: 1.5, margin: "0 0 4px", fontFamily: "sans-serif" }}>📌 {v}</p>))}</div>))}<div style={{ ...s.card, background: GOLD_LIGHT }}><p style={{ color: BROWN_DARK, fontSize: 13, fontWeight: "bold", margin: "0 0 8px" }}>🙏 A Prayer Before You Fast</p><p style={{ color: BROWN_DARK, fontSize: 14, fontStyle: "italic", lineHeight: 1.8, margin: 0 }}>"Father in the name of Jesus Christ I consecrate this fast to you. I deny my flesh and choose to seek your face. Speak to me clearly during this time. Break every chain and release every breakthrough you have prepared for me. I fast and pray believing you are faithful. In the name of Jesus Christ. Amen."</p></div></div>)}
+                {fastingTab === "beginner" && (<div><div style={s.cardGold}><p style={{ color: GOLD_LIGHT, fontSize: 11, fontFamily: "sans-serif", margin: "0 0 6px", letterSpacing: 1, textTransform: "uppercase" }}>Start Your Journey</p><h2 style={{ color: WHITE, fontSize: 20, margin: "0 0 8px" }}>🌱 Beginner Fasting Track</h2><p style={{ color: GOLD_LIGHT, fontSize: 13, margin: 0, lineHeight: 1.6 }}>Every great faster started with one meal. Start small, stay consistent, and always combine your fast with prayer. Prayer and fasting go hand in hand — never do one without the other!</p></div>{user && (<div style={{ ...s.card, background: CREAM_DARK }}><div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}><div><p style={{ color: BROWN, fontSize: 11, fontFamily: "sans-serif", margin: "0 0 4px", letterSpacing: 1, textTransform: "uppercase" }}>Total Fasts Completed</p><p style={{ color: BROWN_DARK, fontSize: 28, fontWeight: "bold", margin: 0, fontFamily: "sans-serif" }}>{totalFasts}</p></div>{getFastingMilestone(totalFasts) && (<div style={{ background: getFastingMilestone(totalFasts).bg, border: `2px solid ${getFastingMilestone(totalFasts).color}`, borderRadius: 12, padding: "8px 14px", textAlign: "center" }}><p style={{ color: getFastingMilestone(totalFasts).color, fontSize: 13, fontWeight: "bold", margin: 0, fontFamily: "sans-serif" }}>{getFastingMilestone(totalFasts).label}</p></div>)}</div></div>)}{beginnerFastingLevels.map(level => (<div key={level.id} style={{ ...s.card, border: `2px solid ${level.color}22` }}><div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 10 }}><span style={{ fontSize: 28 }}>{level.icon}</span><div style={{ flex: 1 }}><p style={{ color: BROWN_DARK, fontSize: 15, fontWeight: "bold", margin: "0 0 2px" }}>{level.label}</p><span style={{ background: level.bg, color: level.color, borderRadius: 20, padding: "2px 10px", fontSize: 11, fontFamily: "sans-serif", fontWeight: "bold" }}>{level.badge}</span></div></div><p style={{ color: BROWN, fontSize: 13, lineHeight: 1.7, margin: "0 0 12px" }}>{level.description}</p><button style={{ ...s.btn, marginTop: 0, background: `linear-gradient(135deg, ${level.color}, ${BROWN_DARK})` }} onClick={() => { setSelectedFastLevel(level); setShowLogFast(true); }}>✅ Log This Fast</button></div>))}{showLogFast && selectedFastLevel && (<div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.7)", zIndex: 500, display: "flex", alignItems: "center", justifyContent: "center" }}><div style={{ background: WHITE, borderRadius: 20, padding: 28, margin: 20, width: "100%", maxWidth: 400 }}><p style={{ color: GOLD, fontSize: 18, fontWeight: "bold", margin: "0 0 8px", fontFamily: "sans-serif" }}>{selectedFastLevel.icon} Log: {selectedFastLevel.label}</p><p style={{ color: BROWN, fontSize: 13, margin: "0 0 14px", lineHeight: 1.5 }}>Remember — prayer and fasting always go hand in hand. Did you pray during this fast? 🙏</p><textarea style={{ ...s.input, minHeight: 70, resize: "none", marginBottom: 12 }} placeholder="Optional: What did you pray for? What did God show you?" value={fastNote} onChange={e => setFastNote(e.target.value)} /><button style={s.btn} onClick={logFast}>✅ Complete This Fast!</button><button style={{ ...s.btnOutline, width: "100%", marginTop: 8, textAlign: "center" }} onClick={() => { setShowLogFast(false); setSelectedFastLevel(null); setFastNote(""); }}>Cancel</button></div></div>)}<div style={{ ...s.card, background: GOLD_LIGHT }}><p style={{ color: BROWN_DARK, fontSize: 13, fontWeight: "bold", margin: "0 0 10px" }}>🏆 Fasting Milestone Badges</p>{fastingMilestones.map(m => { const earned = totalFasts >= m.count; return (<div key={m.count} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8, opacity: earned ? 1 : 0.5 }}><div style={{ width: 32, height: 32, borderRadius: "50%", background: earned ? m.color : GOLD_LIGHT, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14 }}>{earned ? "✅" : m.count}</div><div style={{ flex: 1 }}><p style={{ color: earned ? m.color : BROWN, fontSize: 13, fontWeight: "bold", margin: 0, fontFamily: "sans-serif" }}>{m.label}</p><p style={{ color: BROWN, fontSize: 11, margin: 0, fontFamily: "sans-serif" }}>{m.count} fast{m.count !== 1 ? "s" : ""} completed</p></div>{earned && <span style={{ color: m.color, fontSize: 12, fontFamily: "sans-serif", fontWeight: "bold" }}>Earned!</span>}</div>); })}</div></div>)}
+                {fastingTab === "advanced" && (<div><div style={s.cardGold}><p style={{ color: GOLD_LIGHT, fontSize: 11, fontFamily: "sans-serif", margin: "0 0 6px", letterSpacing: 1, textTransform: "uppercase" }}>For the Committed Faster</p><h2 style={{ color: WHITE, fontSize: 20, margin: "0 0 8px" }}>👑 Advanced Fasting Track</h2><p style={{ color: GOLD_LIGHT, fontSize: 13, margin: 0, lineHeight: 1.6 }}>Prayer and fasting always go hand in hand. The greatest men and women of God in scripture were people of consistent fasting and prayer. Set your goal and grow into it.</p></div><div style={{ ...s.card, background: CREAM_DARK }}><p style={{ color: BROWN_DARK, fontSize: 14, fontWeight: "bold", margin: "0 0 4px" }}>⚡ Matthew 17:21</p><p style={{ color: BROWN, fontSize: 13, fontStyle: "italic", lineHeight: 1.6, margin: 0 }}>"This kind does not go out except by prayer and fasting." — Some breakthroughs only come through the combination of prayer AND fasting together. 🙏</p></div>{user && advancedGoal && (<div style={{ ...s.card, border: `2px solid ${GOLD}` }}><p style={{ color: GOLD, fontSize: 13, fontWeight: "bold", margin: "0 0 6px", fontFamily: "sans-serif" }}>🎯 Your Current Goal</p><div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}><span style={{ fontSize: 24 }}>{advancedGoal.icon}</span><div><p style={{ color: BROWN_DARK, fontSize: 15, fontWeight: "bold", margin: "0 0 2px" }}>{advancedGoal.label}</p><p style={{ color: BROWN, fontSize: 12, fontFamily: "sans-serif", margin: 0 }}>Target: {advancedGoal.targetDays} {advancedGoal.id === "extended" ? "day" : "time"}s per month</p></div></div><button style={{ ...s.btn, marginTop: 0 }} onClick={() => { setSelectedFastLevel(advancedFastingLevels.find(l => l.id === advancedGoal.id) || advancedFastingLevels[0]); setShowLogFast(true); }}>✅ Log a Fast for This Goal</button></div>)}<p style={{ color: BROWN_DARK, fontSize: 14, fontWeight: "bold", margin: "0 0 10px", fontFamily: "sans-serif" }}>Set Your Advanced Fasting Goal:</p>{advancedFastingLevels.map(level => (<div key={level.id} style={{ ...s.card, border: advancedGoal?.id === level.id ? `2px solid ${GOLD}` : `1px solid ${GOLD_LIGHT}`, background: advancedGoal?.id === level.id ? "#FFFDF0" : WHITE }}><div style={{ display: "flex", alignItems: "flex-start", gap: 12, marginBottom: 10 }}><span style={{ fontSize: 28 }}>{level.icon}</span><div style={{ flex: 1 }}><p style={{ color: BROWN_DARK, fontSize: 15, fontWeight: "bold", margin: "0 0 4px" }}>{level.label}</p><span style={{ background: level.bg, color: level.color, borderRadius: 20, padding: "2px 10px", fontSize: 11, fontFamily: "sans-serif", fontWeight: "bold" }}>{level.badge}</span></div>{advancedGoal?.id === level.id && <span style={{ color: GOLD, fontSize: 12, fontFamily: "sans-serif", fontWeight: "bold" }}>✅ Active</span>}</div><p style={{ color: BROWN, fontSize: 13, lineHeight: 1.7, margin: "0 0 12px" }}>{level.description}</p>{level.id === "extended" && (<div style={{ marginBottom: 10 }}><p style={{ color: BROWN, fontSize: 12, fontFamily: "sans-serif", marginBottom: 6 }}>Set your goal (days):</p><div style={{ display: "flex", gap: 8 }}>{["3","7","14","21","40"].map(d => (<button key={d} onClick={() => setCustomFastDays(d)} style={{ flex: 1, padding: "8px 4px", background: customFastDays === d ? `linear-gradient(135deg, ${GOLD}, ${BROWN})` : CREAM_DARK, border: customFastDays === d ? "none" : `1px solid ${GOLD_LIGHT}`, borderRadius: 10, color: customFastDays === d ? WHITE : BROWN, fontSize: 13, fontWeight: "bold", cursor: "pointer", fontFamily: "sans-serif" }}>{d}</button>))}</div></div>)}<button style={{ ...s.btn, marginTop: 0, background: user ? `linear-gradient(135deg, ${level.color}, ${BROWN_DARK})` : `linear-gradient(135deg, ${GOLD_MID}, ${BROWN})` }} onClick={() => user ? setAdvancedFastingGoal(level) : setShowAuth(true)}>{user ? (advancedGoal?.id === level.id ? "✅ Goal Set!" : "Set This Goal →") : "Sign In to Set Goal →"}</button></div>))}<div style={{ ...s.card, background: GOLD_LIGHT }}><p style={{ color: BROWN_DARK, fontSize: 13, fontWeight: "bold", margin: "0 0 8px" }}>📖 The Daniel Fast</p><p style={{ color: BROWN, fontSize: 13, lineHeight: 1.7, margin: "0 0 8px" }}>Daniel 1:12 — "Please test your servants for ten days: Give us nothing but vegetables to eat and water to drink." Daniel fasted and prayed and God gave him wisdom beyond all others in Babylon.</p><p style={{ color: BROWN_DARK, fontSize: 13, fontStyle: "italic", lineHeight: 1.6, margin: 0 }}>The Daniel Fast: 21 days of vegetables, fruits and water only — combined with daily prayer and God's Word. Prayer and fasting together — this is how breakthrough comes. 🔥</p></div></div>)}
+                {fastingTab === "history" && (<div><div style={s.cardGold}><p style={{ color: GOLD_LIGHT, fontSize: 11, fontFamily: "sans-serif", margin: "0 0 6px", letterSpacing: 1, textTransform: "uppercase" }}>Your Fasting Record</p><div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}><div><p style={{ color: WHITE, fontSize: 28, fontWeight: "bold", margin: 0, fontFamily: "sans-serif" }}>{totalFasts}</p><p style={{ color: GOLD_LIGHT, fontSize: 13, margin: 0 }}>total fasts completed</p></div>{getFastingMilestone(totalFasts) && (<div style={{ textAlign: "right" }}><p style={{ color: GOLD_MID, fontSize: 14, fontWeight: "bold", margin: 0, fontFamily: "sans-serif" }}>{getFastingMilestone(totalFasts).label}</p><p style={{ color: GOLD_LIGHT, fontSize: 11, margin: 0, fontFamily: "sans-serif" }}>Current badge</p></div>)}</div></div>{!user && (<div style={{ ...s.card, background: GOLD_LIGHT, border: `2px solid ${GOLD_MID}` }}><p style={{ color: BROWN_DARK, fontSize: 14, fontWeight: "bold", margin: "0 0 6px" }}>🔒 Sign In to Track Your Fasting</p><p style={{ color: BROWN, fontSize: 13, margin: "0 0 10px" }}>Create a free account to log and track your fasting journey.</p><button style={s.btn} onClick={() => setShowAuth(true)}>Sign In or Create Account →</button></div>)}{user && fastingLoading && <div style={{ ...s.card, textAlign: "center", padding: 24 }}><p style={{ color: BROWN, fontStyle: "italic" }}>Loading your fasting history... 🙏</p></div>}{user && !fastingLoading && fastingLog.length === 0 && (<div style={{ ...s.card, textAlign: "center", padding: 32 }}><div style={{ fontSize: 36, marginBottom: 12 }}>⚡</div><p style={{ color: BROWN_DARK, fontSize: 15, fontWeight: "bold", margin: "0 0 8px" }}>Begin Your Fasting Journey</p><p style={{ color: BROWN, fontSize: 13, lineHeight: 1.6, margin: "0 0 16px" }}>This kind does not go out except by prayer and fasting. — Matthew 17:21</p><button style={s.btn} onClick={() => setFastingTab("beginner")}>Start with Beginner Track →</button></div>)}{user && fastingLog.map(log => (<div key={log.id} style={s.card}><div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6 }}><div><p style={{ color: BROWN_DARK, fontSize: 14, fontWeight: "bold", margin: "0 0 2px" }}>{log.label}</p><span style={s.tag}>✅ Completed</span></div><span style={{ color: BROWN + "99", fontSize: 11, fontFamily: "sans-serif" }}>{log.date}</span></div>{log.note && <p style={{ color: BROWN, fontSize: 13, lineHeight: 1.6, margin: "8px 0 0", fontStyle: "italic" }}>🙏 "{log.note}"</p>}</div>))}{user && fastingLog.length > 0 && (<button style={{ ...s.btn, background: `linear-gradient(135deg, ${GOLD}, ${BROWN})` }} onClick={() => { setSelectedFastLevel(beginnerFastingLevels[0]); setShowLogFast(true); }}>+ Log Another Fast</button>)}</div>)}
               </div>
             )}
           </div>
         )}
 
-        {/* VISION BOARD */}
         {activeTab === "vision" && (
           <div>
             <p style={s.sectionTitle}>📋 Faith Vision Board</p>
@@ -1406,38 +1117,12 @@ export default function App() {
           </div>
         )}
 
-        {/* SERMON */}
         {activeTab === "sermon" && (
           <div>
-            {selectedTopic && topicContent ? (
-              <div>
-                <button style={s.backBtn} onClick={() => { setSelectedTopic(null); setTopicContent(null); }}>← Back to Topics</button>
-                <div style={s.cardGold}><p style={{ color: GOLD_LIGHT, fontSize: 11, fontFamily: "sans-serif", margin: "0 0 6px", letterSpacing: 1, textTransform: "uppercase" }}>Sermon Companion</p><h2 style={{ color: WHITE, fontSize: 20, margin: 0 }}>{selectedTopic}</h2></div>
-                <div style={s.card}><p style={{ color: GOLD, fontSize: 13, fontWeight: "bold", marginBottom: 8, fontFamily: "sans-serif" }}>📝 Main Message</p><p style={{ color: BROWN_DARK, fontSize: 14, lineHeight: 1.7, margin: 0 }}>{topicContent.mainMessage}</p></div>
-                <div style={s.card}><p style={{ color: GOLD, fontSize: 13, fontWeight: "bold", marginBottom: 8, fontFamily: "sans-serif" }}>🔑 Key Takeaways</p>{topicContent.keyTakeaways.map((t, i) => (<div key={i} style={{ display: "flex", gap: 10, marginBottom: 8, alignItems: "flex-start" }}><div style={{ ...s.stepNum, width: 24, height: 24, fontSize: 12 }}>{i + 1}</div><p style={{ color: BROWN_DARK, fontSize: 14, lineHeight: 1.6, margin: 0, flex: 1 }}>{t}</p></div>))}</div>
-                <div style={s.card}><p style={{ color: GOLD, fontSize: 13, fontWeight: "bold", marginBottom: 8, fontFamily: "sans-serif" }}>📖 Related Scriptures</p>{topicContent.scriptures.map((sc, i) => (<div key={i} style={{ marginBottom: 8, paddingBottom: 8, borderBottom: i < topicContent.scriptures.length - 1 ? `1px solid ${GOLD_LIGHT}` : "none" }}><p style={{ color: BROWN_DARK, fontSize: 13, lineHeight: 1.5, margin: 0 }}>📌 {sc}</p></div>))}</div>
-                <div style={s.card}><p style={{ color: GOLD, fontSize: 13, fontWeight: "bold", marginBottom: 8, fontFamily: "sans-serif" }}>❓ Discussion Questions</p>{topicContent.discussionQuestions.map((q, i) => (<div key={i} style={{ display: "flex", gap: 10, marginBottom: 10, alignItems: "flex-start" }}><div style={{ ...s.stepNum, width: 24, height: 24, fontSize: 12 }}>{i + 1}</div><p style={{ color: BROWN_DARK, fontSize: 14, lineHeight: 1.6, margin: 0, flex: 1 }}>{q}</p></div>))}</div>
-                <div style={{ ...s.card, background: GOLD_LIGHT }}><p style={{ color: BROWN, fontSize: 12, fontFamily: "sans-serif", fontWeight: "bold", marginBottom: 6, letterSpacing: 1, textTransform: "uppercase" }}>🙏 Application Prayer</p><p style={{ color: BROWN_DARK, fontSize: 14, fontStyle: "italic", lineHeight: 1.7, margin: 0 }}>{topicContent.prayer}</p></div>
-                <div style={s.card}><p style={{ color: GOLD, fontSize: 13, fontWeight: "bold", marginBottom: 8, fontFamily: "sans-serif" }}>✍️ Journal Prompt</p><p style={{ color: BROWN_DARK, fontSize: 14, fontStyle: "italic", lineHeight: 1.7, margin: 0 }}>{topicContent.journal}</p></div>
-                <button style={{ ...s.btn, marginBottom: 16 }} onClick={() => { setSelectedTopic(null); setTopicContent(null); }}>← Back to Topics</button>
-              </div>
-            ) : selectedCategory ? (
-              <div>
-                <button style={s.backBtn} onClick={() => setSelectedCategory(null)}>← All Categories</button>
-                <div style={s.cardGold}><p style={{ color: GOLD_LIGHT, fontSize: 11, fontFamily: "sans-serif", margin: "0 0 6px", letterSpacing: 1, textTransform: "uppercase" }}>Category</p><h2 style={{ color: WHITE, fontSize: 20, margin: 0 }}>{selectedCategory.icon} {selectedCategory.category}</h2></div>
-                <div style={s.card}><p style={{ color: BROWN, fontSize: 13, marginBottom: 12, fontFamily: "sans-serif" }}>Select a topic to go deeper:</p><div style={{ display: "flex", flexWrap: "wrap" }}>{selectedCategory.topics.map(topic => (<button key={topic} style={s.btnSmall} onClick={() => openTopic(topic)}>{topic}</button>))}</div></div>
-              </div>
-            ) : (
-              <div>
-                <p style={s.sectionTitle}>🎙️ Sermon Companion</p>
-                <div style={s.card}><p style={{ color: BROWN, fontSize: 13, marginBottom: 10, lineHeight: 1.5 }}>Search any topic or browse by category.</p><input style={s.input} placeholder="Search topics — Faith, Fear, Marriage..." value={sermonSearch} onChange={e => setSermonSearch(e.target.value)} /></div>
-                {filteredCategories.map(cat => (<div key={cat.id} style={s.card}><div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}><p style={{ color: BROWN_DARK, fontSize: 15, fontWeight: "bold", margin: 0 }}>{cat.icon} {cat.category}</p>{!sermonSearch && <button style={{ ...s.btnOutline, padding: "4px 12px", fontSize: 12 }} onClick={() => setSelectedCategory(cat)}>See All →</button>}</div><div style={{ display: "flex", flexWrap: "wrap" }}>{(sermonSearch ? cat.topics : cat.topics.slice(0, 5)).map(topic => (<button key={topic} style={s.btnSmall} onClick={() => openTopic(topic)}>{topic}</button>))}{!sermonSearch && cat.topics.length > 5 && (<button style={{ ...s.btnSmall, color: GOLD, fontWeight: "bold" }} onClick={() => setSelectedCategory(cat)}>+{cat.topics.length - 5} more</button>)}</div></div>))}
-              </div>
-            )}
+            {selectedTopic && topicContent ? (<div><button style={s.backBtn} onClick={() => { setSelectedTopic(null); setTopicContent(null); }}>← Back to Topics</button><div style={s.cardGold}><p style={{ color: GOLD_LIGHT, fontSize: 11, fontFamily: "sans-serif", margin: "0 0 6px", letterSpacing: 1, textTransform: "uppercase" }}>Sermon Companion</p><h2 style={{ color: WHITE, fontSize: 20, margin: 0 }}>{selectedTopic}</h2></div><div style={s.card}><p style={{ color: GOLD, fontSize: 13, fontWeight: "bold", marginBottom: 8, fontFamily: "sans-serif" }}>📝 Main Message</p><p style={{ color: BROWN_DARK, fontSize: 14, lineHeight: 1.7, margin: 0 }}>{topicContent.mainMessage}</p></div><div style={s.card}><p style={{ color: GOLD, fontSize: 13, fontWeight: "bold", marginBottom: 8, fontFamily: "sans-serif" }}>🔑 Key Takeaways</p>{topicContent.keyTakeaways.map((t, i) => (<div key={i} style={{ display: "flex", gap: 10, marginBottom: 8, alignItems: "flex-start" }}><div style={{ ...s.stepNum, width: 24, height: 24, fontSize: 12 }}>{i + 1}</div><p style={{ color: BROWN_DARK, fontSize: 14, lineHeight: 1.6, margin: 0, flex: 1 }}>{t}</p></div>))}</div><div style={s.card}><p style={{ color: GOLD, fontSize: 13, fontWeight: "bold", marginBottom: 8, fontFamily: "sans-serif" }}>📖 Related Scriptures</p>{topicContent.scriptures.map((sc, i) => (<div key={i} style={{ marginBottom: 8, paddingBottom: 8, borderBottom: i < topicContent.scriptures.length - 1 ? `1px solid ${GOLD_LIGHT}` : "none" }}><p style={{ color: BROWN_DARK, fontSize: 13, lineHeight: 1.5, margin: 0 }}>📌 {sc}</p></div>))}</div><div style={s.card}><p style={{ color: GOLD, fontSize: 13, fontWeight: "bold", marginBottom: 8, fontFamily: "sans-serif" }}>❓ Discussion Questions</p>{topicContent.discussionQuestions.map((q, i) => (<div key={i} style={{ display: "flex", gap: 10, marginBottom: 10, alignItems: "flex-start" }}><div style={{ ...s.stepNum, width: 24, height: 24, fontSize: 12 }}>{i + 1}</div><p style={{ color: BROWN_DARK, fontSize: 14, lineHeight: 1.6, margin: 0, flex: 1 }}>{q}</p></div>))}</div><div style={{ ...s.card, background: GOLD_LIGHT }}><p style={{ color: BROWN, fontSize: 12, fontFamily: "sans-serif", fontWeight: "bold", marginBottom: 6, letterSpacing: 1, textTransform: "uppercase" }}>🙏 Application Prayer</p><p style={{ color: BROWN_DARK, fontSize: 14, fontStyle: "italic", lineHeight: 1.7, margin: 0 }}>{topicContent.prayer}</p></div><div style={s.card}><p style={{ color: GOLD, fontSize: 13, fontWeight: "bold", marginBottom: 8, fontFamily: "sans-serif" }}>✍️ Journal Prompt</p><p style={{ color: BROWN_DARK, fontSize: 14, fontStyle: "italic", lineHeight: 1.7, margin: 0 }}>{topicContent.journal}</p></div><button style={{ ...s.btn, marginBottom: 16 }} onClick={() => { setSelectedTopic(null); setTopicContent(null); }}>← Back to Topics</button></div>) : selectedCategory ? (<div><button style={s.backBtn} onClick={() => setSelectedCategory(null)}>← All Categories</button><div style={s.cardGold}><p style={{ color: GOLD_LIGHT, fontSize: 11, fontFamily: "sans-serif", margin: "0 0 6px", letterSpacing: 1, textTransform: "uppercase" }}>Category</p><h2 style={{ color: WHITE, fontSize: 20, margin: 0 }}>{selectedCategory.icon} {selectedCategory.category}</h2></div><div style={s.card}><p style={{ color: BROWN, fontSize: 13, marginBottom: 12, fontFamily: "sans-serif" }}>Select a topic to go deeper:</p><div style={{ display: "flex", flexWrap: "wrap" }}>{selectedCategory.topics.map(topic => (<button key={topic} style={s.btnSmall} onClick={() => openTopic(topic)}>{topic}</button>))}</div></div></div>) : (<div><p style={s.sectionTitle}>🎙️ Sermon Companion</p><div style={s.card}><p style={{ color: BROWN, fontSize: 13, marginBottom: 10, lineHeight: 1.5 }}>Search any topic or browse by category.</p><input style={s.input} placeholder="Search topics — Faith, Fear, Marriage..." value={sermonSearch} onChange={e => setSermonSearch(e.target.value)} /></div>{filteredCategories.map(cat => (<div key={cat.id} style={s.card}><div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}><p style={{ color: BROWN_DARK, fontSize: 15, fontWeight: "bold", margin: 0 }}>{cat.icon} {cat.category}</p>{!sermonSearch && <button style={{ ...s.btnOutline, padding: "4px 12px", fontSize: 12 }} onClick={() => setSelectedCategory(cat)}>See All →</button>}</div><div style={{ display: "flex", flexWrap: "wrap" }}>{(sermonSearch ? cat.topics : cat.topics.slice(0, 5)).map(topic => (<button key={topic} style={s.btnSmall} onClick={() => openTopic(topic)}>{topic}</button>))}{!sermonSearch && cat.topics.length > 5 && (<button style={{ ...s.btnSmall, color: GOLD, fontWeight: "bold" }} onClick={() => setSelectedCategory(cat)}>+{cat.topics.length - 5} more</button>)}</div></div>))}</div>)}
           </div>
         )}
 
-        {/* SALVATION */}
         {activeTab === "salvation" && (
           <div>
             <div style={s.cardGold}><p style={{ color: GOLD_MID, fontSize: 11, fontFamily: "sans-serif", margin: "0 0 6px", letterSpacing: 1, textTransform: "uppercase" }}>The Greatest Decision</p><h2 style={{ color: WHITE, fontSize: 22, margin: "0 0 8px" }}>Who is Jesus Christ?</h2><p style={{ color: GOLD_LIGHT, fontSize: 14, lineHeight: 1.6, margin: 0 }}>Jesus is the Son of God, who came to earth to save humanity from sin and give us eternal life. He is the Way, the Truth, and the Life.</p></div>
