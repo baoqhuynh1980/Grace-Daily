@@ -1,0 +1,17 @@
+{
+  "short_name": "Grace Daily",
+  "name": "Grace Daily - Faith App",
+  "description": "His Grace is Sufficient - 2 Corinthians 12:9",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "64x64",
+      "type": "image/x-icon"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#4A3510",
+  "background_color": "#FDF8EE",
+  "orientation": "portrait"
+}
