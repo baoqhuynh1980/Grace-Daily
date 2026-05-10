@@ -17,6 +17,7 @@ import {
   increment,
   setDoc,
   deleteDoc,
+  getDoc,
   getDocs
 } from "firebase/firestore";
 
@@ -29,6 +30,87 @@ const BROWN = "#7A5C1E";
 const BROWN_DARK = "#4A3510";
 const WHITE = "#FFFDF7";
 
+const TOTAL_CHAPTERS = 1189;
+
+// ─── BIBLE BOOKS DATA ────────────────────────────────────────────────────────
+const bibleBooks = [
+  // Old Testament
+  { name: "Genesis", chapters: 50, testament: "OT", abbrev: "gen" },
+  { name: "Exodus", chapters: 40, testament: "OT", abbrev: "exo" },
+  { name: "Leviticus", chapters: 27, testament: "OT", abbrev: "lev" },
+  { name: "Numbers", chapters: 36, testament: "OT", abbrev: "num" },
+  { name: "Deuteronomy", chapters: 34, testament: "OT", abbrev: "deu" },
+  { name: "Joshua", chapters: 24, testament: "OT", abbrev: "jos" },
+  { name: "Judges", chapters: 21, testament: "OT", abbrev: "jdg" },
+  { name: "Ruth", chapters: 4, testament: "OT", abbrev: "rut" },
+  { name: "1 Samuel", chapters: 31, testament: "OT", abbrev: "1sa" },
+  { name: "2 Samuel", chapters: 24, testament: "OT", abbrev: "2sa" },
+  { name: "1 Kings", chapters: 22, testament: "OT", abbrev: "1ki" },
+  { name: "2 Kings", chapters: 25, testament: "OT", abbrev: "2ki" },
+  { name: "1 Chronicles", chapters: 29, testament: "OT", abbrev: "1ch" },
+  { name: "2 Chronicles", chapters: 36, testament: "OT", abbrev: "2ch" },
+  { name: "Ezra", chapters: 10, testament: "OT", abbrev: "ezr" },
+  { name: "Nehemiah", chapters: 13, testament: "OT", abbrev: "neh" },
+  { name: "Esther", chapters: 10, testament: "OT", abbrev: "est" },
+  { name: "Job", chapters: 42, testament: "OT", abbrev: "job" },
+  { name: "Psalms", chapters: 150, testament: "OT", abbrev: "psa" },
+  { name: "Proverbs", chapters: 31, testament: "OT", abbrev: "pro" },
+  { name: "Ecclesiastes", chapters: 12, testament: "OT", abbrev: "ecc" },
+  { name: "Song of Solomon", chapters: 8, testament: "OT", abbrev: "sng" },
+  { name: "Isaiah", chapters: 66, testament: "OT", abbrev: "isa" },
+  { name: "Jeremiah", chapters: 52, testament: "OT", abbrev: "jer" },
+  { name: "Lamentations", chapters: 5, testament: "OT", abbrev: "lam" },
+  { name: "Ezekiel", chapters: 48, testament: "OT", abbrev: "ezk" },
+  { name: "Daniel", chapters: 12, testament: "OT", abbrev: "dan" },
+  { name: "Hosea", chapters: 14, testament: "OT", abbrev: "hos" },
+  { name: "Joel", chapters: 3, testament: "OT", abbrev: "jol" },
+  { name: "Amos", chapters: 9, testament: "OT", abbrev: "amo" },
+  { name: "Obadiah", chapters: 1, testament: "OT", abbrev: "oba" },
+  { name: "Jonah", chapters: 4, testament: "OT", abbrev: "jon" },
+  { name: "Micah", chapters: 7, testament: "OT", abbrev: "mic" },
+  { name: "Nahum", chapters: 3, testament: "OT", abbrev: "nam" },
+  { name: "Habakkuk", chapters: 3, testament: "OT", abbrev: "hab" },
+  { name: "Zephaniah", chapters: 3, testament: "OT", abbrev: "zep" },
+  { name: "Haggai", chapters: 2, testament: "OT", abbrev: "hag" },
+  { name: "Zechariah", chapters: 14, testament: "OT", abbrev: "zec" },
+  { name: "Malachi", chapters: 4, testament: "OT", abbrev: "mal" },
+  // New Testament
+  { name: "Matthew", chapters: 28, testament: "NT", abbrev: "mat" },
+  { name: "Mark", chapters: 16, testament: "NT", abbrev: "mrk" },
+  { name: "Luke", chapters: 24, testament: "NT", abbrev: "luk" },
+  { name: "John", chapters: 21, testament: "NT", abbrev: "jhn" },
+  { name: "Acts", chapters: 28, testament: "NT", abbrev: "act" },
+  { name: "Romans", chapters: 16, testament: "NT", abbrev: "rom" },
+  { name: "1 Corinthians", chapters: 16, testament: "NT", abbrev: "1co" },
+  { name: "2 Corinthians", chapters: 13, testament: "NT", abbrev: "2co" },
+  { name: "Galatians", chapters: 6, testament: "NT", abbrev: "gal" },
+  { name: "Ephesians", chapters: 6, testament: "NT", abbrev: "eph" },
+  { name: "Philippians", chapters: 4, testament: "NT", abbrev: "php" },
+  { name: "Colossians", chapters: 4, testament: "NT", abbrev: "col" },
+  { name: "1 Thessalonians", chapters: 5, testament: "NT", abbrev: "1th" },
+  { name: "2 Thessalonians", chapters: 3, testament: "NT", abbrev: "2th" },
+  { name: "1 Timothy", chapters: 6, testament: "NT", abbrev: "1ti" },
+  { name: "2 Timothy", chapters: 4, testament: "NT", abbrev: "2ti" },
+  { name: "Titus", chapters: 3, testament: "NT", abbrev: "tit" },
+  { name: "Philemon", chapters: 1, testament: "NT", abbrev: "phm" },
+  { name: "Hebrews", chapters: 13, testament: "NT", abbrev: "heb" },
+  { name: "James", chapters: 5, testament: "NT", abbrev: "jas" },
+  { name: "1 Peter", chapters: 5, testament: "NT", abbrev: "1pe" },
+  { name: "2 Peter", chapters: 3, testament: "NT", abbrev: "2pe" },
+  { name: "1 John", chapters: 5, testament: "NT", abbrev: "1jn" },
+  { name: "2 John", chapters: 1, testament: "NT", abbrev: "2jn" },
+  { name: "3 John", chapters: 1, testament: "NT", abbrev: "3jn" },
+  { name: "Jude", chapters: 1, testament: "NT", abbrev: "jud" },
+  { name: "Revelation", chapters: 22, testament: "NT", abbrev: "rev" },
+];
+
+const bibleVersions = [
+  { id: "kjv", name: "KJV", full: "King James Version" },
+  { id: "web", name: "WEB", full: "World English Bible" },
+  { id: "asv", name: "ASV", full: "American Standard Version" },
+];
+
+// ─── SERMON DATA ─────────────────────────────────────────────────────────────
 const sermonCategories = [
   { id: 1, category: "Core Christian Life", icon: "✝️", topics: ["Faith","Grace","Forgiveness","Prayer","Love","Salvation","Holy Spirit","Worship","Purpose","Healing","Obedience","Repentance","Holiness","Humility","Wisdom","Trusting God","Walking with God","Spiritual Growth","Surrender","Righteousness"] },
   { id: 2, category: "Emotional & Life Struggles", icon: "💔", topics: ["Fear","Anxiety","Depression","Stress","Loneliness","Doubt","Anger","Worry","Brokenness","Grief","Addiction","Temptation","Spiritual Warfare","Overcoming Sin","Burnout","Waiting on God","Feeling Lost","Identity in Christ"] },
@@ -43,59 +125,58 @@ const sermonContent = {
   "Faith": { mainMessage: "Faith is the foundation of everything in the Christian life. It is not blind belief but confident trust in a God who has proven Himself faithful time and time again. Hebrews 11:1 tells us that faith is the substance of things hoped for and the evidence of things not yet seen. Faith moves mountains, opens doors, and connects us to the supernatural power of God.", keyTakeaways: ["Faith requires action — it is not just believing but stepping out in trust.", "Your faith grows when it is tested — every trial is an opportunity to trust God more.", "Faith speaks to your circumstances rather than letting your circumstances speak to you."], scriptures: ["Hebrews 11:1 — Faith is the substance of things hoped for the evidence of things not seen.", "Matthew 17:20 — Even faith as small as a mustard seed can move mountains.", "Romans 10:17 — Faith comes by hearing and hearing by the Word of God."], discussionQuestions: ["What area of your life requires the most faith right now?", "How has God proven Himself faithful in your past that can strengthen your faith today?", "What is one step of faith God is calling you to take this week?"], prayer: "Father in the name of Jesus Christ strengthen my faith today. Help me to trust you completely even when I cannot see the full picture. I choose to walk by faith and not by sight. In the name of Jesus Christ. Amen.", journal: "Write about a time God came through for you when you stepped out in faith. How does that testimony strengthen your faith for what you are facing today?" },
   "Grace": { mainMessage: "Grace is the unmerited favor of God — His love and blessing extended to us not because of what we have done but because of who He is. Ephesians 2:8-9 reminds us that we are saved by grace through faith and not of ourselves. Grace is not a license to sin but the power to live differently. It is God meeting us exactly where we are and loving us too much to leave us there.", keyTakeaways: ["Grace is not earned — you cannot work for what God freely gives.", "Grace empowers you to live holy — it gives you both forgiveness and the power to change.", "Extend to others the same grace God has extended to you."], scriptures: ["Ephesians 2:8-9 — For by grace you have been saved through faith, not of yourselves.", "2 Corinthians 12:9 — My grace is sufficient for you, for my power is made perfect in weakness.", "Romans 5:20 — Where sin increased, grace increased all the more."], discussionQuestions: ["How does understanding God's grace change the way you view yourself?", "Is there an area of your life where you are trying to earn God's favor instead of receiving His grace?", "How can you extend grace to someone in your life this week?"], prayer: "Father in the name of Jesus Christ thank you for your grace that covers every mistake and every failure. Help me to receive your grace fully and to extend that same grace to others. In the name of Jesus Christ. Amen.", journal: "Reflect on a moment when you experienced God's grace in a powerful way. How did that moment change you?" },
   "Forgiveness": { mainMessage: "Forgiveness is at the heart of the Gospel. God forgave us of everything through Jesus Christ and calls us to extend that same forgiveness to others. Unforgiveness is a prison that keeps us bound while the person who hurt us walks free. When we forgive we are not excusing what was done — we are releasing ourselves from the burden of bitterness and trusting God to handle justice.", keyTakeaways: ["Forgiveness is a choice, not a feeling — you choose to forgive before the feelings follow.", "Unforgiveness hurts you more than the person who wronged you.", "Forgiveness does not always mean reconciliation — you can forgive someone and still have healthy boundaries."], scriptures: ["Ephesians 4:32 — Be kind to one another, tenderhearted, forgiving one another as God in Christ forgave you.", "Matthew 6:14-15 — If you forgive others their trespasses, your heavenly Father will also forgive you.", "Colossians 3:13 — Bear with each other and forgive one another if any of you has a grievance against someone."], discussionQuestions: ["Is there someone in your life you need to forgive but have been struggling to let go?", "How does remembering how much God has forgiven you help you forgive others?", "What does healthy forgiveness look like in a situation where trust has been broken?"], prayer: "Father in the name of Jesus Christ I choose to forgive those who have hurt me. I release every offense and bitterness to you. Heal my heart and fill the space left by unforgiveness with your peace and love. In the name of Jesus Christ. Amen.", journal: "Who do you need to forgive? Write a letter to that person that you will never send — express everything you feel and then write the words I choose to forgive you at the end." },
-  "Prayer": { mainMessage: "Prayer is simply talking to God. It is not a religious ritual but a relationship. God desires to hear from you every day — your joys, your fears, your questions, your praise. Matthew 6 shows us that Jesus taught His disciples to pray not as a performance but as a genuine conversation with the Father. Prayer changes things and it changes us.", keyTakeaways: ["Prayer is a conversation not a monologue — learn to listen as much as you speak.", "Consistency in prayer builds intimacy with God — make it a daily habit.", "Pray with faith and expectation — believe that God hears and answers."], scriptures: ["Philippians 4:6-7 — Do not be anxious about anything but in everything by prayer present your requests to God.", "Matthew 7:7-8 — Ask and it will be given to you, seek and you will find, knock and the door will be opened.", "1 Thessalonians 5:17 — Pray without ceasing."], discussionQuestions: ["What does your current prayer life look like and what would you like it to look like?", "What has been your most powerful answered prayer?", "What is one thing you have been afraid to bring to God in prayer?"], prayer: "Father in the name of Jesus Christ teach me to pray. Help me to come to you daily with an open and honest heart. I believe that you hear me and that you answer prayer. In the name of Jesus Christ. Amen.", journal: "Write out a prayer to God about something you have never prayed about before. Be completely honest with Him." },
-  "Love": { mainMessage: "God is love. Everything He does flows from His love for us. 1 Corinthians 13 gives us the most complete picture of what love truly looks like — patient, kind, not self-seeking. As followers of Jesus we are called to love God with everything we have and to love others the way Christ loved us. Love is not just a feeling — it is a decision and an action.", keyTakeaways: ["Love is an action not just an emotion — it shows up even when it is difficult.", "You can only truly love others when you first receive God's love for yourself.", "The world will know we are Christians by our love for one another."], scriptures: ["1 Corinthians 13:4-7 — Love is patient, love is kind, it does not envy or boast.", "John 3:16 — For God so loved the world that He gave His one and only Son.", "1 John 4:19 — We love because He first loved us."], discussionQuestions: ["What does it look like to love someone who is difficult to love?", "How has experiencing God's love changed the way you love others?", "In what relationship do you need to show more love this week?"], prayer: "Father in the name of Jesus Christ fill me with your love today. Help me to love others the way you love me — unconditionally and sacrificially. Let your love flow through me to everyone I encounter. In the name of Jesus Christ. Amen.", journal: "Think of someone who is hard to love in your life. Write about how God sees that person and how you can show them love this week." },
-  "Salvation": { mainMessage: "Salvation is the greatest gift ever given. God loved us so much that He sent His Son Jesus Christ to die for our sins so that we could be reconciled to Him. Salvation is not about being good enough — none of us are. It is about accepting what Jesus already did on the cross. When we confess with our mouth that Jesus is Lord and believe in our heart that God raised Him from the dead we are saved.", keyTakeaways: ["Salvation is a gift — you cannot earn it, you can only receive it.", "Salvation is the beginning of your journey not the end — it leads to a life of following Jesus.", "Every person needs salvation — share the Gospel boldly with those around you."], scriptures: ["Romans 10:9 — If you confess with your mouth Jesus is Lord and believe in your heart God raised Him from the dead you will be saved.", "John 3:16 — For God so loved the world that He gave His one and only Son.", "Acts 4:12 — Salvation is found in no one else, for there is no other name under heaven by which we must be saved."], discussionQuestions: ["Do you remember the moment you gave your life to Jesus? What was that like?", "How has your life changed since receiving salvation?", "Who in your life needs to hear the message of salvation?"], prayer: "Father in the name of Jesus Christ thank you for the gift of salvation. Thank you that Jesus died for my sins and rose again so that I could have eternal life. Help me to never take this gift for granted and to share it with everyone I can. In the name of Jesus Christ. Amen.", journal: "Write about your salvation story. When did you first encounter Jesus and how has your life been different since that moment?" },
-  "Fear": { mainMessage: "Fear is one of the most common human experiences and one of the enemy's most powerful weapons. But God's Word tells us repeatedly — do not be afraid. 2 Timothy 1:7 reminds us that God has not given us a spirit of fear but of power, love and a sound mind. Fear loses its grip when we fix our eyes on the One who is greater than anything we face.", keyTakeaways: ["Fear is a spirit that must be resisted in the name of Jesus.", "The antidote to fear is not courage alone but a deep trust in God's presence and power.", "What you feed grows — stop feeding your fears and start feeding your faith."], scriptures: ["2 Timothy 1:7 — For God has not given us a spirit of fear but of power love and a sound mind.", "Isaiah 41:10 — Fear not for I am with you, be not dismayed for I am your God.", "Psalm 27:1 — The Lord is my light and my salvation — whom shall I fear?"], discussionQuestions: ["What fear has been controlling your life the most recently?", "How does knowing God is with you change how you face your fears?", "What would you do differently if you were not afraid?"], prayer: "Father in the name of Jesus Christ I reject the spirit of fear right now. You have given me power, love and a sound mind. I will not be afraid because you are with me. Replace my fear with unshakeable faith. In the name of Jesus Christ. Amen.", journal: "Name your biggest fear. Then write out every truth from God's Word that directly contradicts that fear." },
-  "Anxiety": { mainMessage: "Anxiety is the result of trying to carry tomorrow's burdens with today's strength. God never designed us to carry the weight of worry. Philippians 4:6-7 gives us the prescription for anxiety — bring everything to God in prayer with thanksgiving, and His peace that surpasses all understanding will guard your heart and mind.", keyTakeaways: ["Anxiety is a signal to pray not a sentence to suffer.", "You cannot control everything but you can trust the One who controls all things.", "Cast your anxiety on God daily — it is a discipline that must be practiced consistently."], scriptures: ["Philippians 4:6-7 — Do not be anxious about anything but in everything by prayer present your requests to God.", "1 Peter 5:7 — Cast all your anxiety on Him because He cares for you.", "Matthew 6:34 — Do not worry about tomorrow for tomorrow will worry about itself."], discussionQuestions: ["What triggers your anxiety the most and how have you been dealing with it?", "What does it look like practically to cast your anxiety on God?", "How would your life look different if you truly trusted God with everything you are anxious about?"], prayer: "Father in the name of Jesus Christ I bring every anxious thought to you right now. I choose to trust you with everything I cannot control. Fill me with your peace that passes all understanding. In the name of Jesus Christ. Amen.", journal: "List every worry that is on your mind right now. Next to each one write a truth from God's Word that speaks directly to that worry. Then pray over that list." },
-  "Hope": { mainMessage: "Hope in God is an anchor for the soul. It is not wishful thinking — it is confident expectation based on God's promises and His proven faithfulness. Romans 15:13 tells us that God is the God of hope who fills us with all joy and peace as we trust in Him. No matter what you are going through right now God has not run out of options for your life.", keyTakeaways: ["Hope is rooted in God's character not your circumstances.", "Hope deferred makes the heart sick — stay connected to God's promises daily.", "You are never without hope because you are never without God."], scriptures: ["Romans 15:13 — May the God of hope fill you with all joy and peace as you trust in Him.", "Jeremiah 29:11 — For I know the plans I have for you, plans to give you hope and a future.", "Lamentations 3:22-23 — His mercies are new every morning, great is His faithfulness."], discussionQuestions: ["Where have you lost hope recently and what would it look like to get it back?", "What promise from God's Word gives you the most hope for your current situation?", "How can you be a source of hope for someone else this week?"], prayer: "Father in the name of Jesus Christ restore my hope today. Help me to fix my eyes on your promises rather than my problems. Fill me with your joy and peace as I trust in you. In the name of Jesus Christ. Amen.", journal: "Write about a season when all hope seemed lost but God came through. Let that testimony become fuel for the hope you need today." },
-  "Marriage": { mainMessage: "Marriage is God's design and it is a powerful picture of Christ's relationship with the Church. Ephesians 5 calls husbands to love their wives as Christ loved the Church and wives to respect their husbands. A godly marriage requires both partners to put God at the center and to choose love as a daily decision not just a feeling.", keyTakeaways: ["A strong marriage requires three — you, your spouse and God at the center.", "Love in marriage is a covenant commitment not a conditional feeling.", "Invest in your marriage daily — small consistent deposits build a strong relationship over time."], scriptures: ["Ephesians 5:25 — Husbands love your wives just as Christ loved the church and gave himself up for her.", "Genesis 2:24 — A man shall leave his father and mother and be united to his wife.", "Ecclesiastes 4:12 — A cord of three strands is not quickly broken."], discussionQuestions: ["What does it look like to put God at the center of your marriage practically?", "What is one thing you can do this week to strengthen your marriage?", "How does understanding Christ's love for the Church change how you view love in marriage?"], prayer: "Father in the name of Jesus Christ I bring my marriage to you. Strengthen our bond, heal what is broken, and help us to love each other the way you love us. Be the center of our home. In the name of Jesus Christ. Amen.", journal: "Write about what you love most about your spouse and one specific way you will show them love and appreciation this week." },
-  "The Gospel": { mainMessage: "The Gospel is the greatest news the world has ever heard. God created us for relationship with Him, sin separated us from Him, but Jesus Christ came to restore that relationship through His death and resurrection. The Gospel is not just the entry point to Christianity — it is the power that transforms us every single day.", keyTakeaways: ["The Gospel is the power of God for salvation to everyone who believes.", "We are saved by grace through faith in Jesus Christ alone — nothing can be added to what He already did.", "The Gospel compels us to go and tell others — every believer is a witness."], scriptures: ["Romans 1:16 — For I am not ashamed of the gospel, because it is the power of God that brings salvation.", "1 Corinthians 15:3-4 — Christ died for our sins, was buried and was raised on the third day.", "John 14:6 — Jesus answered I am the way the truth and the life, no one comes to the Father except through me."], discussionQuestions: ["How would you explain the Gospel to someone who has never heard it?", "How does the Gospel continue to transform your daily life beyond the moment of salvation?", "Who in your life needs to hear the Gospel and how can you share it with them?"], prayer: "Father in the name of Jesus Christ thank you for the Gospel. Thank you that Jesus paid the price I could never pay. Help me to never lose my wonder at what you did for me and to share this good news boldly. In the name of Jesus Christ. Amen.", journal: "Write out the Gospel in your own words as if you were explaining it to someone for the very first time." },
-  "Spiritual Warfare": { mainMessage: "Every believer is in a spiritual battle whether they know it or not. The enemy comes to steal kill and destroy but Jesus came that we might have life and have it abundantly. Ephesians 6 calls us to put on the full armor of God so that we can stand against the schemes of the devil. The battle is real but the victory has already been won through Jesus Christ.", keyTakeaways: ["Your battle is not against people but against spiritual forces — pray accordingly.", "Put on the full armor of God daily — it is not automatic, it is a deliberate act.", "The enemy has already been defeated — you are enforcing a victory that Christ already won."], scriptures: ["Ephesians 6:11 — Put on the full armor of God so that you can take your stand against the devil's schemes.", "1 Peter 5:8 — Be sober-minded, be watchful, your adversary the devil prowls around like a roaring lion.", "James 4:7 — Submit yourselves to God, resist the devil, and he will flee from you."], discussionQuestions: ["What area of your life do you feel is under spiritual attack right now?", "How consistent are you in putting on the armor of God daily?", "What does it look like practically to resist the devil in your everyday life?"], prayer: "Father in the name of Jesus Christ I put on the full armor of God right now. I stand against every attack of the enemy. Greater is He that is in me than he that is in the world. I declare victory through the blood of Jesus Christ. In the name of Jesus Christ. Amen.", journal: "Identify one area of your life where you sense spiritual attack. Write out a battle plan using specific scriptures as your weapons." },
-  "God's Timing": { mainMessage: "One of the hardest things about the Christian life is waiting on God's timing. We live in a microwave world but God often works in a crockpot way. Ecclesiastes 3:1 tells us there is a time for everything and a season for every activity under heaven. God is never late and He is never early — He is always right on time.", keyTakeaways: ["Waiting on God is not wasted time — He is preparing you in the process.", "God's delays are not God's denials — trust His timing even when it doesn't make sense.", "Use your waiting season to grow deeper in your faith and your relationship with God."], scriptures: ["Ecclesiastes 3:1 — There is a time for everything and a season for every activity under the heavens.", "Isaiah 40:31 — Those who wait on the Lord will renew their strength.", "Habakkuk 2:3 — For the vision awaits an appointed time — if it seems slow wait for it, it will surely come."], discussionQuestions: ["What are you currently waiting on God for and how are you handling the wait?", "Can you look back and see a time when God's timing was perfect even though it felt slow?", "What is God trying to develop in you during this waiting season?"], prayer: "Father in the name of Jesus Christ I trust your timing even when I do not understand it. Help me to wait with patience and faith knowing that you are working all things together for my good. In the name of Jesus Christ. Amen.", journal: "Write about what you are waiting on God for right now. Then write out what God might be trying to build in you through the waiting." },
-  "Identity in Christ": { mainMessage: "Who you are is not defined by what you have done, what others say about you, or what you have been through. Your true identity is found in who God says you are. In Christ you are loved, chosen, redeemed, forgiven, and called. When you know who you are in Christ the enemy loses his power to define you with lies.", keyTakeaways: ["Your identity is rooted in whose you are not what you do.", "Replace the lies you believe about yourself with what God's Word says about you.", "Living from your identity in Christ rather than for it changes everything."], scriptures: ["2 Corinthians 5:17 — If anyone is in Christ the new creation has come, the old has gone the new is here.", "Ephesians 1:4-5 — He chose us in Him before the creation of the world to be holy and blameless.", "1 Peter 2:9 — You are a chosen people, a royal priesthood, a holy nation, God's special possession."], discussionQuestions: ["What lies have you believed about yourself that contradict what God says about you?", "How would your daily life change if you fully believed what God says about your identity?", "What is one truth about your identity in Christ you need to declare over yourself today?"], prayer: "Father in the name of Jesus Christ I declare who I am in you today. I am loved, chosen, redeemed and called. I reject every lie the enemy has told me about myself and I choose to believe what your Word says about me. In the name of Jesus Christ. Amen.", journal: "Make a list of 10 things God says about you in His Word. Read them out loud every morning this week." },
-  "Fasting": { mainMessage: "Fasting is one of the most powerful spiritual disciplines available to believers. When we fast we deny the flesh and say to God that knowing Him and hearing from Him is more important than physical comfort. Jesus said when you fast — not if — indicating that fasting should be a regular part of the believer's life. Fasting combined with prayer moves mountains.", keyTakeaways: ["Start small — a meal fast is a powerful starting point for those new to fasting.", "Fasting is not about impressing God — it is about drawing closer to Him.", "Replace the time you would spend eating with prayer and reading God's Word."], scriptures: ["Matthew 6:16-17 — When you fast do not look somber as the hypocrites do.", "Isaiah 58:6 — Is not this the kind of fasting I have chosen — to loose the chains of injustice.", "Acts 13:2-3 — While they were worshiping the Lord and fasting the Holy Spirit said set apart for me Barnabas and Saul."], discussionQuestions: ["Have you ever fasted before and what was your experience?", "What breakthrough are you believing God for that might require fasting and prayer?", "What type of fast feels right for where you are in your faith journey right now?"], prayer: "Father in the name of Jesus Christ as I fast I draw closer to you. I deny my flesh and declare that you are more important than anything this world offers. Speak to me clearly during this time of fasting and prayer. In the name of Jesus Christ. Amen.", journal: "Write about something you are believing God for. Commit to a specific fast and write out exactly what you are trusting God to do." },
-  "The Armor of God": { mainMessage: "The Armor of God in Ephesians 6 is not decorative — it is essential equipment for every believer in spiritual battle. Each piece of armor serves a specific purpose: the belt of truth, breastplate of righteousness, shoes of peace, shield of faith, helmet of salvation and sword of the Spirit. When we put on the full armor daily we are equipped to stand firm against every attack of the enemy.", keyTakeaways: ["The armor of God is put on through prayer, declaration and living in God's Word.", "Every piece of armor is essential — you cannot leave any of it off.", "The only offensive weapon is the sword of the Spirit which is the Word of God — know your Bible."], scriptures: ["Ephesians 6:11 — Put on the full armor of God so that you can take your stand against the devil's schemes.", "Ephesians 6:17 — Take the helmet of salvation and the sword of the Spirit which is the Word of God.", "Romans 13:12 — Put on the armor of light."], discussionQuestions: ["Which piece of the armor of God do you feel weakest in right now?", "How do you practically put on the armor of God each morning?", "How does knowing your weapons change the way you approach spiritual battles?"], prayer: "Father in the name of Jesus Christ I put on the full armor of God right now. I gird myself with truth, I put on righteousness, I take up the shield of faith and the sword of your Word. I am equipped and I am ready. In the name of Jesus Christ. Amen.", journal: "Go through each piece of the armor of God. For each one write down what it means practically in your daily life and how you will apply it today." },
-  "How to Pray": { mainMessage: "Many people want to pray but do not know where to start. Jesus gave us a model in Matthew 6 — the Lord's Prayer — that covers every element of powerful prayer: worship, surrender, petition, confession and spiritual protection. Prayer does not require fancy words or a perfect life. It simply requires an honest heart and a willingness to come to God just as you are.", keyTakeaways: ["Start with praise and worship — acknowledge who God is before you bring your requests.", "Be specific in your prayers — God honors specific faith.", "End with surrender — your will not mine be done."], scriptures: ["Matthew 6:9-13 — Our Father in heaven hallowed be your name your kingdom come your will be done.", "Jeremiah 33:3 — Call to me and I will answer you and tell you great and unsearchable things.", "James 5:16 — The prayer of a righteous person is powerful and effective."], discussionQuestions: ["What has been the biggest obstacle to your prayer life?", "How does praying the Lord's Prayer as a model change the way you approach God?", "What is one specific thing you want to start praying about consistently?"], prayer: "Father in the name of Jesus Christ teach me to pray. I want to come to you daily with an open heart. Help me to be consistent, specific and expectant in my prayers. In the name of Jesus Christ. Amen.", journal: "Write out your own version of the Lord's Prayer — personalized to your life, your circumstances and your relationship with God." },
-  "When God Feels Silent": { mainMessage: "Every believer goes through seasons where God feels distant or silent. The prayers seem to bounce off the ceiling. The heavens feel like brass. But silence is not absence. God is always with you even when you cannot feel Him. These desert seasons are often where the deepest spiritual growth happens.", keyTakeaways: ["God's silence is not His absence — He is always present even when you cannot feel Him.", "Keep showing up — consistency in seeking God even when it feels dry is a mark of mature faith.", "These seasons always end — your breakthrough is on the other side of your faithfulness."], scriptures: ["Psalm 22:1-2 — My God my God why have you forsaken me, yet you are the Holy One.", "Isaiah 45:15 — Truly you are a God who hides himself, O God and Savior of Israel.", "Hebrews 13:5 — Never will I leave you, never will I forsake you."], discussionQuestions: ["Have you ever gone through a season where God felt silent and what did you do?", "How do you maintain your faith when you cannot feel God's presence?", "What has God taught you during seasons of silence that you could not have learned any other way?"], prayer: "Father in the name of Jesus Christ even in this season of silence I choose to trust you. I know you are present even when I cannot feel you. I will keep seeking you until the breakthrough comes. In the name of Jesus Christ. Amen.", journal: "Write a raw honest letter to God about how you feel in this silent season. Tell Him everything. Then write out what you believe to be true about Him regardless of what you feel." },
-  "Faith Over Fear": { mainMessage: "Fear and faith cannot occupy the same space. When fear rises, faith must rise higher. Every time God called someone to do something great in the Bible fear was present. Joshua was told to be strong and courageous not because danger was not real but because God's presence was more real. Faith over fear is a daily choice to trust God above every threat, uncertainty and impossibility.", keyTakeaways: ["Acknowledge your fear but do not give it authority over your decisions.", "Faith is not the absence of fear — it is moving forward in spite of it.", "Speak the Word of God out loud over your fear — faith comes by hearing."], scriptures: ["Joshua 1:9 — Be strong and courageous, do not be afraid for the Lord your God will be with you.", "Psalm 56:3 — When I am afraid I put my trust in you.", "Isaiah 41:10 — Fear not for I am with you, be not dismayed for I am your God."], discussionQuestions: ["What fear is trying to stop you from moving forward right now?", "What would you do differently this week if fear was not a factor?", "How do you practically choose faith over fear in everyday decisions?"], prayer: "Father in the name of Jesus Christ I choose faith over fear today. I will not let fear make my decisions. I trust you completely and I move forward knowing you are with me. In the name of Jesus Christ. Amen.", journal: "Name the fear that has been controlling you the most. Write out a declaration of faith that directly confronts that fear with God's Word." },
-  "Jesus Changes Everything": { mainMessage: "An encounter with Jesus Christ changes everything. It changed fishermen into world changers, prostitutes into worshippers, murderers into apostles and broken people into new creations. Jesus does not just improve your life — He transforms it from the inside out. 2 Corinthians 5:17 says if anyone is in Christ the new creation has come — the old is gone the new is here.", keyTakeaways: ["Jesus does not just fix broken things — He makes all things new.", "Your past does not define you — your encounter with Jesus does.", "The same power that raised Christ from the dead lives in every believer."], scriptures: ["2 Corinthians 5:17 — If anyone is in Christ the new creation has come, the old has gone the new is here.", "John 10:10 — I have come that they may have life and have it to the full.", "Galatians 2:20 — I have been crucified with Christ and I no longer live but Christ lives in me."], discussionQuestions: ["How has your encounter with Jesus specifically changed your life?", "What area of your life still needs to be fully surrendered to Jesus?", "Who in your life needs to know that Jesus changes everything?"], prayer: "Father in the name of Jesus Christ thank you that Jesus changed everything for me. I give every area of my life to you completely. Have your way in me and transform me from the inside out. In the name of Jesus Christ. Amen.", journal: "Write your before and after story. Who were you before Jesus and who are you now? Let that testimony remind you of His power and share it with someone." }
+  "Prayer": { mainMessage: "Prayer is simply talking to God. It is not a religious ritual but a relationship. God desires to hear from you every day — your joys, your fears, your questions, your praise. Prayer changes things and it changes us.", keyTakeaways: ["Prayer is a conversation not a monologue — learn to listen as much as you speak.", "Consistency in prayer builds intimacy with God — make it a daily habit.", "Pray with faith and expectation — believe that God hears and answers."], scriptures: ["Philippians 4:6-7 — Do not be anxious about anything but in everything by prayer present your requests to God.", "Matthew 7:7-8 — Ask and it will be given to you, seek and you will find, knock and the door will be opened.", "1 Thessalonians 5:17 — Pray without ceasing."], discussionQuestions: ["What does your current prayer life look like and what would you like it to look like?", "What has been your most powerful answered prayer?", "What is one thing you have been afraid to bring to God in prayer?"], prayer: "Father in the name of Jesus Christ teach me to pray. Help me to come to you daily with an open and honest heart. I believe that you hear me and that you answer prayer. In the name of Jesus Christ. Amen.", journal: "Write out a prayer to God about something you have never prayed about before. Be completely honest with Him." },
+  "Love": { mainMessage: "God is love. Everything He does flows from His love for us. 1 Corinthians 13 gives us the most complete picture of what love truly looks like — patient, kind, not self-seeking. Love is not just a feeling — it is a decision and an action.", keyTakeaways: ["Love is an action not just an emotion — it shows up even when it is difficult.", "You can only truly love others when you first receive God's love for yourself.", "The world will know we are Christians by our love for one another."], scriptures: ["1 Corinthians 13:4-7 — Love is patient, love is kind, it does not envy or boast.", "John 3:16 — For God so loved the world that He gave His one and only Son.", "1 John 4:19 — We love because He first loved us."], discussionQuestions: ["What does it look like to love someone who is difficult to love?", "How has experiencing God's love changed the way you love others?", "In what relationship do you need to show more love this week?"], prayer: "Father in the name of Jesus Christ fill me with your love today. Help me to love others the way you love me. In the name of Jesus Christ. Amen.", journal: "Think of someone who is hard to love in your life. Write about how God sees that person and how you can show them love this week." },
+  "Salvation": { mainMessage: "Salvation is the greatest gift ever given. God loved us so much that He sent His Son Jesus Christ to die for our sins so that we could be reconciled to Him. It is about accepting what Jesus already did on the cross.", keyTakeaways: ["Salvation is a gift — you cannot earn it, you can only receive it.", "Salvation is the beginning of your journey not the end.", "Every person needs salvation — share the Gospel boldly with those around you."], scriptures: ["Romans 10:9 — If you confess with your mouth Jesus is Lord and believe in your heart God raised Him from the dead you will be saved.", "John 3:16 — For God so loved the world that He gave His one and only Son.", "Acts 4:12 — Salvation is found in no one else."], discussionQuestions: ["Do you remember the moment you gave your life to Jesus?", "How has your life changed since receiving salvation?", "Who in your life needs to hear the message of salvation?"], prayer: "Father in the name of Jesus Christ thank you for the gift of salvation. Help me to never take this gift for granted. In the name of Jesus Christ. Amen.", journal: "Write about your salvation story. When did you first encounter Jesus and how has your life been different since that moment?" },
+  "Fear": { mainMessage: "Fear is one of the most common human experiences and one of the enemy's most powerful weapons. 2 Timothy 1:7 reminds us that God has not given us a spirit of fear but of power, love and a sound mind.", keyTakeaways: ["Fear is a spirit that must be resisted in the name of Jesus.", "The antidote to fear is not courage alone but a deep trust in God's presence and power.", "What you feed grows — stop feeding your fears and start feeding your faith."], scriptures: ["2 Timothy 1:7 — For God has not given us a spirit of fear but of power love and a sound mind.", "Isaiah 41:10 — Fear not for I am with you, be not dismayed for I am your God.", "Psalm 27:1 — The Lord is my light and my salvation — whom shall I fear?"], discussionQuestions: ["What fear has been controlling your life the most recently?", "How does knowing God is with you change how you face your fears?", "What would you do differently if you were not afraid?"], prayer: "Father in the name of Jesus Christ I reject the spirit of fear right now. You have given me power, love and a sound mind. In the name of Jesus Christ. Amen.", journal: "Name your biggest fear. Then write out every truth from God's Word that directly contradicts that fear." },
+  "Anxiety": { mainMessage: "Anxiety is the result of trying to carry tomorrow's burdens with today's strength. Philippians 4:6-7 gives us the prescription for anxiety — bring everything to God in prayer with thanksgiving.", keyTakeaways: ["Anxiety is a signal to pray not a sentence to suffer.", "You cannot control everything but you can trust the One who controls all things.", "Cast your anxiety on God daily."], scriptures: ["Philippians 4:6-7 — Do not be anxious about anything but in everything by prayer present your requests to God.", "1 Peter 5:7 — Cast all your anxiety on Him because He cares for you.", "Matthew 6:34 — Do not worry about tomorrow for tomorrow will worry about itself."], discussionQuestions: ["What triggers your anxiety the most?", "What does it look like practically to cast your anxiety on God?", "How would your life look different if you truly trusted God with everything?"], prayer: "Father in the name of Jesus Christ I bring every anxious thought to you right now. Fill me with your peace that passes all understanding. In the name of Jesus Christ. Amen.", journal: "List every worry on your mind. Next to each one write a truth from God's Word that speaks directly to that worry." },
+  "Hope": { mainMessage: "Hope in God is an anchor for the soul. Romans 15:13 tells us that God is the God of hope who fills us with all joy and peace as we trust in Him.", keyTakeaways: ["Hope is rooted in God's character not your circumstances.", "You are never without hope because you are never without God."], scriptures: ["Romans 15:13 — May the God of hope fill you with all joy and peace as you trust in Him.", "Jeremiah 29:11 — For I know the plans I have for you.", "Lamentations 3:22-23 — His mercies are new every morning."], discussionQuestions: ["Where have you lost hope recently?", "What promise from God's Word gives you the most hope?"], prayer: "Father in the name of Jesus Christ restore my hope today. In the name of Jesus Christ. Amen.", journal: "Write about a season when all hope seemed lost but God came through." },
+  "Marriage": { mainMessage: "Marriage is God's design and it is a powerful picture of Christ's relationship with the Church. A godly marriage requires both partners to put God at the center.", keyTakeaways: ["A strong marriage requires three — you, your spouse and God at the center.", "Love in marriage is a covenant commitment not a conditional feeling."], scriptures: ["Ephesians 5:25 — Husbands love your wives just as Christ loved the church.", "Genesis 2:24 — A man shall leave his father and mother and be united to his wife.", "Ecclesiastes 4:12 — A cord of three strands is not quickly broken."], discussionQuestions: ["What does it look like to put God at the center of your marriage?", "What is one thing you can do this week to strengthen your marriage?"], prayer: "Father in the name of Jesus Christ I bring my marriage to you. Strengthen our bond and help us to love each other the way you love us. In the name of Jesus Christ. Amen.", journal: "Write about what you love most about your spouse and one specific way you will show them love this week." },
+  "The Gospel": { mainMessage: "The Gospel is the greatest news the world has ever heard. God created us for relationship with Him, sin separated us from Him, but Jesus Christ came to restore that relationship.", keyTakeaways: ["The Gospel is the power of God for salvation to everyone who believes.", "The Gospel compels us to go and tell others — every believer is a witness."], scriptures: ["Romans 1:16 — For I am not ashamed of the gospel.", "1 Corinthians 15:3-4 — Christ died for our sins, was buried and was raised on the third day.", "John 14:6 — I am the way the truth and the life."], discussionQuestions: ["How would you explain the Gospel to someone who has never heard it?", "Who in your life needs to hear the Gospel?"], prayer: "Father in the name of Jesus Christ help me to never lose my wonder at what you did for me. In the name of Jesus Christ. Amen.", journal: "Write out the Gospel in your own words as if explaining it to someone for the very first time." },
+  "Spiritual Warfare": { mainMessage: "Every believer is in a spiritual battle. The battle is real but the victory has already been won through Jesus Christ.", keyTakeaways: ["Your battle is not against people but against spiritual forces.", "The enemy has already been defeated — you are enforcing a victory Christ already won."], scriptures: ["Ephesians 6:11 — Put on the full armor of God.", "1 Peter 5:8 — Your adversary the devil prowls around like a roaring lion.", "James 4:7 — Resist the devil, and he will flee from you."], discussionQuestions: ["What area of your life do you feel is under spiritual attack?", "What does it look like practically to resist the devil?"], prayer: "Father in the name of Jesus Christ I put on the full armor of God. Greater is He that is in me. In the name of Jesus Christ. Amen.", journal: "Identify one area of spiritual attack. Write a battle plan using specific scriptures as your weapons." },
+  "God's Timing": { mainMessage: "One of the hardest things about the Christian life is waiting on God's timing. God is never late and He is never early — He is always right on time.", keyTakeaways: ["Waiting on God is not wasted time — He is preparing you in the process.", "God's delays are not God's denials."], scriptures: ["Ecclesiastes 3:1 — There is a time for everything.", "Isaiah 40:31 — Those who wait on the Lord will renew their strength.", "Habakkuk 2:3 — The vision awaits an appointed time."], discussionQuestions: ["What are you currently waiting on God for?", "What is God trying to develop in you during this waiting season?"], prayer: "Father in the name of Jesus Christ I trust your timing even when I do not understand it. In the name of Jesus Christ. Amen.", journal: "Write about what you are waiting on God for. What might He be building in you through the waiting?" },
+  "Identity in Christ": { mainMessage: "Your true identity is found in who God says you are. In Christ you are loved, chosen, redeemed, forgiven, and called.", keyTakeaways: ["Your identity is rooted in whose you are not what you do.", "Replace the lies you believe about yourself with what God's Word says about you."], scriptures: ["2 Corinthians 5:17 — If anyone is in Christ the new creation has come.", "Ephesians 1:4-5 — He chose us before the creation of the world.", "1 Peter 2:9 — You are a chosen people, a royal priesthood."], discussionQuestions: ["What lies have you believed about yourself?", "What is one truth about your identity in Christ you need to declare today?"], prayer: "Father in the name of Jesus Christ I declare who I am in you. I am loved, chosen, redeemed and called. In the name of Jesus Christ. Amen.", journal: "Make a list of 10 things God says about you in His Word. Read them out loud every morning this week." },
+  "Fasting": { mainMessage: "Fasting is one of the most powerful spiritual disciplines available to believers. When we fast we deny the flesh and say to God that knowing Him is more important than physical comfort.", keyTakeaways: ["Start small — a meal fast is a powerful starting point.", "Fasting is not about impressing God — it is about drawing closer to Him."], scriptures: ["Matthew 6:16-17 — When you fast do not look somber as the hypocrites do.", "Isaiah 58:6 — To loose the chains of injustice.", "Acts 13:2-3 — While fasting the Holy Spirit spoke."], discussionQuestions: ["Have you ever fasted before?", "What breakthrough are you believing God for that might require fasting?"], prayer: "Father in the name of Jesus Christ as I fast I draw closer to you. Speak to me clearly. In the name of Jesus Christ. Amen.", journal: "Write about something you are believing God for. Commit to a specific fast." },
+  "The Armor of God": { mainMessage: "The Armor of God in Ephesians 6 is not decorative — it is essential equipment for every believer in spiritual battle.", keyTakeaways: ["Every piece of armor is essential — you cannot leave any of it off.", "The only offensive weapon is the sword of the Spirit — the Word of God."], scriptures: ["Ephesians 6:11 — Put on the full armor of God.", "Ephesians 6:17 — The sword of the Spirit which is the Word of God.", "Romans 13:12 — Put on the armor of light."], discussionQuestions: ["Which piece of the armor of God do you feel weakest in?", "How do you practically put on the armor each morning?"], prayer: "Father in the name of Jesus Christ I put on the full armor of God right now. I am equipped and I am ready. In the name of Jesus Christ. Amen.", journal: "Go through each piece of armor. Write what it means practically in your daily life." },
+  "How to Pray": { mainMessage: "Jesus gave us a model in Matthew 6 — the Lord's Prayer — that covers every element of powerful prayer. Prayer simply requires an honest heart.", keyTakeaways: ["Start with praise — acknowledge who God is before you bring requests.", "Be specific in your prayers — God honors specific faith.", "End with surrender — your will not mine be done."], scriptures: ["Matthew 6:9-13 — Our Father in heaven hallowed be your name.", "Jeremiah 33:3 — Call to me and I will answer you.", "James 5:16 — The prayer of a righteous person is powerful and effective."], discussionQuestions: ["What has been the biggest obstacle to your prayer life?", "What is one specific thing you want to start praying about consistently?"], prayer: "Father in the name of Jesus Christ teach me to pray. Help me to be consistent, specific and expectant. In the name of Jesus Christ. Amen.", journal: "Write your own version of the Lord's Prayer — personalized to your life." },
+  "When God Feels Silent": { mainMessage: "Every believer goes through seasons where God feels distant or silent. But silence is not absence. God is always with you even when you cannot feel Him.", keyTakeaways: ["God's silence is not His absence — He is always present.", "Keep showing up — consistency when it feels dry is a mark of mature faith."], scriptures: ["Psalm 22:1-2 — My God my God why have you forsaken me.", "Isaiah 45:15 — Truly you are a God who hides himself.", "Hebrews 13:5 — Never will I leave you, never will I forsake you."], discussionQuestions: ["Have you gone through a season where God felt silent?", "How do you maintain your faith when you cannot feel God's presence?"], prayer: "Father in the name of Jesus Christ even in silence I choose to trust you. In the name of Jesus Christ. Amen.", journal: "Write a raw honest letter to God about how you feel. Then write what you believe to be true about Him regardless of feelings." },
+  "Faith Over Fear": { mainMessage: "Fear and faith cannot occupy the same space. Faith over fear is a daily choice to trust God above every threat, uncertainty and impossibility.", keyTakeaways: ["Acknowledge your fear but do not give it authority over your decisions.", "Faith is not the absence of fear — it is moving forward in spite of it."], scriptures: ["Joshua 1:9 — Be strong and courageous.", "Psalm 56:3 — When I am afraid I put my trust in you.", "Isaiah 41:10 — Fear not for I am with you."], discussionQuestions: ["What fear is trying to stop you right now?", "How do you practically choose faith over fear?"], prayer: "Father in the name of Jesus Christ I choose faith over fear today. I move forward knowing you are with me. In the name of Jesus Christ. Amen.", journal: "Name the fear controlling you most. Write a declaration of faith that confronts it with God's Word." },
+  "Jesus Changes Everything": { mainMessage: "An encounter with Jesus Christ changes everything. Jesus does not just improve your life — He transforms it from the inside out.", keyTakeaways: ["Jesus does not just fix broken things — He makes all things new.", "Your past does not define you — your encounter with Jesus does."], scriptures: ["2 Corinthians 5:17 — If anyone is in Christ the new creation has come.", "John 10:10 — I have come that they may have life to the full.", "Galatians 2:20 — I have been crucified with Christ."], discussionQuestions: ["How has your encounter with Jesus specifically changed your life?", "Who in your life needs to know that Jesus changes everything?"], prayer: "Father in the name of Jesus Christ thank you that Jesus changed everything for me. Have your way in me. In the name of Jesus Christ. Amen.", journal: "Write your before and after story. Who were you before Jesus and who are you now?" }
 };
 
 const getSermonContent = (topic) => {
   if (sermonContent[topic]) return sermonContent[topic];
   return {
-    mainMessage: `${topic} is a powerful and important subject in the Christian faith. God's Word has much to say about this topic and studying it will deepen your relationship with Him and transform the way you live.`,
-    keyTakeaways: [`Seek God's wisdom on ${topic} through prayer and His Word.`, `Apply what you learn about ${topic} to your everyday life.`, `Share what God is teaching you about ${topic} with others.`],
-    scriptures: ["Proverbs 3:5-6 — Trust in the Lord with all your heart and lean not on your own understanding.", "Psalm 119:105 — Your word is a lamp to my feet and a light to my path.", "James 1:5 — If any of you lacks wisdom let him ask God who gives generously to all."],
-    discussionQuestions: [`What does God's Word say about ${topic}?`, `How does ${topic} apply to your current season of life?`, `What is one action step you can take this week based on what you are learning about ${topic}?`],
-    prayer: `Father in the name of Jesus Christ give me wisdom and understanding about ${topic}. Let your Word guide me and transform me as I study this topic. In the name of Jesus Christ. Amen.`,
-    journal: `Write about what God is showing you about ${topic}. What is one thing you want to apply to your life this week?`
+    mainMessage: `${topic} is a powerful and important subject in the Christian faith. God's Word has much to say about this topic.`,
+    keyTakeaways: [`Seek God's wisdom on ${topic} through prayer and His Word.`, `Apply what you learn about ${topic} to your everyday life.`],
+    scriptures: ["Proverbs 3:5-6 — Trust in the Lord with all your heart.", "Psalm 119:105 — Your word is a lamp to my feet.", "James 1:5 — If any of you lacks wisdom let him ask God."],
+    discussionQuestions: [`What does God's Word say about ${topic}?`, `How does ${topic} apply to your current season of life?`],
+    prayer: `Father in the name of Jesus Christ give me wisdom about ${topic}. In the name of Jesus Christ. Amen.`,
+    journal: `Write about what God is showing you about ${topic}. What is one thing you want to apply this week?`
   };
 };
 
 const emotionVerses = {
-  anxious: { keywords: ["anxious","anxiety","worried","worry","nervous","stress","stressed","overwhelmed","panic"], verses: ["philippians 4:6","isaiah 41:10","matthew 6:34","1 peter 5:7","john 14:27","psalm 34:4","2 timothy 1:7","psalm 23:4","romans 15:13","psalm 94:19"], reflection: "God sees every worry you carry right now. He doesn't want you to face this alone. Cast every anxiety on Him because He cares deeply for you.", prayer: "Father in the name of Jesus Christ I bring every worry and anxiety to you right now. I choose to trust you above my circumstances. Fill me with your peace that surpasses all understanding. In the name of Jesus Christ. Amen." },
-  sad: { keywords: ["sad","sadness","depressed","depression","unhappy","miserable","hopeless","down","discouraged","heartbroken"], verses: ["psalm 34:18","matthew 5:4","revelation 21:4","psalm 147:3","isaiah 61:3","2 corinthians 1:3","john 16:22","psalm 30:5","romans 8:18","isaiah 43:2"], reflection: "God is close to the brokenhearted. Your sadness is not hidden from Him. He sees every tear and He is right there with you in this moment.", prayer: "Father in the name of Jesus Christ I come to you with a heavy heart. Lift me up from this sadness and remind me that your joy comes in the morning. In the name of Jesus Christ. Amen." },
-  grateful: { keywords: ["grateful","thankful","blessed","happy","joyful","joy","praise","amazing","good","wonderful"], verses: ["psalm 100:4","1 thessalonians 5:18","psalm 107:1","philippians 4:4","james 1:17","psalm 136:1","ephesians 5:20","psalm 118:24","colossians 3:17","psalm 9:1"], reflection: "A grateful heart is a powerful heart. When we count our blessings and thank God for His goodness it opens the door for even more of His grace in our lives.", prayer: "Father in the name of Jesus Christ thank you for your goodness and mercy in my life. I praise you for every blessing both big and small. In the name of Jesus Christ. Amen." },
-  lonely: { keywords: ["lonely","alone","abandoned","isolated","forgotten","unloved","rejected","left out","no one"], verses: ["deuteronomy 31:6","psalm 139:7","hebrews 13:5","matthew 28:20","isaiah 43:4","psalm 68:6","john 14:18","zephaniah 3:17","romans 8:38","psalm 27:10"], reflection: "You are never truly alone. God is always with you. Even in your loneliest moment His presence surrounds you.", prayer: "Father in the name of Jesus Christ remind me right now that I am never alone. Fill the empty spaces in my heart with your love and your peace. In the name of Jesus Christ. Amen." },
-  angry: { keywords: ["angry","anger","mad","furious","frustrated","rage","upset","bitter","resentful","annoyed"], verses: ["ephesians 4:26","james 1:19","proverbs 15:1","psalm 37:8","romans 12:19","colossians 3:8","proverbs 29:11","matthew 5:22","ecclesiastes 7:9","psalm 4:4"], reflection: "God understands your anger. He asks you to bring it to Him rather than let it control you.", prayer: "Father in the name of Jesus Christ I give you my anger right now. Help me to respond with grace and wisdom rather than react in anger. In the name of Jesus Christ. Amen." },
+  anxious: { keywords: ["anxious","anxiety","worried","worry","nervous","stress","stressed","overwhelmed","panic"], verses: ["philippians 4:6","isaiah 41:10","matthew 6:34","1 peter 5:7","john 14:27","psalm 34:4","2 timothy 1:7","psalm 23:4","romans 15:13","psalm 94:19"], reflection: "God sees every worry you carry right now. He doesn't want you to face this alone. Cast every anxiety on Him because He cares deeply for you.", prayer: "Father in the name of Jesus Christ I bring every worry and anxiety to you right now. Fill me with your peace that surpasses all understanding. In the name of Jesus Christ. Amen." },
+  sad: { keywords: ["sad","sadness","depressed","depression","unhappy","miserable","hopeless","down","discouraged","heartbroken"], verses: ["psalm 34:18","matthew 5:4","revelation 21:4","psalm 147:3","isaiah 61:3","2 corinthians 1:3","john 16:22","psalm 30:5","romans 8:18","isaiah 43:2"], reflection: "God is close to the brokenhearted. Your sadness is not hidden from Him. He sees every tear and He is right there with you.", prayer: "Father in the name of Jesus Christ I come to you with a heavy heart. Lift me up and remind me that your joy comes in the morning. In the name of Jesus Christ. Amen." },
+  grateful: { keywords: ["grateful","thankful","blessed","happy","joyful","joy","praise","amazing","good","wonderful"], verses: ["psalm 100:4","1 thessalonians 5:18","psalm 107:1","philippians 4:4","james 1:17","psalm 136:1","ephesians 5:20","psalm 118:24","colossians 3:17","psalm 9:1"], reflection: "A grateful heart is a powerful heart. When we count our blessings it opens the door for even more of His grace.", prayer: "Father in the name of Jesus Christ thank you for your goodness and mercy. I praise you for every blessing big and small. In the name of Jesus Christ. Amen." },
+  lonely: { keywords: ["lonely","alone","abandoned","isolated","forgotten","unloved","rejected","left out","no one"], verses: ["deuteronomy 31:6","psalm 139:7","hebrews 13:5","matthew 28:20","isaiah 43:4","psalm 68:6","john 14:18","zephaniah 3:17","romans 8:38","psalm 27:10"], reflection: "You are never truly alone. God is always with you. Even in your loneliest moment His presence surrounds you.", prayer: "Father in the name of Jesus Christ remind me that I am never alone. Fill the empty spaces in my heart with your love. In the name of Jesus Christ. Amen." },
+  angry: { keywords: ["angry","anger","mad","furious","frustrated","rage","upset","bitter","resentful","annoyed"], verses: ["ephesians 4:26","james 1:19","proverbs 15:1","psalm 37:8","romans 12:19","colossians 3:8","proverbs 29:11","matthew 5:22","ecclesiastes 7:9","psalm 4:4"], reflection: "God understands your anger. He asks you to bring it to Him rather than let it control you.", prayer: "Father in the name of Jesus Christ I give you my anger right now. Help me to respond with grace and wisdom. In the name of Jesus Christ. Amen." },
   lost: { keywords: ["lost","confused","don't know","unsure","unclear","wandering","no direction","uncertain","mixed up"], verses: ["proverbs 3:5","psalm 32:8","isaiah 30:21","john 10:27","psalm 119:105","jeremiah 29:11","proverbs 16:9","isaiah 42:16","psalm 25:4","romans 8:14"], reflection: "Even when you feel lost God always knows exactly where you are. He is faithful to guide you step by step.", prayer: "Father in the name of Jesus Christ I need your guidance right now. Show me the path you have for me. In the name of Jesus Christ. Amen." },
-  hopeful: { keywords: ["hopeful","hope","expectant","believing","trusting","faith","optimistic","looking forward"], verses: ["romans 15:13","jeremiah 29:11","hebrews 11:1","lamentations 3:22","psalm 31:24","isaiah 40:31","romans 8:28","psalm 62:5","micah 7:7","habakkuk 2:3"], reflection: "Hope in God is never wasted. He is faithful to fulfill every promise He has made.", prayer: "Father in the name of Jesus Christ fill me with your hope today. I know that you are faithful and your plans for me are good. In the name of Jesus Christ. Amen." },
-  tempted: { keywords: ["tempted","temptation","struggling","addicted","addiction","can't stop","weak","failing","giving in","sin"], verses: ["1 corinthians 10:13","james 4:7","hebrews 4:15","galatians 5:16","romans 6:14","psalm 119:11","matthew 26:41","2 peter 2:9","ephesians 6:11","1 john 4:4"], reflection: "Every person faces temptation. But God always provides a way out. Through Christ you have the power to overcome.", prayer: "Father in the name of Jesus Christ I need your strength right now. Give me the power to resist temptation and walk in freedom. In the name of Jesus Christ. Amen." },
-  grieving: { keywords: ["grieving","grief","loss","death","mourning","miss","missing","died","passed away","hurting"], verses: ["psalm 34:18","revelation 21:4","matthew 5:4","2 corinthians 1:3","isaiah 61:1","john 11:35","romans 8:28","psalm 23:4","1 thessalonians 4:13","psalm 147:3"], reflection: "God sees your grief and He weeps with you. He is the God of all comfort and He will carry you through this season of loss.", prayer: "Father in the name of Jesus Christ comfort me in this time of grief. Hold me close and remind me that you are near to the brokenhearted. In the name of Jesus Christ. Amen." },
-  surrendering: { keywords: ["surrender","surrendering","let go","giving up","giving it to God","release","submit","yield","trust God"], verses: ["matthew 11:28","proverbs 3:5","romans 12:1","galatians 2:20","psalm 46:10","luke 22:42","1 peter 5:6","james 4:7","matthew 16:24","john 12:24"], reflection: "Surrendering to God is not giving up — it is the greatest act of faith.", prayer: "Father in the name of Jesus Christ I surrender everything to you right now. Have your way in me Lord. In the name of Jesus Christ. Amen." },
-  direction: { keywords: ["direction","purpose","calling","what to do","next step","guidance","path","decision","choose","which way"], verses: ["proverbs 16:3","psalm 37:23","isaiah 30:21","jeremiah 29:11","psalm 32:8","proverbs 3:6","romans 8:14","james 1:5","psalm 25:9","isaiah 48:17"], reflection: "God has a specific plan and purpose for your life. When you seek His direction He is faithful to guide you.", prayer: "Father in the name of Jesus Christ I need your direction for my life. Show me clearly the path you have prepared for me. In the name of Jesus Christ. Amen." },
+  hopeful: { keywords: ["hopeful","hope","expectant","believing","trusting","faith","optimistic","looking forward"], verses: ["romans 15:13","jeremiah 29:11","hebrews 11:1","lamentations 3:22","psalm 31:24","isaiah 40:31","romans 8:28","psalm 62:5","micah 7:7","habakkuk 2:3"], reflection: "Hope in God is never wasted. He is faithful to fulfill every promise He has made.", prayer: "Father in the name of Jesus Christ fill me with your hope today. Your plans for me are good. In the name of Jesus Christ. Amen." },
+  tempted: { keywords: ["tempted","temptation","struggling","addicted","addiction","can't stop","weak","failing","giving in","sin"], verses: ["1 corinthians 10:13","james 4:7","hebrews 4:15","galatians 5:16","romans 6:14","psalm 119:11","matthew 26:41","2 peter 2:9","ephesians 6:11","1 john 4:4"], reflection: "Every person faces temptation. But God always provides a way out. Through Christ you have the power to overcome.", prayer: "Father in the name of Jesus Christ give me the power to resist temptation and walk in freedom. In the name of Jesus Christ. Amen." },
+  grieving: { keywords: ["grieving","grief","loss","death","mourning","miss","missing","died","passed away","hurting"], verses: ["psalm 34:18","revelation 21:4","matthew 5:4","2 corinthians 1:3","isaiah 61:1","john 11:35","romans 8:28","psalm 23:4","1 thessalonians 4:13","psalm 147:3"], reflection: "God sees your grief and He weeps with you. He is the God of all comfort.", prayer: "Father in the name of Jesus Christ comfort me in this grief. Hold me close and remind me that you are near. In the name of Jesus Christ. Amen." },
+  surrendering: { keywords: ["surrender","surrendering","let go","giving up","giving it to God","release","submit","yield","trust God"], verses: ["matthew 11:28","proverbs 3:5","romans 12:1","galatians 2:20","psalm 46:10","luke 22:42","1 peter 5:6","james 4:7","matthew 16:24","john 12:24"], reflection: "Surrendering to God is not giving up — it is the greatest act of faith.", prayer: "Father in the name of Jesus Christ I surrender everything to you right now. Have your way in me. In the name of Jesus Christ. Amen." },
   tired: { keywords: ["tired","exhausted","weary","worn out","burnt out","drained","no energy","fatigued","rest"], verses: ["matthew 11:28","isaiah 40:31","psalm 23:2","mark 6:31","2 corinthians 12:9","galatians 6:9","psalm 127:2","exodus 33:14","isaiah 41:10","hebrews 12:3"], reflection: "God sees your weariness and He invites you to come to Him for rest. True rest is found in His presence.", prayer: "Father in the name of Jesus Christ I am tired and I need your rest. Restore my strength and renew my spirit. In the name of Jesus Christ. Amen." },
-  fearful: { keywords: ["fearful","fear","scared","afraid","terrified","frightened","dread","phobia"], verses: ["2 timothy 1:7","psalm 27:1","isaiah 41:10","john 14:27","psalm 56:3","deuteronomy 31:6","romans 8:15","1 john 4:18","psalm 34:4","hebrews 13:6"], reflection: "Fear is real but God is greater than every fear you face. You can face anything with God by your side.", prayer: "Father in the name of Jesus Christ I reject the spirit of fear right now. You have given me a spirit of power love and a sound mind. In the name of Jesus Christ. Amen." },
-  doubting: { keywords: ["doubt","doubting","weak faith","don't believe","questioning","not sure","wavering","struggling to believe"], verses: ["mark 9:24","hebrews 11:1","james 1:6","romans 10:17","matthew 14:31","john 20:27","jude 1:22","2 corinthians 5:7","psalm 73:26","luke 17:5"], reflection: "Even the disciples had moments of doubt. Bring your doubts honestly to God. He is not offended by your questions.", prayer: "Father in the name of Jesus Christ I bring my doubts to you honestly right now. Help my unbelief and strengthen my faith. In the name of Jesus Christ. Amen." },
-  peace: { keywords: ["peace","calm","quiet","still","tranquil","settled","serenity"], verses: ["john 14:27","philippians 4:7","isaiah 26:3","psalm 46:10","numbers 6:26","romans 5:1","colossians 3:15","psalm 29:11","2 thessalonians 3:16","isaiah 32:17"], reflection: "The peace of God is available to you right now. It is not dependent on your circumstances.", prayer: "Father in the name of Jesus Christ fill me with your perfect peace right now. Guard my heart and my mind. In the name of Jesus Christ. Amen." },
-  financial: { keywords: ["financial","money","broke","debt","bills","poor","struggling financially","no money","paycheck","provision"], verses: ["philippians 4:19","matthew 6:33","psalm 23:1","luke 12:24","2 corinthians 9:8","proverbs 3:9","malachi 3:10","psalm 37:25","isaiah 58:11","deuteronomy 8:18"], reflection: "God is your provider and He knows every financial need you have.", prayer: "Father in the name of Jesus Christ I trust you as my provider. I release my worry about money and trust that you will provide everything I need. In the name of Jesus Christ. Amen." },
-  strength: { keywords: ["strength","strong","power","courage","bold","brave","overcome","victory","conquer","persevere"], verses: ["philippians 4:13","isaiah 40:29","psalm 46:1","2 corinthians 12:9","ephesians 6:10","joshua 1:9","psalm 18:32","isaiah 41:10","habakkuk 3:19","1 chronicles 16:11"], reflection: "God is your strength when you are weak. His power is made perfect in your weakness.", prayer: "Father in the name of Jesus Christ be my strength today. Fill me with your power and help me to overcome every obstacle. In the name of Jesus Christ. Amen." },
-  worship: { keywords: ["worship","praise","glorify","honor","adore","magnify","exalt","hallelujah","thanksgiving"], verses: ["psalm 100:1","john 4:24","psalm 150:6","hebrews 13:15","revelation 4:11","psalm 95:6","isaiah 6:3","psalm 29:2","1 chronicles 29:11","psalm 34:1"], reflection: "God is worthy of all praise and worship. When we worship Him our perspective shifts from our problems to His greatness.", prayer: "Father in the name of Jesus Christ I worship you today. You are worthy of all praise honor and glory. Receive my worship today Lord. In the name of Jesus Christ. Amen." },
+  fearful: { keywords: ["fearful","fear","scared","afraid","terrified","frightened","dread","phobia"], verses: ["2 timothy 1:7","psalm 27:1","isaiah 41:10","john 14:27","psalm 56:3","deuteronomy 31:6","romans 8:15","1 john 4:18","psalm 34:4","hebrews 13:6"], reflection: "Fear is real but God is greater than every fear you face.", prayer: "Father in the name of Jesus Christ I reject the spirit of fear. You have given me power love and a sound mind. In the name of Jesus Christ. Amen." },
+  doubting: { keywords: ["doubt","doubting","weak faith","don't believe","questioning","not sure","wavering","struggling to believe"], verses: ["mark 9:24","hebrews 11:1","james 1:6","romans 10:17","matthew 14:31","john 20:27","jude 1:22","2 corinthians 5:7","psalm 73:26","luke 17:5"], reflection: "Even the disciples had moments of doubt. Bring your doubts honestly to God. He is not offended by your questions.", prayer: "Father in the name of Jesus Christ I bring my doubts to you. Help my unbelief and strengthen my faith. In the name of Jesus Christ. Amen." },
+  peace: { keywords: ["peace","calm","quiet","still","tranquil","settled","serenity"], verses: ["john 14:27","philippians 4:7","isaiah 26:3","psalm 46:10","numbers 6:26","romans 5:1","colossians 3:15","psalm 29:11","2 thessalonians 3:16","isaiah 32:17"], reflection: "The peace of God is available to you right now. It is not dependent on your circumstances.", prayer: "Father in the name of Jesus Christ fill me with your perfect peace. Guard my heart and my mind. In the name of Jesus Christ. Amen." },
+  financial: { keywords: ["financial","money","broke","debt","bills","poor","struggling financially","no money","paycheck","provision"], verses: ["philippians 4:19","matthew 6:33","psalm 23:1","luke 12:24","2 corinthians 9:8","proverbs 3:9","malachi 3:10","psalm 37:25","isaiah 58:11","deuteronomy 8:18"], reflection: "God is your provider and He knows every financial need you have.", prayer: "Father in the name of Jesus Christ I trust you as my provider. I release my worry about money. In the name of Jesus Christ. Amen." },
+  strength: { keywords: ["strength","strong","power","courage","bold","brave","overcome","victory","conquer","persevere"], verses: ["philippians 4:13","isaiah 40:29","psalm 46:1","2 corinthians 12:9","ephesians 6:10","joshua 1:9","psalm 18:32","isaiah 41:10","habakkuk 3:19","1 chronicles 16:11"], reflection: "God is your strength when you are weak. His power is made perfect in your weakness.", prayer: "Father in the name of Jesus Christ be my strength today. Help me to overcome every obstacle. In the name of Jesus Christ. Amen." },
+  worship: { keywords: ["worship","praise","glorify","honor","adore","magnify","exalt","hallelujah","thanksgiving"], verses: ["psalm 100:1","john 4:24","psalm 150:6","hebrews 13:15","revelation 4:11","psalm 95:6","isaiah 6:3","psalm 29:2","1 chronicles 29:11","psalm 34:1"], reflection: "God is worthy of all praise and worship. When we worship Him our perspective shifts from our problems to His greatness.", prayer: "Father in the name of Jesus Christ I worship you today. You are worthy of all praise honor and glory. In the name of Jesus Christ. Amen." },
   unworthy: { keywords: ["unworthy","worthless","not good enough","failure","useless","nobody","don't deserve","inadequate"], verses: ["psalm 139:14","ephesians 2:10","romans 5:8","john 3:16","isaiah 43:4","1 peter 2:9","zephaniah 3:17","romans 8:37","galatians 3:26","1 john 3:1"], reflection: "You are not defined by your failures. God loved you so much that He sent His Son to die for you.", prayer: "Father in the name of Jesus Christ remind me of my worth in your eyes. Help me to see myself the way you see me. In the name of Jesus Christ. Amen." },
   addiction: { keywords: ["addiction","addicted","substance","alcohol","drugs","pornography","gambling","can't quit","bondage","chains"], verses: ["1 corinthians 10:13","john 8:36","galatians 5:1","romans 6:14","2 corinthians 5:17","philippians 4:13","romans 8:1","1 john 1:9","luke 4:18","psalm 107:14"], reflection: "Jesus came to set the captives free. No addiction is too powerful for God.", prayer: "Father in the name of Jesus Christ set me free from this addiction by the power of your Holy Spirit. In the name of Jesus Christ. Amen." },
-  relationships: { keywords: ["relationship","marriage","husband","wife","family","friend","conflict","broken","divorce","partner"], verses: ["1 corinthians 13:4","colossians 3:13","ephesians 4:32","proverbs 17:17","matthew 18:20","romans 12:18","1 peter 4:8","ecclesiastes 4:9","john 15:13","psalm 133:1"], reflection: "God cares deeply about your relationships. He is the author of love and He can heal and restore what is broken.", prayer: "Father in the name of Jesus Christ I bring this relationship to you. Heal what is broken and help me to love the way you love. In the name of Jesus Christ. Amen." },
+  relationships: { keywords: ["relationship","marriage","husband","wife","family","friend","conflict","broken","divorce","partner"], verses: ["1 corinthians 13:4","colossians 3:13","ephesians 4:32","proverbs 17:17","matthew 18:20","romans 12:18","1 peter 4:8","ecclesiastes 4:9","john 15:13","psalm 133:1"], reflection: "God cares deeply about your relationships. He can heal and restore what is broken.", prayer: "Father in the name of Jesus Christ I bring this relationship to you. Heal what is broken and help me to love the way you love. In the name of Jesus Christ. Amen." },
   forgiveness: { keywords: ["forgiveness","forgive","guilty","shame","regret","mistake","failed","messed up","repent"], verses: ["1 john 1:9","psalm 103:12","isaiah 43:25","romans 8:1","micah 7:19","ephesians 1:7","acts 3:19","hebrews 8:12","luke 15:20","psalm 32:5"], reflection: "God's forgiveness is complete and total. You do not have to carry guilt and shame any longer.", prayer: "Father in the name of Jesus Christ I confess my sins and receive your complete forgiveness. Thank you that there is no condemnation in Christ Jesus. In the name of Jesus Christ. Amen." }
 };
 
@@ -104,7 +185,7 @@ const getEmotionCategory = (feeling) => {
   for (const [category, data] of Object.entries(emotionVerses)) {
     if (data.keywords.some(keyword => lowerFeeling.includes(keyword))) return { category, ...data };
   }
-  return { category: "general", verses: ["psalm 46:1","john 3:16","romans 8:28","philippians 4:13","isaiah 41:10"], reflection: "Whatever you are going through right now God sees you and He cares deeply for you. Bring everything to Him and trust that He is working all things together for your good.", prayer: "Father in the name of Jesus Christ I come to you right now with everything on my heart. I trust you completely with my life. In the name of Jesus Christ. Amen." };
+  return { category: "general", verses: ["psalm 46:1","john 3:16","romans 8:28","philippians 4:13","isaiah 41:10"], reflection: "Whatever you are going through right now God sees you and He cares deeply for you. Bring everything to Him.", prayer: "Father in the name of Jesus Christ I come to you with everything on my heart. I trust you completely. In the name of Jesus Christ. Amen." };
 };
 
 const fetchVerse = async (verseRef) => {
@@ -136,10 +217,11 @@ const salvationSteps = [
 
 const tabs = [
   { id: "home", label: "Home", icon: "🏠" },
+  { id: "bible", label: "Bible", icon: "📖" },
   { id: "verse", label: "Verse", icon: "✨" },
   { id: "prayer", label: "Prayer", icon: "🙏" },
   { id: "vision", label: "Vision", icon: "📋" },
-  { id: "sermon", label: "Sermon", icon: "📖" },
+  { id: "sermon", label: "Sermon", icon: "🎙️" },
   { id: "salvation", label: "Jesus", icon: "✝️" },
 ];
 
@@ -262,8 +344,18 @@ export default function App() {
   const [showAddGoal, setShowAddGoal] = useState(false);
   const [newGoalTitle, setNewGoalTitle] = useState("");
   const [newGoalIcon, setNewGoalIcon] = useState("🎯");
-  const [editingGoal, setEditingGoal] = useState(null);
   const [celebration, setCelebration] = useState(null);
+
+  // Bible Reader State
+  const [bibleTestament, setBibleTestament] = useState("NT");
+  const [selectedBook, setSelectedBook] = useState(null);
+  const [selectedChapter, setSelectedChapter] = useState(null);
+  const [chapterText, setChapterText] = useState(null);
+  const [bibleLoading, setBibleLoading] = useState(false);
+  const [bibleVersion, setBibleVersion] = useState("kjv");
+  const [readChapters, setReadChapters] = useState({});
+  const [readChaptersLoading, setReadChaptersLoading] = useState(true);
+  const [totalRead, setTotalRead] = useState(0);
 
   // ─── FIREBASE AUTH ────────────────────────────────────────────────────────
   useEffect(() => {
@@ -299,10 +391,10 @@ export default function App() {
   useEffect(() => {
     if (!user) {
       setVisionGoals([
-        { id: "1", title: "Read the entire Bible", progress: 34, icon: "📖" },
-        { id: "2", title: "Pray daily for 30 days", progress: 12, icon: "🙏" },
-        { id: "3", title: "Memorize 10 scriptures", progress: 40, icon: "✝️" },
-        { id: "4", title: "Fast once a week", progress: 60, icon: "⚡" },
+        { id: "1", title: "Read the entire Bible", progress: 0, icon: "📖" },
+        { id: "2", title: "Pray daily for 30 days", progress: 0, icon: "🙏" },
+        { id: "3", title: "Memorize 10 scriptures", progress: 0, icon: "✝️" },
+        { id: "4", title: "Fast once a week", progress: 0, icon: "⚡" },
       ]);
       setVisionLoading(false);
       return;
@@ -326,6 +418,36 @@ export default function App() {
     });
     return () => unsubscribe();
   }, [user]);
+
+  // ─── LOAD READ CHAPTERS ───────────────────────────────────────────────────
+  useEffect(() => {
+    if (!user) { setReadChapters({}); setTotalRead(0); setReadChaptersLoading(false); return; }
+    setReadChaptersLoading(true);
+    const unsubscribe = onSnapshot(doc(db, "bibleProgress", user.uid), (snap) => {
+      if (snap.exists()) {
+        const data = snap.data();
+        const chapters = data.chapters || {};
+        setReadChapters(chapters);
+        setTotalRead(Object.keys(chapters).length);
+      } else {
+        setReadChapters({});
+        setTotalRead(0);
+      }
+      setReadChaptersLoading(false);
+    });
+    return () => unsubscribe();
+  }, [user]);
+
+  // ─── AUTO UPDATE BIBLE PROGRESS IN VISION BOARD ──────────────────────────
+  useEffect(() => {
+    if (!user || visionGoals.length === 0) return;
+    const bibleGoal = visionGoals.find(g => g.title === "Read the entire Bible");
+    if (!bibleGoal) return;
+    const newProgress = Math.min(100, Math.round((totalRead / TOTAL_CHAPTERS) * 100));
+    if (newProgress !== bibleGoal.progress) {
+      updateDoc(doc(db, "visionGoals", user.uid, "goals", bibleGoal.id), { progress: newProgress }).catch(() => {});
+    }
+  }, [totalRead, user, visionGoals]);
 
   const todayVerse = dailyVerses[new Date().getDay() % dailyVerses.length];
 
@@ -381,7 +503,7 @@ export default function App() {
     setTestimony("");
   };
 
-  // ─── VISION BOARD FUNCTIONS ───────────────────────────────────────────────
+  // ─── VISION BOARD ─────────────────────────────────────────────────────────
   const addGoal = async () => {
     if (!newGoalTitle.trim()) return;
     if (!user) { setShowAuth(true); return; }
@@ -394,10 +516,7 @@ export default function App() {
   const updateProgress = async (goalId, newProgress) => {
     const clamped = Math.min(100, Math.max(0, newProgress));
     const prev = visionGoals.find(g => g.id === goalId);
-    if (prev && prev.progress < 100 && clamped === 100) {
-      setCelebration(goalId);
-      setTimeout(() => setCelebration(null), 4000);
-    }
+    if (prev && prev.progress < 100 && clamped === 100) { setCelebration(goalId); setTimeout(() => setCelebration(null), 4000); }
     if (user) {
       try { await updateDoc(doc(db, "visionGoals", user.uid, "goals", goalId), { progress: clamped }); } catch (err) { console.error(err); }
     } else {
@@ -413,7 +532,52 @@ export default function App() {
     }
   };
 
+  // ─── BIBLE READER ─────────────────────────────────────────────────────────
+  const loadChapter = async (book, chapter) => {
+    setSelectedChapter(chapter);
+    setBibleLoading(true);
+    setChapterText(null);
+    try {
+      const ref = `${book.abbrev}+${chapter}`;
+      const response = await fetch(`https://bible-api.com/${encodeURIComponent(ref)}?translation=${bibleVersion}`);
+      const data = await response.json();
+      if (data.verses) {
+        setChapterText({ verses: data.verses, reference: data.reference });
+      } else {
+        setChapterText({ error: "Could not load this chapter. Please try again." });
+      }
+    } catch {
+      setChapterText({ error: "Network error. Please check your connection." });
+    }
+    setBibleLoading(false);
+  };
+
+  const markChapterRead = async () => {
+    if (!user) { setShowAuth(true); return; }
+    const key = `${selectedBook.abbrev}_${selectedChapter}`;
+    if (readChapters[key]) return;
+    try {
+      const newChapters = { ...readChapters, [key]: true };
+      await setDoc(doc(db, "bibleProgress", user.uid), { chapters: newChapters }, { merge: true });
+    } catch (err) { console.error(err); }
+  };
+
+  const isChapterRead = (book, chapter) => {
+    const key = `${book.abbrev}_${chapter}`;
+    return !!readChapters[key];
+  };
+
+  const getBookProgress = (book) => {
+    let read = 0;
+    for (let c = 1; c <= book.chapters; c++) {
+      if (readChapters[`${book.abbrev}_${c}`]) read++;
+    }
+    return read;
+  };
+
   const handleSignOut = async () => { await signOut(auth); };
+
+  const bibleProgress = Math.min(100, Math.round((totalRead / TOTAL_CHAPTERS) * 100));
 
   const s = {
     app: { background: CREAM, minHeight: "100vh", fontFamily: "Georgia, serif", paddingBottom: 80 },
@@ -493,14 +657,14 @@ export default function App() {
             {!user && (
               <div style={{ ...s.card, border: `2px solid ${GOLD_MID}`, background: GOLD_LIGHT }}>
                 <p style={{ color: BROWN_DARK, fontSize: 14, fontWeight: "bold", margin: "0 0 6px" }}>✝️ Save Your Progress</p>
-                <p style={{ color: BROWN, fontSize: 13, margin: "0 0 10px", lineHeight: 1.5 }}>Create a free account to save your prayer streak, journal entries, vision goals, and more.</p>
+                <p style={{ color: BROWN, fontSize: 13, margin: "0 0 10px", lineHeight: 1.5 }}>Create a free account to save your Bible reading, prayer journal, vision goals, and more.</p>
                 <button style={s.btn} onClick={() => setShowAuth(true)}>Create Free Account →</button>
               </div>
             )}
             <div style={s.card}>
               <p style={{ ...s.sectionTitle, fontSize: 15, marginBottom: 8 }}>Quick Actions</p>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-                {[["✨","Verse for\nmy mood","verse"],["🙏","Pray with\nothers","prayer"],["📋","My faith\ngoals","vision"],["📖","Sermon\ntopics","sermon"]].map(([icon, label, tab]) => (
+                {[["📖","Read\nthe Bible","bible"],["✨","Verse for\nmy mood","verse"],["🙏","Pray with\nothers","prayer"],["📋","My faith\ngoals","vision"]].map(([icon, label, tab]) => (
                   <button key={tab} onClick={() => setActiveTab(tab)} style={{ background: CREAM_DARK, border: `1px solid ${GOLD_LIGHT}`, borderRadius: 12, padding: "12px 8px", cursor: "pointer", textAlign: "center" }}>
                     <div style={{ fontSize: 20 }}>{icon}</div>
                     <div style={{ fontSize: 11, color: BROWN, fontFamily: "sans-serif", marginTop: 4, whiteSpace: "pre-line", lineHeight: 1.3 }}>{label}</div>
@@ -508,11 +672,191 @@ export default function App() {
                 ))}
               </div>
             </div>
+            {user && (
+              <div style={s.card}>
+                <p style={{ ...s.sectionTitle, fontSize: 15, marginBottom: 8 }}>📖 Bible Reading Progress</p>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+                  <p style={{ color: BROWN, fontSize: 13, margin: 0 }}>{totalRead} of {TOTAL_CHAPTERS} chapters read</p>
+                  <span style={{ color: GOLD, fontSize: 14, fontWeight: "bold", fontFamily: "sans-serif" }}>{bibleProgress}%</span>
+                </div>
+                <div style={s.progressBg}>
+                  <div style={{ height: 10, borderRadius: 6, background: `linear-gradient(90deg, ${GOLD}, ${BROWN})`, width: `${bibleProgress}%`, transition: "width 0.3s ease" }} />
+                </div>
+                <button style={{ ...s.btn, marginTop: 10 }} onClick={() => setActiveTab("bible")}>Continue Reading →</button>
+              </div>
+            )}
             <div style={s.card}>
               <p style={{ ...s.sectionTitle, fontSize: 15, marginBottom: 6 }}>✝️ New to Jesus?</p>
               <p style={{ color: BROWN, fontSize: 13, margin: "0 0 10px", lineHeight: 1.5 }}>Find out who Jesus is and how He can transform your life.</p>
               <button style={s.btn} onClick={() => setActiveTab("salvation")}>Learn About Jesus →</button>
             </div>
+          </div>
+        )}
+
+        {/* BIBLE READER */}
+        {activeTab === "bible" && (
+          <div>
+            {/* Chapter Reading View */}
+            {selectedBook && selectedChapter && (
+              <div>
+                <button style={s.backBtn} onClick={() => { setSelectedChapter(null); setChapterText(null); }}>← Back to {selectedBook.name}</button>
+                <div style={s.cardGold}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                    <div>
+                      <p style={{ color: GOLD_LIGHT, fontSize: 11, fontFamily: "sans-serif", margin: "0 0 4px", letterSpacing: 1, textTransform: "uppercase" }}>{selectedBook.name}</p>
+                      <h2 style={{ color: WHITE, fontSize: 20, margin: 0 }}>Chapter {selectedChapter}</h2>
+                    </div>
+                    <div style={{ display: "flex", gap: 6 }}>
+                      {bibleVersions.map(v => (
+                        <button key={v.id} onClick={() => { setBibleVersion(v.id); loadChapter(selectedBook, selectedChapter); }} style={{ background: bibleVersion === v.id ? GOLD : "rgba(255,255,255,0.2)", border: "none", borderRadius: 8, padding: "4px 10px", color: WHITE, fontSize: 11, cursor: "pointer", fontFamily: "sans-serif", fontWeight: bibleVersion === v.id ? "bold" : "normal" }}>{v.name}</button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {bibleLoading && (
+                  <div style={{ ...s.card, textAlign: "center", padding: 32 }}>
+                    <div style={{ fontSize: 28, marginBottom: 8 }}>📖</div>
+                    <p style={{ color: BROWN, fontStyle: "italic" }}>Loading chapter...</p>
+                  </div>
+                )}
+
+                {chapterText && chapterText.error && (
+                  <div style={s.card}><p style={{ color: BROWN, textAlign: "center" }}>{chapterText.error}</p></div>
+                )}
+
+                {chapterText && chapterText.verses && (
+                  <div>
+                    <div style={s.card}>
+                      {chapterText.verses.map((v, i) => (
+                        <div key={i} style={{ display: "flex", gap: 10, marginBottom: 12, alignItems: "flex-start" }}>
+                          <span style={{ color: GOLD, fontSize: 11, fontWeight: "bold", fontFamily: "sans-serif", minWidth: 20, marginTop: 2 }}>{v.verse}</span>
+                          <p style={{ color: BROWN_DARK, fontSize: 15, lineHeight: 1.8, margin: 0, flex: 1 }}>{v.text}</p>
+                        </div>
+                      ))}
+                    </div>
+
+                    {isChapterRead(selectedBook, selectedChapter) ? (
+                      <div style={{ ...s.card, background: GOLD_LIGHT, textAlign: "center" }}>
+                        <p style={{ color: GOLD, fontSize: 15, fontWeight: "bold", margin: "0 0 4px", fontFamily: "sans-serif" }}>✅ Chapter Completed!</p>
+                        <p style={{ color: BROWN, fontSize: 13, margin: 0 }}>This chapter is marked as read. Keep going! 🔥</p>
+                      </div>
+                    ) : (
+                      <button style={s.btn} onClick={markChapterRead}>
+                        {user ? "✅ Mark as Read" : "Sign in to Track Progress"}
+                      </button>
+                    )}
+
+                    <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
+                      {selectedChapter > 1 && (
+                        <button style={{ ...s.btnOutline, flex: 1 }} onClick={() => loadChapter(selectedBook, selectedChapter - 1)}>← Previous</button>
+                      )}
+                      {selectedChapter < selectedBook.chapters && (
+                        <button style={{ ...s.btn, flex: 1, marginTop: 0 }} onClick={() => loadChapter(selectedBook, selectedChapter + 1)}>Next Chapter →</button>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Book Chapter List View */}
+            {selectedBook && !selectedChapter && (
+              <div>
+                <button style={s.backBtn} onClick={() => setSelectedBook(null)}>← Back to Books</button>
+                <div style={s.cardGold}>
+                  <p style={{ color: GOLD_LIGHT, fontSize: 11, fontFamily: "sans-serif", margin: "0 0 4px", letterSpacing: 1, textTransform: "uppercase" }}>{selectedBook.testament === "OT" ? "Old Testament" : "New Testament"}</p>
+                  <h2 style={{ color: WHITE, fontSize: 20, margin: "0 0 6px" }}>{selectedBook.name}</h2>
+                  <p style={{ color: GOLD_LIGHT, fontSize: 13, margin: 0 }}>{getBookProgress(selectedBook)} of {selectedBook.chapters} chapters read</p>
+                </div>
+                <div style={s.card}>
+                  <p style={{ color: BROWN, fontSize: 13, marginBottom: 12, fontFamily: "sans-serif", fontWeight: "bold" }}>Select a Chapter:</p>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 8 }}>
+                    {Array.from({ length: selectedBook.chapters }, (_, i) => i + 1).map(ch => {
+                      const read = isChapterRead(selectedBook, ch);
+                      return (
+                        <button key={ch} onClick={() => loadChapter(selectedBook, ch)} style={{ background: read ? GOLD : CREAM_DARK, border: read ? `2px solid ${GOLD}` : `1px solid ${GOLD_LIGHT}`, borderRadius: 10, padding: "10px 4px", cursor: "pointer", textAlign: "center", color: read ? WHITE : BROWN_DARK, fontSize: 13, fontWeight: "bold", fontFamily: "sans-serif", position: "relative" }}>
+                          {read ? "✓" : ch}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Main Bible View — Book List */}
+            {!selectedBook && (
+              <div>
+                <p style={s.sectionTitle}>📖 Bible Reader</p>
+
+                {user && (
+                  <div style={s.cardGold}>
+                    <p style={{ color: GOLD_LIGHT, fontSize: 11, fontFamily: "sans-serif", margin: "0 0 6px", letterSpacing: 1, textTransform: "uppercase" }}>Your Reading Progress</p>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                      <p style={{ color: WHITE, fontSize: 14, margin: 0 }}>{totalRead} of {TOTAL_CHAPTERS} chapters</p>
+                      <span style={{ color: GOLD_MID, fontSize: 18, fontWeight: "bold", fontFamily: "sans-serif" }}>{bibleProgress}%</span>
+                    </div>
+                    <div style={{ height: 8, borderRadius: 6, background: "rgba(255,255,255,0.2)", marginBottom: 4 }}>
+                      <div style={{ height: 8, borderRadius: 6, background: GOLD_MID, width: `${bibleProgress}%`, transition: "width 0.3s ease" }} />
+                    </div>
+                    {totalRead === 0 && <p style={{ color: GOLD_LIGHT, fontSize: 12, margin: "8px 0 0", fontStyle: "italic" }}>Start reading and mark chapters as complete to track your progress!</p>}
+                  </div>
+                )}
+
+                {!user && (
+                  <div style={{ ...s.card, background: GOLD_LIGHT, border: `2px solid ${GOLD_MID}` }}>
+                    <p style={{ color: BROWN_DARK, fontSize: 14, fontWeight: "bold", margin: "0 0 6px" }}>📖 Track Your Reading</p>
+                    <p style={{ color: BROWN, fontSize: 13, margin: "0 0 10px", lineHeight: 1.5 }}>Sign in to track which chapters you've read and see your progress automatically update!</p>
+                    <button style={s.btn} onClick={() => setShowAuth(true)}>Sign In to Track Progress →</button>
+                  </div>
+                )}
+
+                {/* Version Selector */}
+                <div style={s.card}>
+                  <p style={{ color: BROWN, fontSize: 13, fontWeight: "bold", marginBottom: 10, fontFamily: "sans-serif" }}>Bible Version:</p>
+                  <div style={{ display: "flex", gap: 8 }}>
+                    {bibleVersions.map(v => (
+                      <button key={v.id} onClick={() => setBibleVersion(v.id)} style={{ flex: 1, padding: "8px 4px", background: bibleVersion === v.id ? `linear-gradient(135deg, ${GOLD}, ${BROWN})` : CREAM_DARK, border: bibleVersion === v.id ? "none" : `1px solid ${GOLD_LIGHT}`, borderRadius: 10, color: bibleVersion === v.id ? WHITE : BROWN, fontSize: 12, fontFamily: "sans-serif", fontWeight: bibleVersion === v.id ? "bold" : "normal", cursor: "pointer" }}>
+                        <div style={{ fontWeight: "bold" }}>{v.name}</div>
+                        <div style={{ fontSize: 10, opacity: 0.8 }}>{v.full}</div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Testament Toggle */}
+                <div style={{ display: "flex", background: WHITE, borderRadius: 12, padding: 4, marginBottom: 14, border: `1px solid ${GOLD_LIGHT}` }}>
+                  {[["OT","Old Testament"],["NT","New Testament"]].map(([id, label]) => (
+                    <button key={id} onClick={() => setBibleTestament(id)} style={{ flex: 1, padding: "10px", border: "none", borderRadius: 10, background: bibleTestament === id ? `linear-gradient(135deg, ${GOLD}, ${BROWN})` : "none", color: bibleTestament === id ? WHITE : BROWN, fontSize: 13, fontFamily: "sans-serif", fontWeight: bibleTestament === id ? "bold" : "normal", cursor: "pointer" }}>
+                      {label}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Book List */}
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                  {bibleBooks.filter(b => b.testament === bibleTestament).map(book => {
+                    const bookRead = getBookProgress(book);
+                    const bookComplete = bookRead === book.chapters;
+                    return (
+                      <button key={book.name} onClick={() => { setSelectedBook(book); setSelectedChapter(null); setChapterText(null); }} style={{ background: bookComplete ? `linear-gradient(135deg, ${GOLD}, ${BROWN})` : WHITE, border: bookComplete ? "none" : `1px solid ${GOLD_LIGHT}`, borderRadius: 14, padding: "14px 12px", cursor: "pointer", textAlign: "left" }}>
+                        <p style={{ color: bookComplete ? WHITE : BROWN_DARK, fontSize: 13, fontWeight: "bold", margin: "0 0 4px" }}>{bookComplete ? "✅ " : ""}{book.name}</p>
+                        <p style={{ color: bookComplete ? GOLD_LIGHT : BROWN + "99", fontSize: 11, fontFamily: "sans-serif", margin: "0 0 6px" }}>{book.chapters} chapters</p>
+                        {bookRead > 0 && !bookComplete && (
+                          <div style={{ height: 4, borderRadius: 4, background: GOLD_LIGHT }}>
+                            <div style={{ height: 4, borderRadius: 4, background: GOLD, width: `${Math.round((bookRead / book.chapters) * 100)}%` }} />
+                          </div>
+                        )}
+                        {bookRead > 0 && !bookComplete && (
+                          <p style={{ color: GOLD, fontSize: 10, fontFamily: "sans-serif", margin: "4px 0 0", fontWeight: "bold" }}>{bookRead}/{book.chapters} read</p>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -684,16 +1028,14 @@ export default function App() {
         {activeTab === "vision" && (
           <div>
             <p style={s.sectionTitle}>📋 Faith Vision Board</p>
-
             <div style={s.card}>
               <p style={{ color: BROWN, fontSize: 13, lineHeight: 1.5, margin: 0 }}>Track your spiritual goals and celebrate every milestone. God sees every step of faith you take! 🙌</p>
             </div>
-
             {visionLoading && <div style={{ ...s.card, textAlign: "center", padding: 24 }}><p style={{ color: BROWN, fontStyle: "italic" }}>Loading your goals... 🙏</p></div>}
-
             {visionGoals.map(g => {
               const milestone = getMilestone(g.progress);
               const isCelebrating = celebration === g.id;
+              const isBibleGoal = g.title === "Read the entire Bible";
               return (
                 <div key={g.id} style={{ ...s.card, border: isCelebrating ? `2px solid ${GOLD}` : `1px solid ${GOLD_LIGHT}`, background: isCelebrating ? "#FFFDF0" : WHITE }}>
                   {isCelebrating && (
@@ -707,42 +1049,38 @@ export default function App() {
                     <span style={{ fontSize: 26 }}>{g.icon}</span>
                     <div style={{ flex: 1 }}>
                       <p style={{ color: BROWN_DARK, fontSize: 14, fontWeight: "bold", margin: 0 }}>{g.title}</p>
-                      {milestone && (
-                        <span style={{ display: "inline-block", background: milestone.bg, color: milestone.color, borderRadius: 20, padding: "2px 10px", fontSize: 11, fontFamily: "sans-serif", fontWeight: "bold", marginTop: 4 }}>
-                          {milestone.label}
-                        </span>
-                      )}
+                      {isBibleGoal && <p style={{ color: GOLD, fontSize: 11, fontFamily: "sans-serif", margin: "2px 0 0" }}>📖 Auto-tracked from Bible Reader</p>}
+                      {milestone && <span style={{ display: "inline-block", background: milestone.bg, color: milestone.color, borderRadius: 20, padding: "2px 10px", fontSize: 11, fontFamily: "sans-serif", fontWeight: "bold", marginTop: 4 }}>{milestone.label}</span>}
                     </div>
                     <span style={{ color: GOLD, fontSize: 16, fontWeight: "bold", fontFamily: "sans-serif" }}>{g.progress}%</span>
                   </div>
-
                   <div style={s.progressBg}>
                     <div style={{ height: 10, borderRadius: 6, background: g.progress >= 100 ? "#FFD700" : `linear-gradient(90deg, ${GOLD}, ${BROWN})`, width: `${g.progress}%`, transition: "width 0.3s ease" }} />
                   </div>
-
-                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 10 }}>
-                    <span style={{ color: BROWN, fontSize: 11, fontFamily: "sans-serif", flexShrink: 0 }}>0%</span>
-                    <input
-                      type="range"
-                      min="0"
-                      max="100"
-                      value={g.progress}
-                      onChange={e => updateProgress(g.id, parseInt(e.target.value))}
-                      style={{ flex: 1, accentColor: GOLD, cursor: "pointer" }}
-                    />
-                    <span style={{ color: BROWN, fontSize: 11, fontFamily: "sans-serif", flexShrink: 0 }}>100%</span>
-                  </div>
-
-                  <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
-                    <button onClick={() => updateProgress(g.id, Math.max(0, g.progress - 5))} style={{ ...s.btnSmall, flex: 1, textAlign: "center" }}>-5%</button>
-                    <button onClick={() => updateProgress(g.id, Math.min(100, g.progress + 5))} style={{ ...s.btnSmall, flex: 1, textAlign: "center", background: GOLD_LIGHT }}>+5%</button>
-                    <button onClick={() => updateProgress(g.id, Math.min(100, g.progress + 10))} style={{ ...s.btnSmall, flex: 1, textAlign: "center", background: GOLD_LIGHT }}>+10%</button>
-                    <button onClick={() => deleteGoal(g.id)} style={{ ...s.btnSmall, color: "#cc0000", borderColor: "#ffcccc", background: "#fff5f5" }}>🗑️</button>
-                  </div>
+                  {!isBibleGoal && (
+                    <div>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 10 }}>
+                        <span style={{ color: BROWN, fontSize: 11, fontFamily: "sans-serif", flexShrink: 0 }}>0%</span>
+                        <input type="range" min="0" max="100" value={g.progress} onChange={e => updateProgress(g.id, parseInt(e.target.value))} style={{ flex: 1, accentColor: GOLD, cursor: "pointer" }} />
+                        <span style={{ color: BROWN, fontSize: 11, fontFamily: "sans-serif", flexShrink: 0 }}>100%</span>
+                      </div>
+                      <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
+                        <button onClick={() => updateProgress(g.id, Math.max(0, g.progress - 5))} style={{ ...s.btnSmall, flex: 1, textAlign: "center" }}>-5%</button>
+                        <button onClick={() => updateProgress(g.id, Math.min(100, g.progress + 5))} style={{ ...s.btnSmall, flex: 1, textAlign: "center", background: GOLD_LIGHT }}>+5%</button>
+                        <button onClick={() => updateProgress(g.id, Math.min(100, g.progress + 10))} style={{ ...s.btnSmall, flex: 1, textAlign: "center", background: GOLD_LIGHT }}>+10%</button>
+                        <button onClick={() => deleteGoal(g.id)} style={{ ...s.btnSmall, color: "#cc0000", borderColor: "#ffcccc", background: "#fff5f5" }}>🗑️</button>
+                      </div>
+                    </div>
+                  )}
+                  {isBibleGoal && (
+                    <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
+                      <button style={{ ...s.btn, marginTop: 0, flex: 1 }} onClick={() => setActiveTab("bible")}>Open Bible Reader →</button>
+                      <button onClick={() => deleteGoal(g.id)} style={{ ...s.btnSmall, color: "#cc0000", borderColor: "#ffcccc", background: "#fff5f5" }}>🗑️</button>
+                    </div>
+                  )}
                 </div>
               );
             })}
-
             {!showAddGoal ? (
               <button style={{ ...s.card, textAlign: "center", border: `2px dashed ${GOLD_MID}`, background: "none", cursor: "pointer", width: "100%", padding: 16 }} onClick={() => setShowAddGoal(true)}>
                 <p style={{ color: GOLD, fontSize: 15, fontWeight: "bold", margin: 0, fontFamily: "sans-serif" }}>+ Add a New Faith Goal</p>
@@ -754,9 +1092,7 @@ export default function App() {
                 <p style={{ color: BROWN, fontSize: 12, fontFamily: "sans-serif", marginBottom: 8 }}>Choose an icon:</p>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 12 }}>
                   {goalIcons.map(icon => (
-                    <button key={icon} onClick={() => setNewGoalIcon(icon)} style={{ fontSize: 22, background: newGoalIcon === icon ? GOLD_LIGHT : "none", border: newGoalIcon === icon ? `2px solid ${GOLD}` : `1px solid ${GOLD_LIGHT}`, borderRadius: 10, padding: "6px 8px", cursor: "pointer" }}>
-                      {icon}
-                    </button>
+                    <button key={icon} onClick={() => setNewGoalIcon(icon)} style={{ fontSize: 22, background: newGoalIcon === icon ? GOLD_LIGHT : "none", border: newGoalIcon === icon ? `2px solid ${GOLD}` : `1px solid ${GOLD_LIGHT}`, borderRadius: 10, padding: "6px 8px", cursor: "pointer" }}>{icon}</button>
                   ))}
                 </div>
                 <div style={{ display: "flex", gap: 8 }}>
@@ -765,7 +1101,6 @@ export default function App() {
                 </div>
               </div>
             )}
-
             <div style={{ ...s.card, background: GOLD_LIGHT, marginTop: 4 }}>
               <p style={{ color: BROWN_DARK, fontSize: 13, fontWeight: "bold", margin: "0 0 6px" }}>🏆 Milestone Badges</p>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
@@ -820,7 +1155,7 @@ export default function App() {
               </div>
             ) : (
               <div>
-                <p style={s.sectionTitle}>📖 Sermon Companion</p>
+                <p style={s.sectionTitle}>🎙️ Sermon Companion</p>
                 <div style={s.card}>
                   <p style={{ color: BROWN, fontSize: 13, marginBottom: 10, lineHeight: 1.5 }}>Search any topic or browse by category to go deeper in God's Word.</p>
                   <input style={s.input} placeholder="Search topics — Faith, Fear, Marriage..." value={sermonSearch} onChange={e => setSermonSearch(e.target.value)} />
@@ -879,7 +1214,7 @@ export default function App() {
 
       <nav style={s.nav}>
         {tabs.map(t => (
-          <button key={t.id} style={s.navBtn} onClick={() => { setActiveTab(t.id); setSelectedTopic(null); setTopicContent(null); setSelectedCategory(null); }}>
+          <button key={t.id} style={s.navBtn} onClick={() => { setActiveTab(t.id); setSelectedTopic(null); setTopicContent(null); setSelectedCategory(null); setSelectedBook(null); setSelectedChapter(null); setChapterText(null); }}>
             <span style={{ fontSize: 18 }}>{t.icon}</span>
             <span style={{ fontSize: 9, color: activeTab === t.id ? GOLD_MID : GOLD_LIGHT + "99", fontFamily: "sans-serif", fontWeight: activeTab === t.id ? "bold" : "normal" }}>{t.label}</span>
           </button>
