@@ -32,7 +32,19 @@ const WHITE = "#FFFDF7";
 const TOTAL_CHAPTERS = 1189;
 const MEMORY_GOAL = 10;
 
-// ─── SCRIPTURE MEMORY SYSTEM ─────────────────────────────────────────────────
+// ─── STREAK HELPERS ───────────────────────────────────────────────────────────
+const getTodayString = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+};
+
+const getYesterdayString = () => {
+  const d = new Date();
+  d.setDate(d.getDate() - 1);
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+};
+
+// ─── SCRIPTURE MEMORY SYSTEM ──────────────────────────────────────────────────
 const memoryMilestones = [
   { count: 1, label: "First Word 🌱", color: "#4CAF50", bg: "#F1F8E9" },
   { count: 3, label: "Growing Strong 🌿", color: "#388E3C", bg: "#E8F5E9" },
@@ -79,7 +91,7 @@ const checkAnswers = (words, blankIndices, userAnswers) => {
   return { correct, total: blankIndices.length, score, passed: score >= 70 };
 };
 
-// ─── BIBLE BOOKS ─────────────────────────────────────────────────────────────
+// ─── BIBLE BOOKS ──────────────────────────────────────────────────────────────
 const bibleBooks = [
   { name: "Genesis", chapters: 50, testament: "OT", abbrev: "gen" },
   { name: "Exodus", chapters: 40, testament: "OT", abbrev: "exo" },
@@ -155,7 +167,6 @@ const bibleVersions = [
   { id: "asv", name: "ASV", full: "American Standard Version" },
 ];
 
-// ─── SERMON DATA ─────────────────────────────────────────────────────────────
 const sermonCategories = [
   { id: 1, category: "Core Christian Life", icon: "✝️", topics: ["Faith","Grace","Forgiveness","Prayer","Love","Salvation","Holy Spirit","Worship","Purpose","Healing","Obedience","Repentance","Holiness","Humility","Wisdom","Trusting God","Walking with God","Spiritual Growth","Surrender","Righteousness"] },
   { id: 2, category: "Emotional & Life Struggles", icon: "💔", topics: ["Fear","Anxiety","Depression","Stress","Loneliness","Doubt","Anger","Worry","Brokenness","Grief","Addiction","Temptation","Spiritual Warfare","Overcoming Sin","Burnout","Waiting on God","Feeling Lost","Identity in Christ"] },
@@ -168,22 +179,22 @@ const sermonCategories = [
 
 const sermonContent = {
   "Faith": { mainMessage: "Faith is the foundation of everything in the Christian life. It is not blind belief but confident trust in a God who has proven Himself faithful time and time again. Hebrews 11:1 tells us that faith is the substance of things hoped for and the evidence of things not yet seen.", keyTakeaways: ["Faith requires action — it is not just believing but stepping out in trust.", "Your faith grows when it is tested — every trial is an opportunity to trust God more.", "Faith speaks to your circumstances rather than letting your circumstances speak to you."], scriptures: ["Hebrews 11:1 — Faith is the substance of things hoped for the evidence of things not seen.", "Matthew 17:20 — Even faith as small as a mustard seed can move mountains.", "Romans 10:17 — Faith comes by hearing and hearing by the Word of God."], discussionQuestions: ["What area of your life requires the most faith right now?", "How has God proven Himself faithful in your past?", "What is one step of faith God is calling you to take this week?"], prayer: "Father in the name of Jesus Christ strengthen my faith today. Help me to trust you completely even when I cannot see the full picture. In the name of Jesus Christ. Amen.", journal: "Write about a time God came through for you when you stepped out in faith." },
-  "Grace": { mainMessage: "Grace is the unmerited favor of God — His love and blessing extended to us not because of what we have done but because of who He is. Grace is not a license to sin but the power to live differently.", keyTakeaways: ["Grace is not earned — you cannot work for what God freely gives.", "Grace empowers you to live holy.", "Extend to others the same grace God has extended to you."], scriptures: ["Ephesians 2:8-9 — For by grace you have been saved through faith.", "2 Corinthians 12:9 — My grace is sufficient for you.", "Romans 5:20 — Where sin increased, grace increased all the more."], discussionQuestions: ["How does understanding God's grace change the way you view yourself?", "Is there an area where you are trying to earn God's favor?", "How can you extend grace to someone this week?"], prayer: "Father in the name of Jesus Christ thank you for your grace that covers every mistake. Help me to receive it fully. In the name of Jesus Christ. Amen.", journal: "Reflect on a moment when you experienced God's grace in a powerful way." },
-  "Forgiveness": { mainMessage: "Forgiveness is at the heart of the Gospel. Unforgiveness is a prison that keeps us bound while the person who hurt us walks free. When we forgive we release ourselves from the burden of bitterness.", keyTakeaways: ["Forgiveness is a choice, not a feeling.", "Unforgiveness hurts you more than the person who wronged you.", "You can forgive someone and still have healthy boundaries."], scriptures: ["Ephesians 4:32 — Be kind to one another, tenderhearted, forgiving one another.", "Matthew 6:14-15 — If you forgive others your heavenly Father will also forgive you.", "Colossians 3:13 — Bear with each other and forgive one another."], discussionQuestions: ["Is there someone in your life you need to forgive?", "How does remembering how much God has forgiven you help you forgive others?", "What does healthy forgiveness look like?"], prayer: "Father in the name of Jesus Christ I choose to forgive those who have hurt me. Heal my heart. In the name of Jesus Christ. Amen.", journal: "Who do you need to forgive? Write a letter you will never send." },
+  "Grace": { mainMessage: "Grace is the unmerited favor of God — His love and blessing extended to us not because of what we have done but because of who He is. Grace is not a license to sin but the power to live differently.", keyTakeaways: ["Grace is not earned — you cannot work for what God freely gives.", "Grace empowers you to live holy.", "Extend to others the same grace God has extended to you."], scriptures: ["Ephesians 2:8-9 — For by grace you have been saved through faith.", "2 Corinthians 12:9 — My grace is sufficient for you.", "Romans 5:20 — Where sin increased, grace increased all the more."], discussionQuestions: ["How does understanding God's grace change the way you view yourself?", "Is there an area where you are trying to earn God's favor?", "How can you extend grace to someone this week?"], prayer: "Father in the name of Jesus Christ thank you for your grace that covers every mistake. In the name of Jesus Christ. Amen.", journal: "Reflect on a moment when you experienced God's grace in a powerful way." },
+  "Forgiveness": { mainMessage: "Forgiveness is at the heart of the Gospel. Unforgiveness is a prison that keeps us bound. When we forgive we release ourselves from the burden of bitterness.", keyTakeaways: ["Forgiveness is a choice, not a feeling.", "Unforgiveness hurts you more than the person who wronged you.", "You can forgive someone and still have healthy boundaries."], scriptures: ["Ephesians 4:32 — Be kind to one another, tenderhearted, forgiving one another.", "Matthew 6:14-15 — If you forgive others your heavenly Father will also forgive you.", "Colossians 3:13 — Bear with each other and forgive one another."], discussionQuestions: ["Is there someone in your life you need to forgive?", "How does remembering how much God has forgiven you help you forgive others?", "What does healthy forgiveness look like?"], prayer: "Father in the name of Jesus Christ I choose to forgive those who have hurt me. In the name of Jesus Christ. Amen.", journal: "Who do you need to forgive? Write a letter you will never send." },
   "Prayer": { mainMessage: "Prayer is simply talking to God. It is not a religious ritual but a relationship. Prayer changes things and it changes us.", keyTakeaways: ["Prayer is a conversation — learn to listen as much as you speak.", "Consistency in prayer builds intimacy with God.", "Pray with faith and expectation."], scriptures: ["Philippians 4:6-7 — Do not be anxious about anything but in everything by prayer.", "Matthew 7:7-8 — Ask and it will be given to you.", "1 Thessalonians 5:17 — Pray without ceasing."], discussionQuestions: ["What does your current prayer life look like?", "What has been your most powerful answered prayer?", "What is one thing you have been afraid to bring to God?"], prayer: "Father in the name of Jesus Christ teach me to pray with an open and honest heart. In the name of Jesus Christ. Amen.", journal: "Write out a prayer to God about something you have never prayed about before." },
   "Love": { mainMessage: "God is love. Love is not just a feeling — it is a decision and an action.", keyTakeaways: ["Love is an action not just an emotion.", "You can only truly love others when you first receive God's love.", "The world will know we are Christians by our love."], scriptures: ["1 Corinthians 13:4-7 — Love is patient, love is kind.", "John 3:16 — For God so loved the world.", "1 John 4:19 — We love because He first loved us."], discussionQuestions: ["What does it look like to love someone who is difficult to love?", "How has God's love changed the way you love others?", "In what relationship do you need to show more love?"], prayer: "Father in the name of Jesus Christ fill me with your love today. In the name of Jesus Christ. Amen.", journal: "Think of someone hard to love. How can you show them love this week?" },
-  "Fear": { mainMessage: "Fear is one of the enemy's most powerful weapons. 2 Timothy 1:7 reminds us God has not given us a spirit of fear but of power, love and a sound mind.", keyTakeaways: ["Fear is a spirit that must be resisted in the name of Jesus.", "The antidote to fear is a deep trust in God.", "Stop feeding your fears and start feeding your faith."], scriptures: ["2 Timothy 1:7 — God has not given us a spirit of fear but of power.", "Isaiah 41:10 — Fear not for I am with you.", "Psalm 27:1 — The Lord is my light and salvation."], discussionQuestions: ["What fear has been controlling your life?", "How does knowing God is with you change things?", "What would you do differently if you were not afraid?"], prayer: "Father in the name of Jesus Christ I reject the spirit of fear. You have given me power, love and a sound mind. In the name of Jesus Christ. Amen.", journal: "Name your biggest fear. Write every truth from God's Word that contradicts it." },
-  "Anxiety": { mainMessage: "Anxiety is the result of trying to carry tomorrow's burdens with today's strength. God's prescription is to bring everything to Him in prayer with thanksgiving.", keyTakeaways: ["Anxiety is a signal to pray not a sentence to suffer.", "You cannot control everything but you can trust the One who controls all things.", "Cast your anxiety on God daily."], scriptures: ["Philippians 4:6-7 — Do not be anxious about anything but in everything by prayer.", "1 Peter 5:7 — Cast all your anxiety on Him.", "Matthew 6:34 — Do not worry about tomorrow."], discussionQuestions: ["What triggers your anxiety the most?", "What does it look like practically to cast your anxiety on God?", "How would your life look different if you truly trusted God?"], prayer: "Father in the name of Jesus Christ I bring every anxious thought to you. Fill me with your peace. In the name of Jesus Christ. Amen.", journal: "List every worry. Next to each write a truth from God's Word that speaks to it." },
-  "Hope": { mainMessage: "Hope in God is an anchor for the soul. Romans 15:13 tells us God fills us with all joy and peace as we trust in Him.", keyTakeaways: ["Hope is rooted in God's character not your circumstances.", "You are never without hope because you are never without God."], scriptures: ["Romans 15:13 — May the God of hope fill you with joy and peace.", "Jeremiah 29:11 — For I know the plans I have for you.", "Lamentations 3:22-23 — His mercies are new every morning."], discussionQuestions: ["Where have you lost hope recently?", "What promise from God's Word gives you the most hope?"], prayer: "Father in the name of Jesus Christ restore my hope today. In the name of Jesus Christ. Amen.", journal: "Write about a season when all hope seemed lost but God came through." },
+  "Fear": { mainMessage: "Fear is one of the enemy's most powerful weapons. God has not given us a spirit of fear but of power, love and a sound mind.", keyTakeaways: ["Fear is a spirit that must be resisted in the name of Jesus.", "The antidote to fear is a deep trust in God.", "Stop feeding your fears and start feeding your faith."], scriptures: ["2 Timothy 1:7 — God has not given us a spirit of fear but of power.", "Isaiah 41:10 — Fear not for I am with you.", "Psalm 27:1 — The Lord is my light and salvation."], discussionQuestions: ["What fear has been controlling your life?", "How does knowing God is with you change things?", "What would you do differently if you were not afraid?"], prayer: "Father in the name of Jesus Christ I reject the spirit of fear. In the name of Jesus Christ. Amen.", journal: "Name your biggest fear. Write every truth from God's Word that contradicts it." },
+  "Anxiety": { mainMessage: "Anxiety is the result of trying to carry tomorrow's burdens with today's strength. God's prescription is to bring everything to Him in prayer.", keyTakeaways: ["Anxiety is a signal to pray not a sentence to suffer.", "You cannot control everything but you can trust the One who controls all things.", "Cast your anxiety on God daily."], scriptures: ["Philippians 4:6-7 — Do not be anxious about anything but in everything by prayer.", "1 Peter 5:7 — Cast all your anxiety on Him.", "Matthew 6:34 — Do not worry about tomorrow."], discussionQuestions: ["What triggers your anxiety the most?", "What does it look like practically to cast your anxiety on God?", "How would your life look different if you truly trusted God?"], prayer: "Father in the name of Jesus Christ I bring every anxious thought to you. Fill me with your peace. In the name of Jesus Christ. Amen.", journal: "List every worry. Next to each write a truth from God's Word that speaks to it." },
+  "Hope": { mainMessage: "Hope in God is an anchor for the soul. God fills us with all joy and peace as we trust in Him.", keyTakeaways: ["Hope is rooted in God's character not your circumstances.", "You are never without hope because you are never without God."], scriptures: ["Romans 15:13 — May the God of hope fill you with joy and peace.", "Jeremiah 29:11 — For I know the plans I have for you.", "Lamentations 3:22-23 — His mercies are new every morning."], discussionQuestions: ["Where have you lost hope recently?", "What promise from God's Word gives you the most hope?"], prayer: "Father in the name of Jesus Christ restore my hope today. In the name of Jesus Christ. Amen.", journal: "Write about a season when all hope seemed lost but God came through." },
   "The Gospel": { mainMessage: "The Gospel is the greatest news the world has ever heard. Jesus Christ came to restore our relationship with God through His death and resurrection.", keyTakeaways: ["The Gospel is the power of God for salvation to everyone who believes.", "The Gospel compels us to go and tell others."], scriptures: ["Romans 1:16 — I am not ashamed of the gospel.", "1 Corinthians 15:3-4 — Christ died for our sins and was raised.", "John 14:6 — I am the way the truth and the life."], discussionQuestions: ["How would you explain the Gospel to someone who has never heard it?", "Who in your life needs to hear the Gospel?"], prayer: "Father in the name of Jesus Christ help me to never lose my wonder at what you did for me. In the name of Jesus Christ. Amen.", journal: "Write out the Gospel in your own words as if explaining it for the first time." },
-  "Spiritual Warfare": { mainMessage: "Every believer is in a spiritual battle. The battle is real but the victory has already been won through Jesus Christ.", keyTakeaways: ["Your battle is not against people but against spiritual forces.", "The enemy has already been defeated — you enforce a victory Christ already won."], scriptures: ["Ephesians 6:11 — Put on the full armor of God.", "1 Peter 5:8 — Your adversary the devil prowls like a roaring lion.", "James 4:7 — Resist the devil and he will flee."], discussionQuestions: ["What area of your life feels under spiritual attack?", "What does it look like practically to resist the devil?"], prayer: "Father in the name of Jesus Christ I put on the full armor of God. Greater is He that is in me. In the name of Jesus Christ. Amen.", journal: "Identify one area of spiritual attack. Write a battle plan using scripture." },
+  "Spiritual Warfare": { mainMessage: "Every believer is in a spiritual battle. The battle is real but the victory has already been won through Jesus Christ.", keyTakeaways: ["Your battle is not against people but against spiritual forces.", "The enemy has already been defeated — you enforce a victory Christ already won."], scriptures: ["Ephesians 6:11 — Put on the full armor of God.", "1 Peter 5:8 — Your adversary the devil prowls like a roaring lion.", "James 4:7 — Resist the devil and he will flee."], discussionQuestions: ["What area of your life feels under spiritual attack?", "What does it look like practically to resist the devil?"], prayer: "Father in the name of Jesus Christ I put on the full armor of God. In the name of Jesus Christ. Amen.", journal: "Identify one area of spiritual attack. Write a battle plan using scripture." },
   "God's Timing": { mainMessage: "God is never late and He is never early — He is always right on time.", keyTakeaways: ["Waiting on God is not wasted time.", "God's delays are not God's denials."], scriptures: ["Ecclesiastes 3:1 — There is a time for everything.", "Isaiah 40:31 — Those who wait on the Lord will renew their strength.", "Habakkuk 2:3 — The vision awaits an appointed time."], discussionQuestions: ["What are you currently waiting on God for?", "What is God trying to develop in you during this waiting season?"], prayer: "Father in the name of Jesus Christ I trust your timing even when I do not understand it. In the name of Jesus Christ. Amen.", journal: "Write about what you are waiting on God for. What might He be building in you?" },
   "Identity in Christ": { mainMessage: "Your true identity is found in who God says you are. In Christ you are loved, chosen, redeemed, forgiven, and called.", keyTakeaways: ["Your identity is rooted in whose you are not what you do.", "Replace lies you believe with what God's Word says about you."], scriptures: ["2 Corinthians 5:17 — If anyone is in Christ the new creation has come.", "Ephesians 1:4-5 — He chose us before the creation of the world.", "1 Peter 2:9 — You are a chosen people, a royal priesthood."], discussionQuestions: ["What lies have you believed about yourself?", "What truth about your identity in Christ do you need to declare today?"], prayer: "Father in the name of Jesus Christ I declare who I am in you. I am loved, chosen, redeemed and called. In the name of Jesus Christ. Amen.", journal: "List 10 things God says about you. Read them out loud every morning this week." },
-  "Fasting": { mainMessage: "Fasting is one of the most powerful spiritual disciplines. When we fast we deny the flesh and say knowing God is more important than physical comfort.", keyTakeaways: ["Start small — a meal fast is a powerful starting point.", "Fasting is about drawing closer to God not impressing Him."], scriptures: ["Matthew 6:16-17 — When you fast do not look somber.", "Isaiah 58:6 — To loose the chains of injustice.", "Acts 13:2-3 — While fasting the Holy Spirit spoke."], discussionQuestions: ["Have you ever fasted before?", "What breakthrough requires fasting and prayer?"], prayer: "Father in the name of Jesus Christ as I fast I draw closer to you. Speak to me clearly. In the name of Jesus Christ. Amen.", journal: "Write about something you are believing God for. Commit to a specific fast." },
+  "Fasting": { mainMessage: "Fasting is one of the most powerful spiritual disciplines. When we fast we deny the flesh and say knowing God is more important than physical comfort.", keyTakeaways: ["Start small — a meal fast is a powerful starting point.", "Fasting is about drawing closer to God not impressing Him."], scriptures: ["Matthew 6:16-17 — When you fast do not look somber.", "Isaiah 58:6 — To loose the chains of injustice.", "Acts 13:2-3 — While fasting the Holy Spirit spoke."], discussionQuestions: ["Have you ever fasted before?", "What breakthrough requires fasting and prayer?"], prayer: "Father in the name of Jesus Christ as I fast I draw closer to you. In the name of Jesus Christ. Amen.", journal: "Write about something you are believing God for. Commit to a specific fast." },
   "The Armor of God": { mainMessage: "The Armor of God in Ephesians 6 is essential equipment for every believer in spiritual battle.", keyTakeaways: ["Every piece of armor is essential.", "The only offensive weapon is the sword of the Spirit — the Word of God."], scriptures: ["Ephesians 6:11 — Put on the full armor of God.", "Ephesians 6:17 — The sword of the Spirit which is the Word of God.", "Romans 13:12 — Put on the armor of light."], discussionQuestions: ["Which piece of armor do you feel weakest in?", "How do you practically put on the armor each morning?"], prayer: "Father in the name of Jesus Christ I put on the full armor right now. I am equipped and ready. In the name of Jesus Christ. Amen.", journal: "Go through each piece of armor. Write what it means in your daily life." },
   "How to Pray": { mainMessage: "Jesus gave us a model in Matthew 6 — the Lord's Prayer — that covers every element of powerful prayer.", keyTakeaways: ["Start with praise — acknowledge who God is before bringing requests.", "Be specific in your prayers.", "End with surrender — your will not mine be done."], scriptures: ["Matthew 6:9-13 — Our Father in heaven hallowed be your name.", "Jeremiah 33:3 — Call to me and I will answer you.", "James 5:16 — The prayer of a righteous person is powerful."], discussionQuestions: ["What has been the biggest obstacle to your prayer life?", "What is one thing you want to start praying about consistently?"], prayer: "Father in the name of Jesus Christ teach me to pray. Help me to be consistent, specific and expectant. In the name of Jesus Christ. Amen.", journal: "Write your own version of the Lord's Prayer — personalized to your life." },
-  "Faith Over Fear": { mainMessage: "Fear and faith cannot occupy the same space. Faith over fear is a daily choice to trust God above every threat and impossibility.", keyTakeaways: ["Acknowledge your fear but do not give it authority.", "Faith is not the absence of fear — it is moving forward in spite of it."], scriptures: ["Joshua 1:9 — Be strong and courageous.", "Psalm 56:3 — When I am afraid I put my trust in you.", "Isaiah 41:10 — Fear not for I am with you."], discussionQuestions: ["What fear is trying to stop you right now?", "How do you practically choose faith over fear?"], prayer: "Father in the name of Jesus Christ I choose faith over fear today. I move forward knowing you are with me. In the name of Jesus Christ. Amen.", journal: "Name the fear controlling you most. Write a declaration of faith against it." },
-  "Jesus Changes Everything": { mainMessage: "An encounter with Jesus Christ changes everything. He transforms life from the inside out.", keyTakeaways: ["Jesus does not just fix broken things — He makes all things new.", "Your past does not define you — your encounter with Jesus does."], scriptures: ["2 Corinthians 5:17 — If anyone is in Christ the new creation has come.", "John 10:10 — I have come that they may have life to the full.", "Galatians 2:20 — I have been crucified with Christ."], discussionQuestions: ["How has your encounter with Jesus changed your life?", "Who needs to know that Jesus changes everything?"], prayer: "Father in the name of Jesus Christ thank you that Jesus changed everything for me. Have your way in me. In the name of Jesus Christ. Amen.", journal: "Write your before and after story. Who were you before Jesus and who are you now?" },
+  "Faith Over Fear": { mainMessage: "Fear and faith cannot occupy the same space. Faith over fear is a daily choice to trust God above every threat and impossibility.", keyTakeaways: ["Acknowledge your fear but do not give it authority.", "Faith is not the absence of fear — it is moving forward in spite of it."], scriptures: ["Joshua 1:9 — Be strong and courageous.", "Psalm 56:3 — When I am afraid I put my trust in you.", "Isaiah 41:10 — Fear not for I am with you."], discussionQuestions: ["What fear is trying to stop you right now?", "How do you practically choose faith over fear?"], prayer: "Father in the name of Jesus Christ I choose faith over fear today. In the name of Jesus Christ. Amen.", journal: "Name the fear controlling you most. Write a declaration of faith against it." },
+  "Jesus Changes Everything": { mainMessage: "An encounter with Jesus Christ changes everything. He transforms life from the inside out.", keyTakeaways: ["Jesus does not just fix broken things — He makes all things new.", "Your past does not define you — your encounter with Jesus does."], scriptures: ["2 Corinthians 5:17 — If anyone is in Christ the new creation has come.", "John 10:10 — I have come that they may have life to the full.", "Galatians 2:20 — I have been crucified with Christ."], discussionQuestions: ["How has your encounter with Jesus changed your life?", "Who needs to know that Jesus changes everything?"], prayer: "Father in the name of Jesus Christ thank you that Jesus changed everything for me. In the name of Jesus Christ. Amen.", journal: "Write your before and after story. Who were you before Jesus and who are you now?" },
   "Marriage": { mainMessage: "Marriage is God's design and a powerful picture of Christ's relationship with the Church.", keyTakeaways: ["A strong marriage requires three — you, your spouse and God.", "Love in marriage is a covenant not a feeling."], scriptures: ["Ephesians 5:25 — Husbands love your wives as Christ loved the church.", "Genesis 2:24 — A man shall be united to his wife.", "Ecclesiastes 4:12 — A cord of three strands is not quickly broken."], discussionQuestions: ["What does it look like to put God at the center of your marriage?", "What is one thing you can do this week to strengthen your marriage?"], prayer: "Father in the name of Jesus Christ I bring my marriage to you. Strengthen our bond. In the name of Jesus Christ. Amen.", journal: "Write about what you love most about your spouse and one way you will show them love." },
   "When God Feels Silent": { mainMessage: "Every believer goes through seasons where God feels distant. But silence is not absence. God is always with you.", keyTakeaways: ["God's silence is not His absence.", "Keep showing up — consistency in dry seasons is a mark of mature faith."], scriptures: ["Psalm 22:1-2 — My God why have you forsaken me.", "Isaiah 45:15 — Truly you are a God who hides himself.", "Hebrews 13:5 — Never will I leave you."], discussionQuestions: ["Have you gone through a season where God felt silent?", "How do you maintain faith when you cannot feel God?"], prayer: "Father in the name of Jesus Christ even in silence I choose to trust you. In the name of Jesus Christ. Amen.", journal: "Write an honest letter to God about this silent season. Then write what you believe is true about Him." }
 };
@@ -279,7 +290,7 @@ const getMilestone = (progress) => {
   return null;
 };
 
-// ─── AUTH SCREEN ─────────────────────────────────────────────────────────────
+// ─── AUTH SCREEN ──────────────────────────────────────────────────────────────
 function AuthScreen({ onAuthSuccess }) {
   const [mode, setMode] = useState("login");
   const [email, setEmail] = useState("");
@@ -359,12 +370,10 @@ export default function App() {
   const [feeling, setFeeling] = useState("");
   const [verseResult, setVerseResult] = useState(null);
   const [loadingVerse, setLoadingVerse] = useState(false);
-  const [streak, setStreak] = useState(7);
   const [prayedIds, setPrayedIds] = useState([]);
   const [newPrayer, setNewPrayer] = useState("");
   const [prayerList, setPrayerList] = useState([]);
   const [prayerLoading, setPrayerLoading] = useState(true);
-  const [streakLogged, setStreakLogged] = useState(false);
   const [sinner, setSinner] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedTopic, setSelectedTopic] = useState(null);
@@ -381,6 +390,12 @@ export default function App() {
     { text: "I prayed for a job for 6 months. Last week I received an offer beyond what I imagined. God's timing is perfect.", time: "1 week ago" },
     { text: "My marriage was falling apart. We prayed together for the first time in years and God restored everything. To God be the glory!", time: "2 weeks ago" },
   ]);
+
+  // ─── FIREBASE STREAK STATE ────────────────────────────────────────────────
+  const [streak, setStreak] = useState(0);
+  const [streakLogged, setStreakLogged] = useState(false);
+  const [streakLoading, setStreakLoading] = useState(true);
+  const [streakCelebration, setStreakCelebration] = useState(false);
 
   // Vision Board State
   const [visionGoals, setVisionGoals] = useState([]);
@@ -425,6 +440,91 @@ export default function App() {
     });
     return () => unsubscribe();
   }, []);
+
+  // ─── LOAD STREAK FROM FIREBASE ────────────────────────────────────────────
+  useEffect(() => {
+    if (!user) {
+      setStreak(0);
+      setStreakLogged(false);
+      setStreakLoading(false);
+      return;
+    }
+    setStreakLoading(true);
+    const loadStreak = async () => {
+      try {
+        const streakDoc = await getDoc(doc(db, "streaks", user.uid));
+        if (streakDoc.exists()) {
+          const data = streakDoc.data();
+          const today = getTodayString();
+          const yesterday = getYesterdayString();
+          const lastLogged = data.lastLogged || "";
+
+          if (lastLogged === today) {
+            // Already logged today
+            setStreak(data.count || 0);
+            setStreakLogged(true);
+          } else if (lastLogged === yesterday) {
+            // Logged yesterday — streak still alive
+            setStreak(data.count || 0);
+            setStreakLogged(false);
+          } else if (lastLogged === "") {
+            // Never logged
+            setStreak(0);
+            setStreakLogged(false);
+          } else {
+            // Missed a day — reset streak
+            setStreak(0);
+            setStreakLogged(false);
+            await setDoc(doc(db, "streaks", user.uid), { count: 0, lastLogged: "", longestStreak: data.longestStreak || 0 }, { merge: true });
+          }
+        } else {
+          setStreak(0);
+          setStreakLogged(false);
+        }
+      } catch (err) { console.error(err); }
+      setStreakLoading(false);
+    };
+    loadStreak();
+  }, [user]);
+
+  // ─── LOG PRAYER STREAK ────────────────────────────────────────────────────
+  const logPrayer = async () => {
+    if (streakLogged) return;
+    if (!user) {
+      setShowAuth(true);
+      return;
+    }
+    const today = getTodayString();
+    try {
+      const streakDoc = await getDoc(doc(db, "streaks", user.uid));
+      const data = streakDoc.exists() ? streakDoc.data() : { count: 0, lastLogged: "", longestStreak: 0 };
+      const yesterday = getYesterdayString();
+      let newCount;
+
+      if (data.lastLogged === yesterday || data.lastLogged === "") {
+        newCount = (data.count || 0) + 1;
+      } else if (data.lastLogged === today) {
+        return; // Already logged
+      } else {
+        newCount = 1; // Reset
+      }
+
+      const newLongest = Math.max(newCount, data.longestStreak || 0);
+      await setDoc(doc(db, "streaks", user.uid), {
+        count: newCount,
+        lastLogged: today,
+        longestStreak: newLongest,
+      });
+      setStreak(newCount);
+      setStreakLogged(true);
+
+      // Celebrate milestone streaks
+      if ([7, 14, 21, 30, 50, 100].includes(newCount)) {
+        setStreakCelebration(true);
+        setTimeout(() => setStreakCelebration(false), 4000);
+      }
+    } catch (err) { console.error(err); }
+  };
 
   // ─── LOAD PRAYER WALL ─────────────────────────────────────────────────────
   useEffect(() => {
@@ -557,7 +657,6 @@ export default function App() {
 
   const openTopic = (topic) => { setSelectedTopic(topic); setTopicContent(getSermonContent(topic)); };
   const filteredCategories = sermonSearch.trim() ? sermonCategories.map(cat => ({ ...cat, topics: cat.topics.filter(t => t.toLowerCase().includes(sermonSearch.toLowerCase())) })).filter(cat => cat.topics.length > 0) : sermonCategories;
-  const logPrayer = () => { if (!streakLogged) { setStreak(s => s + 1); setStreakLogged(true); } };
 
   const submitPrayer = async () => {
     if (!newPrayer.trim()) return;
@@ -659,17 +758,11 @@ export default function App() {
     try {
       const verseData = await fetchVerse(newVerseRef.trim());
       if (verseData) {
-        await addDoc(collection(db, "memoryVerses", user.uid, "verses"), {
-          reference: verseData.reference,
-          text: verseData.text,
-          memorized: false,
-          timesAttempted: 0,
-          createdAt: new Date(),
-        });
+        await addDoc(collection(db, "memoryVerses", user.uid, "verses"), { reference: verseData.reference, text: verseData.text, memorized: false, timesAttempted: 0, createdAt: new Date() });
         setNewVerseRef("");
         setMemoryTab("list");
       } else {
-        alert("Could not find that verse. Try a different format like 'John 3:16'");
+        alert("Could not find that verse. Try a format like 'John 3:16'");
       }
     } catch (err) { console.error(err); }
     setFetchingVerse(false);
@@ -679,13 +772,7 @@ export default function App() {
     if (!newVerseRef.trim() || !newVerseText.trim()) return;
     if (!user) { setShowAuth(true); return; }
     try {
-      await addDoc(collection(db, "memoryVerses", user.uid, "verses"), {
-        reference: newVerseRef.trim(),
-        text: newVerseText.trim(),
-        memorized: false,
-        timesAttempted: 0,
-        createdAt: new Date(),
-      });
+      await addDoc(collection(db, "memoryVerses", user.uid, "verses"), { reference: newVerseRef.trim(), text: newVerseText.trim(), memorized: false, timesAttempted: 0, createdAt: new Date() });
       setNewVerseRef(""); setNewVerseText("");
       setMemoryTab("list");
     } catch (err) { console.error(err); }
@@ -695,12 +782,7 @@ export default function App() {
     try { await deleteDoc(doc(db, "memoryVerses", user.uid, "verses", verseId)); } catch (err) { console.error(err); }
   };
 
-  const startTest = (verse) => {
-    setTestingVerse(verse);
-    setTestAnswers({});
-    setTestResult(null);
-    setMemoryTab("test");
-  };
+  const startTest = (verse) => { setTestingVerse(verse); setTestAnswers({}); setTestResult(null); setMemoryTab("test"); };
 
   const submitTest = async () => {
     if (!testingVerse) return;
@@ -710,11 +792,7 @@ export default function App() {
     try {
       const prevMemorized = testingVerse.memorized;
       const nowMemorized = result.passed;
-      await updateDoc(doc(db, "memoryVerses", user.uid, "verses", testingVerse.id), {
-        memorized: nowMemorized,
-        timesAttempted: (testingVerse.timesAttempted || 0) + 1,
-        lastScore: result.score,
-      });
+      await updateDoc(doc(db, "memoryVerses", user.uid, "verses", testingVerse.id), { memorized: nowMemorized, timesAttempted: (testingVerse.timesAttempted || 0) + 1, lastScore: result.score });
       if (!prevMemorized && nowMemorized) {
         const newTotal = totalMemorized + 1;
         setNewSticker(getMemoryMilestone(newTotal));
@@ -723,12 +801,7 @@ export default function App() {
           const passedVerses = memoryVerses.filter(v => v.memorized && v.id !== testingVerse.id);
           if (passedVerses.length > 0) {
             const randomVerse = passedVerses[Math.floor(Math.random() * passedVerses.length)];
-            setTimeout(() => {
-              setQuizVerse(randomVerse);
-              setQuizAnswers({});
-              setQuizResult(null);
-              setShowPopQuiz(true);
-            }, 3000);
+            setTimeout(() => { setQuizVerse(randomVerse); setQuizAnswers({}); setQuizResult(null); setShowPopQuiz(true); }, 3000);
           }
         }
       }
@@ -804,12 +877,7 @@ export default function App() {
                     if (blankIdx !== -1) {
                       return (
                         <span key={i}>
-                          <input
-                            type="text"
-                            value={quizAnswers[blankIdx] || ""}
-                            onChange={e => setQuizAnswers(prev => ({ ...prev, [blankIdx]: e.target.value }))}
-                            style={{ width: 80, padding: "2px 6px", borderRadius: 6, border: `2px solid ${GOLD_MID}`, background: "rgba(255,255,255,0.15)", color: WHITE, fontSize: 14, fontFamily: "Georgia, serif", outline: "none", textAlign: "center" }}
-                          />{" "}
+                          <input type="text" value={quizAnswers[blankIdx] || ""} onChange={e => setQuizAnswers(prev => ({ ...prev, [blankIdx]: e.target.value }))} style={{ width: 80, padding: "2px 6px", borderRadius: 6, border: `2px solid ${GOLD_MID}`, background: "rgba(255,255,255,0.15)", color: WHITE, fontSize: 14, fontFamily: "Georgia, serif", outline: "none", textAlign: "center" }} />{" "}
                         </span>
                       );
                     }
@@ -835,15 +903,29 @@ export default function App() {
 
   return (
     <div style={s.app}>
-      {/* NEW STICKER CELEBRATION */}
+
+      {/* STICKER CELEBRATION */}
       {newSticker && (
-        <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.7)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column" }}>
+        <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.7)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center" }}>
           <div style={{ background: WHITE, borderRadius: 20, padding: 32, textAlign: "center", margin: 24 }}>
             <div style={{ fontSize: 48, marginBottom: 12 }}>🌟</div>
             <p style={{ color: GOLD, fontSize: 20, fontWeight: "bold", margin: "0 0 8px", fontFamily: "sans-serif" }}>New Badge Earned!</p>
             <p style={{ color: newSticker.color, fontSize: 22, fontWeight: "bold", margin: "0 0 12px", fontFamily: "sans-serif" }}>{newSticker.label}</p>
             <p style={{ color: BROWN, fontSize: 14, margin: "0 0 16px", lineHeight: 1.5 }}>Your word is a lamp to my feet and a light to my path. — Psalm 119:105 🙏</p>
             <button style={s.btn} onClick={() => setNewSticker(null)}>Praise God! 🙌</button>
+          </div>
+        </div>
+      )}
+
+      {/* STREAK MILESTONE CELEBRATION */}
+      {streakCelebration && (
+        <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.7)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div style={{ background: WHITE, borderRadius: 20, padding: 32, textAlign: "center", margin: 24 }}>
+            <div style={{ fontSize: 48, marginBottom: 12 }}>🔥</div>
+            <p style={{ color: GOLD, fontSize: 20, fontWeight: "bold", margin: "0 0 8px", fontFamily: "sans-serif" }}>🎉 {streak} Day Streak!</p>
+            <p style={{ color: BROWN_DARK, fontSize: 15, fontWeight: "bold", margin: "0 0 8px" }}>You are on fire for God! 🔥</p>
+            <p style={{ color: BROWN, fontSize: 13, margin: "0 0 16px", lineHeight: 1.5 }}>Those who wait on the Lord shall renew their strength. — Isaiah 40:31</p>
+            <button style={s.btn} onClick={() => setStreakCelebration(false)}>Keep Going! ✝️</button>
           </div>
         </div>
       )}
@@ -873,23 +955,38 @@ export default function App() {
               <p style={{ color: WHITE, fontSize: 15, fontStyle: "italic", lineHeight: 1.7, margin: "0 0 10px" }}>"{todayVerse.text}"</p>
               <p style={{ color: GOLD_MID, fontSize: 13, fontFamily: "sans-serif", margin: 0, fontWeight: "bold" }}>— {todayVerse.ref}</p>
             </div>
+
+            {/* FIREBASE STREAK BOX */}
             <div style={s.streakBox}>
-              <div>
-                <div style={{ fontSize: 36, fontWeight: "bold", color: WHITE }}>{streak}</div>
+              <div style={{ textAlign: "center" }}>
+                <div style={{ fontSize: 36, fontWeight: "bold", color: WHITE }}>{streakLoading ? "..." : streak}</div>
                 <div style={{ color: GOLD_LIGHT, fontSize: 11, fontFamily: "sans-serif" }}>day streak 🔥</div>
               </div>
               <div style={{ flex: 1 }}>
-                <p style={{ color: WHITE, fontSize: 13, margin: "0 0 8px", fontFamily: "sans-serif" }}>Keep your prayer streak going!</p>
-                <button style={{ ...s.btnOutline, color: WHITE, borderColor: WHITE, fontSize: 12, padding: "6px 14px" }} onClick={logPrayer}>{streakLogged ? "✓ Logged today" : "Log today's prayer"}</button>
+                <p style={{ color: WHITE, fontSize: 13, margin: "0 0 4px", fontFamily: "sans-serif", fontWeight: "bold" }}>
+                  {streakLogged ? "✅ Prayer logged today!" : "Log your prayer to keep your streak!"}
+                </p>
+                <p style={{ color: GOLD_LIGHT, fontSize: 11, margin: "0 0 8px", fontFamily: "sans-serif" }}>
+                  {!user ? "Sign in to save your streak forever" : streakLogged ? "Come back tomorrow to keep going! 🙏" : "Don't break your streak — pray today!"}
+                </p>
+                <button
+                  style={{ ...s.btnOutline, color: streakLogged ? GOLD_LIGHT : WHITE, borderColor: streakLogged ? GOLD_LIGHT : WHITE, fontSize: 12, padding: "6px 14px", opacity: streakLogged ? 0.7 : 1 }}
+                  onClick={logPrayer}
+                  disabled={streakLogged}
+                >
+                  {streakLogged ? "✓ Prayed Today" : "🔥 Log Today's Prayer"}
+                </button>
               </div>
             </div>
+
             {!user && (
               <div style={{ ...s.card, border: `2px solid ${GOLD_MID}`, background: GOLD_LIGHT }}>
                 <p style={{ color: BROWN_DARK, fontSize: 14, fontWeight: "bold", margin: "0 0 6px" }}>✝️ Save Your Progress</p>
-                <p style={{ color: BROWN, fontSize: 13, margin: "0 0 10px", lineHeight: 1.5 }}>Create a free account to save your Bible reading, prayer journal, memory verses, and more.</p>
+                <p style={{ color: BROWN, fontSize: 13, margin: "0 0 10px", lineHeight: 1.5 }}>Create a free account to save your streak, Bible reading, memory verses, and more — forever!</p>
                 <button style={s.btn} onClick={() => setShowAuth(true)}>Create Free Account →</button>
               </div>
             )}
+
             <div style={s.card}>
               <p style={{ ...s.sectionTitle, fontSize: 15, marginBottom: 8 }}>Quick Actions</p>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
@@ -901,6 +998,7 @@ export default function App() {
                 ))}
               </div>
             </div>
+
             {user && (
               <div style={s.card}>
                 <p style={{ ...s.sectionTitle, fontSize: 15, marginBottom: 8 }}>📖 Bible Reading Progress</p>
@@ -914,6 +1012,7 @@ export default function App() {
                 <button style={{ ...s.btn, marginTop: 10 }} onClick={() => setActiveTab("bible")}>Continue Reading →</button>
               </div>
             )}
+
             {user && (
               <div style={s.card}>
                 <p style={{ ...s.sectionTitle, fontSize: 15, marginBottom: 8 }}>✍️ Scripture Memory</p>
@@ -924,12 +1023,11 @@ export default function App() {
                 <div style={s.progressBg}>
                   <div style={{ height: 10, borderRadius: 6, background: `linear-gradient(90deg, ${GOLD}, ${BROWN})`, width: `${Math.min(100, Math.round((totalMemorized / MEMORY_GOAL) * 100))}%`, transition: "width 0.3s ease" }} />
                 </div>
-                {getMemoryMilestone(totalMemorized) && (
-                  <p style={{ color: GOLD, fontSize: 12, fontFamily: "sans-serif", margin: "6px 0 0", fontWeight: "bold" }}>{getMemoryMilestone(totalMemorized).label}</p>
-                )}
+                {getMemoryMilestone(totalMemorized) && <p style={{ color: GOLD, fontSize: 12, fontFamily: "sans-serif", margin: "6px 0 0", fontWeight: "bold" }}>{getMemoryMilestone(totalMemorized).label}</p>}
                 <button style={{ ...s.btn, marginTop: 10 }} onClick={() => setActiveTab("memory")}>Go to Memory →</button>
               </div>
             )}
+
             <div style={s.card}>
               <p style={{ ...s.sectionTitle, fontSize: 15, marginBottom: 6 }}>✝️ New to Jesus?</p>
               <p style={{ color: BROWN, fontSize: 13, margin: "0 0 10px", lineHeight: 1.5 }}>Find out who Jesus is and how He can transform your life.</p>
@@ -1076,7 +1174,6 @@ export default function App() {
         {activeTab === "memory" && (
           <div>
             <p style={s.sectionTitle}>✍️ Scripture Memory</p>
-
             {!user && (
               <div style={{ ...s.card, background: GOLD_LIGHT, border: `2px solid ${GOLD_MID}` }}>
                 <p style={{ color: BROWN_DARK, fontSize: 14, fontWeight: "bold", margin: "0 0 6px" }}>🔒 Sign In to Memorize Scripture</p>
@@ -1084,10 +1181,8 @@ export default function App() {
                 <button style={s.btn} onClick={() => setShowAuth(true)}>Sign In or Create Account →</button>
               </div>
             )}
-
             {user && (
               <div>
-                {/* Stats Bar */}
                 <div style={s.cardGold}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
                     <div>
@@ -1105,17 +1200,11 @@ export default function App() {
                   </div>
                   <p style={{ color: GOLD_LIGHT, fontSize: 11, fontFamily: "sans-serif", margin: "8px 0 0", fontStyle: "italic" }}>Every 5 verses earned triggers a Pop Quiz! 🎯</p>
                 </div>
-
-                {/* Tabs */}
                 <div style={{ display: "flex", background: WHITE, borderRadius: 12, padding: 4, marginBottom: 14, border: `1px solid ${GOLD_LIGHT}` }}>
                   {[["list","📋 My Verses"],["add","➕ Add Verse"],["badges","🏆 Badges"]].map(([id, label]) => (
-                    <button key={id} onClick={() => { setMemoryTab(id); setTestingVerse(null); setTestResult(null); }} style={{ flex: 1, padding: "8px 4px", border: "none", borderRadius: 10, background: memoryTab === id ? `linear-gradient(135deg, ${GOLD}, ${BROWN})` : "none", color: memoryTab === id ? WHITE : BROWN, fontSize: 11, fontFamily: "sans-serif", fontWeight: memoryTab === id ? "bold" : "normal", cursor: "pointer" }}>
-                      {label}
-                    </button>
+                    <button key={id} onClick={() => { setMemoryTab(id); setTestingVerse(null); setTestResult(null); }} style={{ flex: 1, padding: "8px 4px", border: "none", borderRadius: 10, background: memoryTab === id ? `linear-gradient(135deg, ${GOLD}, ${BROWN})` : "none", color: memoryTab === id ? WHITE : BROWN, fontSize: 11, fontFamily: "sans-serif", fontWeight: memoryTab === id ? "bold" : "normal", cursor: "pointer" }}>{label}</button>
                   ))}
                 </div>
-
-                {/* MY VERSES LIST */}
                 {memoryTab === "list" && (
                   <div>
                     {memoryLoading && <div style={{ ...s.card, textAlign: "center", padding: 24 }}><p style={{ color: BROWN, fontStyle: "italic" }}>Loading your verses... 🙏</p></div>}
@@ -1138,9 +1227,7 @@ export default function App() {
                           <button onClick={() => deleteMemoryVerse(verse.id)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 16, color: "#cc0000", padding: "0 0 0 8px" }}>🗑️</button>
                         </div>
                         <p style={{ color: BROWN_DARK, fontSize: 14, lineHeight: 1.7, margin: "0 0 12px", fontStyle: "italic" }}>"{verse.text}"</p>
-                        <button style={{ ...s.btn, marginTop: 0 }} onClick={() => startTest(verse)}>
-                          {verse.memorized ? "Practice Again ✍️" : "Take the Test →"}
-                        </button>
+                        <button style={{ ...s.btn, marginTop: 0 }} onClick={() => startTest(verse)}>{verse.memorized ? "Practice Again ✍️" : "Take the Test →"}</button>
                       </div>
                     ))}
                     {memoryVerses.length > 0 && (
@@ -1150,31 +1237,24 @@ export default function App() {
                     )}
                   </div>
                 )}
-
-                {/* ADD VERSE */}
                 {memoryTab === "add" && (
                   <div>
                     <div style={s.cardGold}>
                       <p style={{ color: GOLD_LIGHT, fontSize: 11, fontFamily: "sans-serif", margin: "0 0 6px", letterSpacing: 1, textTransform: "uppercase" }}>Add a Scripture</p>
-                      <p style={{ color: WHITE, fontSize: 14, margin: 0, lineHeight: 1.6 }}>Choose a verse you want to hide in your heart. Start with ones that speak to your current season.</p>
+                      <p style={{ color: WHITE, fontSize: 14, margin: 0, lineHeight: 1.6 }}>Choose a verse you want to hide in your heart.</p>
                     </div>
-
                     <div style={s.card}>
                       <p style={{ color: GOLD, fontSize: 13, fontWeight: "bold", marginBottom: 10, fontFamily: "sans-serif" }}>🔍 Search by Reference</p>
-                      <p style={{ color: BROWN, fontSize: 12, marginBottom: 8, lineHeight: 1.5 }}>Type a verse reference and we'll fetch the text for you automatically.</p>
                       <input style={{ ...s.input, marginBottom: 10 }} placeholder="e.g. John 3:16 or Philippians 4:13" value={newVerseRef} onChange={e => setNewVerseRef(e.target.value)} onKeyDown={e => e.key === "Enter" && fetchAndAddVerse()} />
                       <button style={s.btn} onClick={fetchAndAddVerse} disabled={fetchingVerse}>{fetchingVerse ? "Fetching verse..." : "Add This Verse →"}</button>
                     </div>
-
                     <div style={{ textAlign: "center", margin: "8px 0", color: BROWN, fontSize: 13, fontFamily: "sans-serif" }}>— or type it manually —</div>
-
                     <div style={s.card}>
                       <p style={{ color: GOLD, fontSize: 13, fontWeight: "bold", marginBottom: 10, fontFamily: "sans-serif" }}>✍️ Enter Manually</p>
                       <input style={{ ...s.input, marginBottom: 10 }} placeholder="Reference — e.g. Romans 8:28" value={newVerseRef} onChange={e => setNewVerseRef(e.target.value)} />
                       <textarea style={{ ...s.input, minHeight: 80, resize: "none", marginBottom: 10 }} placeholder="Type the verse text here..." value={newVerseText} onChange={e => setNewVerseText(e.target.value)} />
                       <button style={s.btn} onClick={addManualVerse}>Save Verse →</button>
                     </div>
-
                     <div style={{ ...s.card, background: GOLD_LIGHT }}>
                       <p style={{ color: BROWN_DARK, fontSize: 13, fontWeight: "bold", margin: "0 0 8px" }}>💡 Great Verses to Start With</p>
                       {[["John 3:16","The Gospel in one verse"],["Philippians 4:13","Strength through Christ"],["Jeremiah 29:11","God's plans for you"],["Romans 8:28","All things work together"],["Psalm 23:1","The Lord is my shepherd"],["2 Timothy 1:7","No spirit of fear"]].map(([ref, desc]) => (
@@ -1186,17 +1266,14 @@ export default function App() {
                     </div>
                   </div>
                 )}
-
-                {/* TEST VIEW */}
                 {memoryTab === "test" && testingVerse && (
                   <div>
                     <button style={s.backBtn} onClick={() => { setMemoryTab("list"); setTestingVerse(null); setTestResult(null); }}>← Back to My Verses</button>
                     <div style={s.cardGold}>
                       <p style={{ color: GOLD_LIGHT, fontSize: 11, fontFamily: "sans-serif", margin: "0 0 4px", letterSpacing: 1, textTransform: "uppercase" }}>Fill in the Blanks</p>
                       <p style={{ color: WHITE, fontSize: 18, fontWeight: "bold", margin: "0 0 4px" }}>{testingVerse.reference}</p>
-                      <p style={{ color: GOLD_LIGHT, fontSize: 12, margin: 0, fontFamily: "sans-serif" }}>Type the missing words to complete the verse. 70% or more = passed! ✅</p>
+                      <p style={{ color: GOLD_LIGHT, fontSize: 12, margin: 0, fontFamily: "sans-serif" }}>Type the missing words. 70% or more = passed! ✅</p>
                     </div>
-
                     {!testResult ? (
                       <div style={s.card}>
                         {(() => {
@@ -1209,12 +1286,7 @@ export default function App() {
                                   if (blankIdx !== -1) {
                                     return (
                                       <span key={i}>
-                                        <input
-                                          type="text"
-                                          value={testAnswers[blankIdx] || ""}
-                                          onChange={e => setTestAnswers(prev => ({ ...prev, [blankIdx]: e.target.value }))}
-                                          style={{ width: 90, padding: "2px 8px", borderRadius: 8, border: `2px solid ${GOLD_MID}`, background: CREAM, color: BROWN_DARK, fontSize: 14, fontFamily: "Georgia, serif", outline: "none", textAlign: "center" }}
-                                        />{" "}
+                                        <input type="text" value={testAnswers[blankIdx] || ""} onChange={e => setTestAnswers(prev => ({ ...prev, [blankIdx]: e.target.value }))} style={{ width: 90, padding: "2px 8px", borderRadius: 8, border: `2px solid ${GOLD_MID}`, background: CREAM, color: BROWN_DARK, fontSize: 14, fontFamily: "Georgia, serif", outline: "none", textAlign: "center" }} />{" "}
                                       </span>
                                     );
                                   }
@@ -1232,7 +1304,6 @@ export default function App() {
                           <div style={{ fontSize: 40, marginBottom: 8 }}>{testResult.passed ? "🎉" : "💪"}</div>
                           <p style={{ color: testResult.passed ? GOLD : "#cc0000", fontSize: 22, fontWeight: "bold", margin: "0 0 6px", fontFamily: "sans-serif" }}>{testResult.score}%</p>
                           <p style={{ color: BROWN_DARK, fontSize: 15, fontWeight: "bold", margin: "0 0 6px" }}>{testResult.passed ? "Passed! You memorized this verse! ✅" : `${testResult.correct} of ${testResult.total} correct — keep practicing!`}</p>
-                          {testResult.passed && <p style={{ color: BROWN, fontSize: 13, margin: "0 0 8px" }}>This verse is now saved in your heart and in your memory list! 🙏</p>}
                         </div>
                         <div style={{ ...s.card, background: GOLD_LIGHT }}>
                           <p style={{ color: BROWN, fontSize: 12, fontFamily: "sans-serif", fontWeight: "bold", marginBottom: 6, letterSpacing: 1, textTransform: "uppercase" }}>The Full Verse</p>
@@ -1247,8 +1318,6 @@ export default function App() {
                     )}
                   </div>
                 )}
-
-                {/* BADGES */}
                 {memoryTab === "badges" && (
                   <div>
                     <div style={s.cardGold}>
@@ -1265,18 +1334,14 @@ export default function App() {
                               <p style={{ color: earned ? m.color : BROWN, fontSize: 15, fontWeight: "bold", margin: "0 0 4px", fontFamily: "sans-serif" }}>{m.label}</p>
                               <p style={{ color: BROWN, fontSize: 12, margin: 0, fontFamily: "sans-serif" }}>Memorize {m.count} {m.count === 1 ? "verse" : "verses"}</p>
                             </div>
-                            {earned ? (
-                              <span style={{ background: m.color, color: WHITE, borderRadius: 20, padding: "4px 12px", fontSize: 12, fontFamily: "sans-serif", fontWeight: "bold" }}>Earned! ✅</span>
-                            ) : (
-                              <span style={{ color: BROWN, fontSize: 12, fontFamily: "sans-serif" }}>{m.count - totalMemorized} more</span>
-                            )}
+                            {earned ? <span style={{ background: m.color, color: WHITE, borderRadius: 20, padding: "4px 12px", fontSize: 12, fontFamily: "sans-serif", fontWeight: "bold" }}>Earned! ✅</span> : <span style={{ color: BROWN, fontSize: 12, fontFamily: "sans-serif" }}>{m.count - totalMemorized} more</span>}
                           </div>
                         </div>
                       );
                     })}
                     <div style={{ ...s.card, background: GOLD_LIGHT }}>
                       <p style={{ color: BROWN_DARK, fontSize: 13, fontWeight: "bold", margin: "0 0 6px" }}>🎯 Pop Quiz System</p>
-                      <p style={{ color: BROWN, fontSize: 13, lineHeight: 1.6, margin: 0 }}>Every time you earn 5 new verses a surprise Pop Quiz fires to test a random verse from your collection. Stay sharp — God's Word never returns void! 🔥</p>
+                      <p style={{ color: BROWN, fontSize: 13, lineHeight: 1.6, margin: 0 }}>Every time you earn 5 new verses a surprise Pop Quiz fires! Stay sharp — God's Word never returns void! 🔥</p>
                     </div>
                   </div>
                 )}
@@ -1330,7 +1395,7 @@ export default function App() {
                 </div>
                 {[
                   { phrase: "Our Father in heaven", section: "ADORATION", icon: "👑", explanation: "Begin by acknowledging who God is — your Father, your Creator, the One who loves you unconditionally. Start every prayer with worship before requests." },
-                  { phrase: "Your kingdom come, your will be done", section: "SURRENDER", icon: "🙌", explanation: "Surrender your plans to God's plans. You are saying: God, I trust you more than I trust myself. Have your way in my life today." },
+                  { phrase: "Your kingdom come, your will be done", section: "SURRENDER", icon: "🙌", explanation: "Surrender your plans to God's plans. God, I trust you more than I trust myself. Have your way in my life today." },
                   { phrase: "Give us today our daily bread", section: "PETITION", icon: "🙏", explanation: "Bring your needs to God — provision, health, relationships, finances, direction. Be bold and be specific." },
                   { phrase: "Forgive us our debts as we forgive others", section: "CONFESSION", icon: "💛", explanation: "Be honest about where you have fallen short. Then choose to forgive anyone who has wronged you." },
                   { phrase: "Lead us not into temptation", section: "PROTECTION", icon: "🛡️", explanation: "Ask God for protection over your mind, your family, your home and your future." },
