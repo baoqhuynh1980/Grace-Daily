@@ -285,6 +285,7 @@ const tabs = [
   { id: "vision", label: "Vision", icon: "📋" },
   { id: "sermon", label: "Sermon", icon: "🎙️" },
   { id: "salvation", label: "Jesus", icon: "✝️" },
+  { id: "about", label: "About", icon: "💛" },
 ];
 
 const goalIcons = ["📖","🙏","✝️","⚡","❤️","🌟","🕊️","🔥","💪","🌿","🎯","👑"];
@@ -447,9 +448,7 @@ export default function App() {
   const [newSticker, setNewSticker] = useState(null);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-      setUser(firebaseUser);
-    });
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => { setUser(firebaseUser); });
     return () => unsubscribe();
   }, []);
 
@@ -496,8 +495,7 @@ export default function App() {
       else { newCount = 1; }
       const newLongest = Math.max(newCount, data.longestStreak || 0);
       await setDoc(doc(db, "streaks", user.uid), { count: newCount, lastLogged: today, longestStreak: newLongest });
-      setStreak(newCount);
-      setStreakLogged(true);
+      setStreak(newCount); setStreakLogged(true);
       if ([7, 14, 21, 30, 50, 100].includes(newCount)) { setStreakCelebration(true); setTimeout(() => setStreakCelebration(false), 4000); }
     } catch (err) { console.error(err); }
   };
@@ -623,37 +621,31 @@ export default function App() {
 
   const openTopic = (topic) => { setSelectedTopic(topic); setTopicContent(getSermonContent(topic)); };
   const filteredCategories = sermonSearch.trim() ? sermonCategories.map(cat => ({ ...cat, topics: cat.topics.filter(t => t.toLowerCase().includes(sermonSearch.toLowerCase())) })).filter(cat => cat.topics.length > 0) : sermonCategories;
-
   const submitPrayer = async () => {
     if (!newPrayer.trim()) return;
     try { await addDoc(collection(db, "prayerWall"), { name: user ? user.email.split("@")[0] : "Guest", request: newPrayer.trim(), time: "Just now", prayed: 0, createdAt: new Date() }); setNewPrayer(""); } catch (err) { console.error(err); }
   };
-
   const prayFor = async (id) => {
     if (prayedIds.includes(id)) return;
     setPrayedIds(p => [...p, id]);
     try { await updateDoc(doc(db, "prayerWall", id), { prayed: increment(1) }); } catch (err) { console.error(err); }
   };
-
   const submitJournal = async () => {
     if (!journalEntry.trim()) return;
     if (!user) { setShowAuth(true); return; }
     const date = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
     try { await addDoc(collection(db, "journals", user.uid, "entries"), { title: journalTitle || "My Prayer", text: journalEntry.trim(), date, createdAt: new Date() }); setJournalTitle(""); setJournalEntry(""); } catch (err) { console.error(err); }
   };
-
   const submitTestimony = () => {
     if (!testimony.trim()) return;
     setTestimonies(prev => [{ text: testimony, time: "Just now" }, ...prev]);
     setTestimony("");
   };
-
   const addGoal = async () => {
     if (!newGoalTitle.trim()) return;
     if (!user) { setShowAuth(true); return; }
     try { await addDoc(collection(db, "visionGoals", user.uid, "goals"), { title: newGoalTitle.trim(), icon: newGoalIcon, progress: 0, createdAt: new Date() }); setNewGoalTitle(""); setNewGoalIcon("🎯"); setShowAddGoal(false); } catch (err) { console.error(err); }
   };
-
   const updateProgress = async (goalId, newProgress) => {
     const clamped = Math.min(100, Math.max(0, newProgress));
     const prev = visionGoals.find(g => g.id === goalId);
@@ -661,12 +653,10 @@ export default function App() {
     if (user) { try { await updateDoc(doc(db, "visionGoals", user.uid, "goals", goalId), { progress: clamped }); } catch (err) { console.error(err); } }
     else { setVisionGoals(goals => goals.map(g => g.id === goalId ? { ...g, progress: clamped } : g)); }
   };
-
   const deleteGoal = async (goalId) => {
     if (user) { try { await deleteDoc(doc(db, "visionGoals", user.uid, "goals", goalId)); } catch (err) { console.error(err); } }
     else { setVisionGoals(goals => goals.filter(g => g.id !== goalId)); }
   };
-
   const loadChapter = async (book, chapter) => {
     setSelectedChapter(chapter); setBibleLoading(true); setChapterText(null);
     try {
@@ -678,17 +668,14 @@ export default function App() {
     } catch { setChapterText({ error: "Network error. Please check your connection." }); }
     setBibleLoading(false);
   };
-
   const markChapterRead = async () => {
     if (!user) { setShowAuth(true); return; }
     const key = `${selectedBook.abbrev}_${selectedChapter}`;
     if (readChapters[key]) return;
     try { const newChapters = { ...readChapters, [key]: true }; await setDoc(doc(db, "bibleProgress", user.uid), { chapters: newChapters }, { merge: true }); } catch (err) { console.error(err); }
   };
-
   const isChapterRead = (book, chapter) => !!readChapters[`${book.abbrev}_${chapter}`];
   const getBookProgress = (book) => { let read = 0; for (let c = 1; c <= book.chapters; c++) { if (readChapters[`${book.abbrev}_${c}`]) read++; } return read; };
-
   const fetchAndAddVerse = async () => {
     if (!newVerseRef.trim()) return;
     if (!user) { setShowAuth(true); return; }
@@ -700,16 +687,13 @@ export default function App() {
     } catch (err) { console.error(err); }
     setFetchingVerse(false);
   };
-
   const addManualVerse = async () => {
     if (!newVerseRef.trim() || !newVerseText.trim()) return;
     if (!user) { setShowAuth(true); return; }
     try { await addDoc(collection(db, "memoryVerses", user.uid, "verses"), { reference: newVerseRef.trim(), text: newVerseText.trim(), memorized: false, timesAttempted: 0, createdAt: new Date() }); setNewVerseRef(""); setNewVerseText(""); setMemoryTab("list"); } catch (err) { console.error(err); }
   };
-
   const deleteMemoryVerse = async (verseId) => { try { await deleteDoc(doc(db, "memoryVerses", user.uid, "verses", verseId)); } catch (err) { console.error(err); } };
   const startTest = (verse) => { setTestingVerse(verse); setTestAnswers({}); setTestResult(null); setMemoryTab("test"); };
-
   const submitTest = async () => {
     if (!testingVerse) return;
     const { words, blankIndices } = createFillInBlank(testingVerse.text);
@@ -730,14 +714,12 @@ export default function App() {
       }
     } catch (err) { console.error(err); }
   };
-
   const submitQuiz = () => {
     if (!quizVerse) return;
     const { words, blankIndices } = createFillInBlank(quizVerse.text);
     const result = checkAnswers(words, blankIndices, quizAnswers);
     setQuizResult(result);
   };
-
   const handleSignOut = async () => { await signOut(auth); };
 
   const s = {
@@ -811,7 +793,6 @@ export default function App() {
   return (
     <div style={s.app}>
 
-      {/* NOTIFICATION BANNER */}
       {user && showNotifBanner && !notifEnabled && (
         <div style={{ background: `linear-gradient(135deg, ${BROWN_DARK}, ${BROWN})`, padding: "12px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
           <div>
@@ -825,13 +806,8 @@ export default function App() {
         </div>
       )}
 
-      {/* BADGE CELEBRATION */}
       {newSticker && (<div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.7)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center" }}><div style={{ background: WHITE, borderRadius: 20, padding: 32, textAlign: "center", margin: 24 }}><div style={{ fontSize: 48, marginBottom: 12 }}>🌟</div><p style={{ color: GOLD, fontSize: 20, fontWeight: "bold", margin: "0 0 8px", fontFamily: "sans-serif" }}>New Badge Earned!</p><p style={{ color: newSticker.color, fontSize: 22, fontWeight: "bold", margin: "0 0 12px", fontFamily: "sans-serif" }}>{newSticker.label}</p><p style={{ color: BROWN, fontSize: 14, margin: "0 0 16px", lineHeight: 1.5 }}>Your word is a lamp to my feet and a light to my path. — Psalm 119:105 🙏</p><button style={s.btn} onClick={() => setNewSticker(null)}>Praise God! 🙌</button></div></div>)}
-
-      {/* STREAK CELEBRATION */}
       {streakCelebration && (<div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.7)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center" }}><div style={{ background: WHITE, borderRadius: 20, padding: 32, textAlign: "center", margin: 24 }}><div style={{ fontSize: 48, marginBottom: 12 }}>🔥</div><p style={{ color: GOLD, fontSize: 20, fontWeight: "bold", margin: "0 0 8px", fontFamily: "sans-serif" }}>🎉 {streak} Day Streak!</p><p style={{ color: BROWN_DARK, fontSize: 15, fontWeight: "bold", margin: "0 0 8px" }}>You are on fire for God! 🔥</p><p style={{ color: BROWN, fontSize: 13, margin: "0 0 16px", lineHeight: 1.5 }}>Those who wait on the Lord shall renew their strength. — Isaiah 40:31</p><button style={s.btn} onClick={() => setStreakCelebration(false)}>Keep Going! ✝️</button></div></div>)}
-
-      {/* FASTING BADGE CELEBRATION */}
       {fastCelebration && (<div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.7)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center" }}><div style={{ background: WHITE, borderRadius: 20, padding: 32, textAlign: "center", margin: 24 }}><div style={{ fontSize: 48, marginBottom: 12 }}>⚡</div><p style={{ color: GOLD, fontSize: 20, fontWeight: "bold", margin: "0 0 8px", fontFamily: "sans-serif" }}>Fasting Badge Earned!</p><p style={{ color: fastCelebration.color, fontSize: 22, fontWeight: "bold", margin: "0 0 12px", fontFamily: "sans-serif" }}>{fastCelebration.label}</p><p style={{ color: BROWN, fontSize: 14, margin: "0 0 6px", lineHeight: 1.5 }}>Is not this the kind of fasting I have chosen:</p><p style={{ color: BROWN, fontSize: 13, fontStyle: "italic", margin: "0 0 16px" }}>to loose the chains of injustice — Isaiah 58:6 🙏</p><button style={s.btn} onClick={() => setFastCelebration(null)}>To God Be the Glory! 🙌</button></div></div>)}
 
       <div style={s.header}>
@@ -851,7 +827,6 @@ export default function App() {
 
       <div style={s.content}>
 
-        {/* HOME */}
         {activeTab === "home" && (
           <div>
             <div style={s.cardGold}>
@@ -870,8 +845,6 @@ export default function App() {
                 <button style={{ ...s.btnOutline, color: streakLogged ? GOLD_LIGHT : WHITE, borderColor: streakLogged ? GOLD_LIGHT : WHITE, fontSize: 12, padding: "6px 14px", opacity: streakLogged ? 0.7 : 1 }} onClick={logPrayer} disabled={streakLogged}>{streakLogged ? "✓ Prayed Today" : "🔥 Log Today's Prayer"}</button>
               </div>
             </div>
-
-            {/* PREMIUM CARD */}
             {!isPremium && (
               <div style={{ background: `linear-gradient(135deg, ${BROWN_DARK}, ${BROWN})`, borderRadius: 16, padding: 18, marginBottom: 14, border: `2px solid ${GOLD}` }}>
                 <p style={{ color: GOLD_MID, fontSize: 11, fontFamily: "sans-serif", margin: "0 0 4px", letterSpacing: 1, textTransform: "uppercase" }}>Unlock Everything 👑</p>
@@ -884,13 +857,10 @@ export default function App() {
                 {[["📖","Bible Reading Progress"],["✍️","Scripture Memory + Badges"],["📓","Prayer Journal"],["📋","Faith Vision Board"],["⚡","Fasting Tracker"],["🎯","Pop Quiz System"]].map(([icon, feature]) => (
                   <p key={feature} style={{ color: GOLD_LIGHT, fontSize: 12, margin: "0 0 4px", fontFamily: "sans-serif" }}>✅ {icon} {feature}</p>
                 ))}
-                <button style={{ background: `linear-gradient(135deg, ${GOLD}, #C9972A)`, color: WHITE, border: "none", borderRadius: 10, padding: "12px 20px", fontSize: 15, fontWeight: "bold", cursor: "pointer", fontFamily: "sans-serif", width: "100%", marginTop: 12 }} onClick={() => window.open(STRIPE_LINK, "_blank")}>
-                  Start 7-Day Free Trial 👑
-                </button>
+                <button style={{ background: `linear-gradient(135deg, ${GOLD}, #C9972A)`, color: WHITE, border: "none", borderRadius: 10, padding: "12px 20px", fontSize: 15, fontWeight: "bold", cursor: "pointer", fontFamily: "sans-serif", width: "100%", marginTop: 12 }} onClick={() => window.open(STRIPE_LINK, "_blank")}>Start 7-Day Free Trial 👑</button>
                 <p style={{ color: GOLD_LIGHT, fontSize: 10, textAlign: "center", margin: "8px 0 0", fontFamily: "sans-serif", opacity: 0.7 }}>Powered by Stripe — Secure Payment 🔒</p>
               </div>
             )}
-
             {!user && (<div style={{ ...s.card, border: `2px solid ${GOLD_MID}`, background: GOLD_LIGHT }}><p style={{ color: BROWN_DARK, fontSize: 14, fontWeight: "bold", margin: "0 0 6px" }}>✝️ Save Your Progress</p><p style={{ color: BROWN, fontSize: 13, margin: "0 0 10px", lineHeight: 1.5 }}>Create a free account to save your streak, Bible reading, memory verses, and more — forever!</p><button style={s.btn} onClick={() => setShowAuth(true)}>Create Free Account →</button></div>)}
             <div style={s.card}>
               <p style={{ ...s.sectionTitle, fontSize: 15, marginBottom: 8 }}>Quick Actions</p>
@@ -1011,6 +981,65 @@ export default function App() {
               <p style={{ color: BROWN, fontSize: 13, fontWeight: "bold", fontFamily: "sans-serif", marginBottom: 8 }}>Receive Salvation</p>
               <p style={{ color: BROWN_DARK, fontSize: 14, fontStyle: "italic", lineHeight: 1.8 }}>"Father in the name of Jesus Christ I confess with my mouth that Jesus is Lord and I believe in my heart that God raised Him from the dead. I repent of my sins and I receive Jesus Christ as my Lord and Savior. I commit to deny myself pick up my cross daily and follow Him. In the name of Jesus Christ. Amen."</p>
               {!sinner ? (<button style={s.btn} onClick={() => setSinner(true)}>I Prayed This Prayer 🙏</button>) : (<div style={{ textAlign: "center", padding: "10px 0" }}><div style={{ fontSize: 28 }}>🎉</div><p style={{ color: BROWN_DARK, fontSize: 15, fontWeight: "bold", margin: "6px 0 4px" }}>Welcome to the Family of God!</p><p style={{ color: BROWN, fontSize: 13, lineHeight: 1.5, margin: 0 }}>Heaven is rejoicing right now. You are loved. Start your journey with Grace Daily. ✝️</p></div>)}
+            </div>
+          </div>
+        )}
+
+        {activeTab === "about" && (
+          <div>
+            <div style={s.cardGold}>
+              <p style={{ color: GOLD_MID, fontSize: 11, fontFamily: "sans-serif", margin: "0 0 6px", letterSpacing: 1, textTransform: "uppercase" }}>Our Story</p>
+              <h2 style={{ color: WHITE, fontSize: 22, margin: "0 0 8px" }}>About Grace Daily ✝️</h2>
+              <p style={{ color: GOLD_LIGHT, fontSize: 13, lineHeight: 1.7, margin: 0 }}>Built with one purpose — to bring lost sheep back to the Shepherd, Jesus Christ.</p>
+            </div>
+
+            <div style={s.card}>
+              <p style={{ color: GOLD, fontSize: 14, fontWeight: "bold", margin: "0 0 10px", fontFamily: "sans-serif" }}>🎯 Our Mission</p>
+              <p style={{ color: BROWN_DARK, fontSize: 14, lineHeight: 1.8, margin: 0 }}>Grace Daily was built with one purpose — to bring lost sheep back to the Shepherd, Jesus Christ. We believe that every person on earth deserves to encounter the living God in a personal, beautiful and life-changing way. This app is our offering to Him.</p>
+            </div>
+
+            <div style={s.card}>
+              <p style={{ color: GOLD, fontSize: 14, fontWeight: "bold", margin: "0 0 10px", fontFamily: "sans-serif" }}>👨‍👩‍👧 Who We Are</p>
+              <p style={{ color: BROWN_DARK, fontSize: 14, lineHeight: 1.8, margin: 0 }}>Hi — I am Bao, the founder of Grace Daily and The Bible Story Project. Alongside my beloved wife Tiffany, we have dedicated our lives to spreading the Gospel and making God's Word accessible to everyone. I am not a perfect person. I am simply someone who has been radically transformed by the grace of Jesus Christ and cannot keep that grace to myself. Everything you see in this app was built out of a deep love for God and a burning desire to see lives changed by His Word.</p>
+            </div>
+
+            <div style={s.card}>
+              <p style={{ color: GOLD, fontSize: 14, fontWeight: "bold", margin: "0 0 10px", fontFamily: "sans-serif" }}>✝️ What We Believe</p>
+              <p style={{ color: BROWN_DARK, fontSize: 14, lineHeight: 1.8, margin: 0 }}>We believe the Bible is the living Word of God. We believe prayer changes everything. We believe fasting breaks chains. We believe that no matter where you are in life — broken, lost, struggling or searching — Jesus Christ is the answer. He always has been and He always will be.</p>
+            </div>
+
+            <div style={{ ...s.card, background: GOLD_LIGHT }}>
+              <p style={{ color: GOLD, fontSize: 14, fontWeight: "bold", margin: "0 0 10px", fontFamily: "sans-serif" }}>🙏 Our Heart For You</p>
+              <p style={{ color: BROWN_DARK, fontSize: 14, lineHeight: 1.8, margin: "0 0 12px" }}>You are not here by accident. God led you to Grace Daily because He wants to meet you right where you are. Whether you are a brand new believer or someone who has walked with God for years — this app was built for you. We pray that every verse, every prayer and every feature draws you closer to the heart of God.</p>
+              <p style={{ color: BROWN_DARK, fontSize: 14, fontStyle: "italic", lineHeight: 1.7, margin: 0 }}>"For God so loved the world that He gave His one and only Son." — John 3:16 ✝️</p>
+            </div>
+
+            <div style={s.card}>
+              <p style={{ color: GOLD, fontSize: 14, fontWeight: "bold", margin: "0 0 14px", fontFamily: "sans-serif" }}>🌐 Connect With Us</p>
+              {[
+                ["🌐", "Website", "faithdailywalk.com", "https://faithdailywalk.com"],
+                ["📧", "Email", "hello@faithdailywalk.com", "mailto:hello@faithdailywalk.com"],
+                ["▶️", "YouTube", "The Bible Story Project", "https://youtube.com/@baoqhuynh1980"],
+                ["📘", "Facebook", "The Bible Story Project", "https://facebook.com/thebiblestoryproject"],
+                ["📸", "Instagram", "@baoqhuynh1980", "https://instagram.com/baoqhuynh1980"],
+                ["🎵", "TikTok", "@thebiblestoryproject", "https://tiktok.com/@thebiblestoryproject"],
+              ].map(([icon, platform, handle, url], i, arr) => (
+                <div key={platform} style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: i < arr.length - 1 ? 12 : 0, paddingBottom: i < arr.length - 1 ? 12 : 0, borderBottom: i < arr.length - 1 ? `1px solid ${GOLD_LIGHT}` : "none" }}>
+                  <span style={{ fontSize: 22 }}>{icon}</span>
+                  <div style={{ flex: 1 }}>
+                    <p style={{ color: BROWN_DARK, fontSize: 13, fontWeight: "bold", margin: "0 0 2px", fontFamily: "sans-serif" }}>{platform}</p>
+                    <p style={{ color: BROWN, fontSize: 12, margin: 0, fontFamily: "sans-serif" }}>{handle}</p>
+                  </div>
+                  <button style={{ background: `linear-gradient(135deg, ${GOLD}, ${BROWN})`, color: WHITE, border: "none", borderRadius: 8, padding: "6px 14px", fontSize: 12, cursor: "pointer", fontFamily: "sans-serif", fontWeight: "bold" }} onClick={() => window.open(url, "_blank")}>Visit →</button>
+                </div>
+              ))}
+            </div>
+
+            <div style={{ ...s.card, background: BROWN_DARK, textAlign: "center", marginBottom: 20 }}>
+              <div style={{ fontSize: 32, marginBottom: 8 }}>✝️</div>
+              <p style={{ color: GOLD_MID, fontSize: 15, fontWeight: "bold", margin: "0 0 4px", fontFamily: "sans-serif" }}>Grace Daily</p>
+              <p style={{ color: GOLD_LIGHT, fontSize: 12, margin: "0 0 6px", fontFamily: "sans-serif" }}>His Grace is Sufficient — 2 Corinthians 12:9</p>
+              <p style={{ color: GOLD_LIGHT, fontSize: 11, margin: 0, fontFamily: "sans-serif", opacity: 0.7 }}>© 2026 Grace Daily · faithdailywalk.com · All Glory to God Yahweh 👑</p>
             </div>
           </div>
         )}
