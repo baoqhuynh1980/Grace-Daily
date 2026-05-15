@@ -2260,7 +2260,7 @@ const startQuiz = (level) => {
   <div>
     <p style={s.sectionTitle}>🎯 Bible Quiz</p>
     {!isPremium && <PremiumGate onUpgrade={() => window.open(STRIPE_LINK, "_blank")} />}
-{isPremium && (
+{isPremium && (<>
     <div style={{ display: "flex", background: WHITE, borderRadius: 12, padding: 4, marginBottom: 14, border: `1px solid ${GOLD_LIGHT}` }}>
       {[["play","🎮 Play"],["progress","📊 Progress"]].map(([id, label]) => (
         <button key={id} onClick={() => { setQuizView(id); resetQuiz(); }} style={{ flex: 1, padding: "10px 4px", border: "none", borderRadius: 10, background: quizView === id ? `linear-gradient(135deg, ${GOLD}, ${BROWN})` : "none", color: quizView === id ? WHITE : BROWN, fontSize: 13, fontFamily: "sans-serif", fontWeight: quizView === id ? "bold" : "normal", cursor: "pointer" }}>{label}</button>
@@ -2382,6 +2382,7 @@ const startQuiz = (level) => {
         </div>
       </div>
     )}
+    </>
     )}
   </div>
 )}
