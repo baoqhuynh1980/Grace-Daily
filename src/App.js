@@ -1158,6 +1158,104 @@ const emotionVerses = {
   strength: { keywords: ["strength","strong","power","courage","bold","brave","overcome","victory","conquer","persevere"], verses: ["philippians 4:13","isaiah 40:29","psalm 46:1","2 corinthians 12:9","ephesians 6:10","joshua 1:9","psalm 18:32","isaiah 41:10","habakkuk 3:19","1 chronicles 16:11"], reflection: "God is your strength when you are weak. His power is made perfect in weakness.", prayer: "Father in the name of Jesus Christ be my strength today. In the name of Jesus Christ. Amen." },
 };
 
+const bibleQuizQuestions = {
+  beginner: [
+    { question: "How many days did God take to create the world?", options: ["5 days", "6 days", "7 days", "10 days"], correct: 1, explanation: "God created the world in 6 days and rested on the 7th day. (Genesis 1)" },
+    { question: "Who built the ark to survive the great flood?", options: ["Moses", "Abraham", "Noah", "David"], correct: 2, explanation: "God commanded Noah to build the ark to save his family and the animals. (Genesis 6)" },
+    { question: "What was the name of the garden where Adam and Eve lived?", options: ["Garden of Gethsemane", "Garden of Eden", "Garden of Nazareth", "Garden of Canaan"], correct: 1, explanation: "God planted the Garden of Eden for Adam and Eve. (Genesis 2:8)" },
+    { question: "How many disciples did Jesus have?", options: ["7", "10", "12", "14"], correct: 2, explanation: "Jesus chose 12 disciples to follow Him and spread the Gospel. (Matthew 10:1-4)" },
+    { question: "What did Jesus turn water into at the wedding in Cana?", options: ["Milk", "Oil", "Wine", "Juice"], correct: 2, explanation: "Jesus performed His first miracle turning water into wine at Cana. (John 2:1-11)" },
+    { question: "Who was swallowed by a large fish?", options: ["Elijah", "Jonah", "Daniel", "Paul"], correct: 1, explanation: "Jonah was swallowed by a great fish after fleeing from God's command. (Jonah 1:17)" },
+    { question: "What is the first book of the Bible?", options: ["Exodus", "Psalms", "Genesis", "Matthew"], correct: 2, explanation: "Genesis is the first book of the Bible, meaning 'beginning' in Hebrew." },
+    { question: "Who was the mother of Jesus?", options: ["Elizabeth", "Mary", "Ruth", "Sarah"], correct: 1, explanation: "Mary was chosen by God to be the mother of Jesus Christ. (Luke 1:26-31)" },
+    { question: "What river was Jesus baptized in?", options: ["Nile River", "Jordan River", "Euphrates River", "Sea of Galilee"], correct: 1, explanation: "Jesus was baptized by John the Baptist in the Jordan River. (Matthew 3:13)" },
+    { question: "How many commandments did God give Moses?", options: ["5", "7", "10", "12"], correct: 2, explanation: "God gave Moses the Ten Commandments on Mount Sinai. (Exodus 20)" },
+    { question: "What did God use to part the Red Sea for Moses?", options: ["A large wind alone", "Moses stretched out his hand and God sent a strong east wind", "An angel", "A miracle stone"], correct: 1, explanation: "Moses stretched out his hand and God drove the sea back with a strong east wind. (Exodus 14:21)" },
+    { question: "Who was thrown into the lion's den?", options: ["Shadrach", "Daniel", "Joseph", "Ezekiel"], correct: 1, explanation: "Daniel was thrown into the lion's den for praying to God, but God shut the lions' mouths. (Daniel 6)" },
+    { question: "What is the last book of the Bible?", options: ["Jude", "Hebrews", "Acts", "Revelation"], correct: 3, explanation: "Revelation is the last book of the Bible, written by the Apostle John." },
+    { question: "Who was the first man God created?", options: ["Noah", "Adam", "Abraham", "Moses"], correct: 1, explanation: "Adam was the first man God created from the dust of the ground. (Genesis 2:7)" },
+    { question: "What did Jesus feed 5000 people with?", options: ["Manna and water", "5 loaves and 2 fish", "7 loaves and 3 fish", "Bread and wine"], correct: 1, explanation: "Jesus miraculously fed 5000 men with just 5 loaves of bread and 2 fish. (John 6:1-14)" },
+    { question: "Where was Jesus born?", options: ["Nazareth", "Jerusalem", "Bethlehem", "Jericho"], correct: 2, explanation: "Jesus was born in Bethlehem, fulfilling the prophecy of Micah 5:2. (Luke 2:4-7)" },
+    { question: "Who betrayed Jesus for 30 pieces of silver?", options: ["Peter", "Judas Iscariot", "Thomas", "Bartholomew"], correct: 1, explanation: "Judas Iscariot betrayed Jesus to the chief priests for 30 pieces of silver. (Matthew 26:14-15)" },
+    { question: "On which day did Jesus rise from the dead?", options: ["The first day", "The second day", "The third day", "The seventh day"], correct: 2, explanation: "Jesus rose from the dead on the third day, just as He had predicted. (1 Corinthians 15:4)" },
+    { question: "Who was the first person to see the risen Jesus?", options: ["Peter", "Mary Magdalene", "John", "Thomas"], correct: 1, explanation: "Mary Magdalene was the first person to see Jesus after His resurrection. (John 20:14-16)" },
+    { question: "What is the shortest verse in the Bible?", options: ["Pray without ceasing", "Jesus wept", "God is love", "Fear not"], correct: 1, explanation: "'Jesus wept' (John 11:35) is the shortest verse in the Bible, showing His compassion." },
+    { question: "Who wrote most of the Psalms?", options: ["Solomon", "Moses", "David", "Asaph"], correct: 2, explanation: "King David wrote most of the 150 Psalms in the Bible." },
+    { question: "What did the Holy Spirit look like when it descended on Jesus at His baptism?", options: ["A lamb", "A dove", "A flame of fire", "A cloud"], correct: 1, explanation: "The Holy Spirit descended on Jesus in the form of a dove at His baptism. (Matthew 3:16)" },
+    { question: "How many books are in the New Testament?", options: ["27", "39", "66", "22"], correct: 0, explanation: "The New Testament contains 27 books, from Matthew to Revelation." },
+    { question: "Who was the first king of Israel?", options: ["David", "Solomon", "Saul", "Samuel"], correct: 2, explanation: "Saul was anointed by Samuel as the first king of Israel. (1 Samuel 10:1)" },
+    { question: "What language was most of the Old Testament originally written in?", options: ["Greek", "Latin", "Aramaic", "Hebrew"], correct: 3, explanation: "Most of the Old Testament was originally written in Hebrew, with some portions in Aramaic." },
+    { question: "Who led the Israelites out of Egypt?", options: ["Aaron", "Joshua", "Moses", "Abraham"], correct: 2, explanation: "God called Moses to lead the Israelites out of slavery in Egypt. (Exodus 3)" },
+    { question: "What were the names of the first two sons of Adam and Eve?", options: ["Cain and Seth", "Cain and Abel", "Abel and Seth", "Enoch and Abel"], correct: 1, explanation: "Cain and Abel were the first two sons born to Adam and Eve. (Genesis 4:1-2)" },
+    { question: "What is the Golden Rule Jesus taught?", options: ["Love God above all", "Pray without ceasing", "Do to others as you would have them do to you", "Fear God and keep His commandments"], correct: 2, explanation: "Jesus taught the Golden Rule in Matthew 7:12 — treat others the way you want to be treated." },
+    { question: "Who was the wisest king in the Bible?", options: ["David", "Hezekiah", "Solomon", "Josiah"], correct: 2, explanation: "God gave King Solomon wisdom surpassing all others when Solomon asked for an understanding heart. (1 Kings 3:12)" },
+    { question: "How many people were on Noah's ark?", options: ["4", "6", "8", "10"], correct: 2, explanation: "Noah, his wife, their three sons and their wives — 8 people total — were on the ark. (1 Peter 3:20)" },
+  ],
+  intermediate: [
+    { question: "What were the names of the three men thrown into the fiery furnace?", options: ["Daniel, Ezra, Nehemiah", "Shadrach, Meshach, Abednego", "Gideon, Samson, Eli", "Amos, Hosea, Joel"], correct: 1, explanation: "Shadrach, Meshach, and Abednego were thrown into the fiery furnace for refusing to bow to Nebuchadnezzar's idol. (Daniel 3)" },
+    { question: "What was the name of Abraham's wife?", options: ["Rachel", "Rebekah", "Leah", "Sarah"], correct: 3, explanation: "Sarah was Abraham's wife. God changed her name from Sarai to Sarah and promised her a son. (Genesis 17:15)" },
+    { question: "Which fruit did Adam and Eve eat in the Garden of Eden?", options: ["An apple", "The Bible says fruit from the tree of the knowledge of good and evil", "A fig", "A pomegranate"], correct: 1, explanation: "The Bible simply says 'fruit from the tree of the knowledge of good and evil' — it never specifies an apple. (Genesis 3:6)" },
+    { question: "Who was Paul's companion on his first missionary journey?", options: ["Silas", "Timothy", "Barnabas", "Luke"], correct: 2, explanation: "Barnabas accompanied Paul on his first missionary journey. (Acts 13:2)" },
+    { question: "What were the two cities destroyed by fire and brimstone in Genesis?", options: ["Nineveh and Babylon", "Jericho and Ai", "Sodom and Gomorrah", "Tyre and Sidon"], correct: 2, explanation: "God destroyed Sodom and Gomorrah with fire and brimstone because of their great wickedness. (Genesis 19)" },
+    { question: "How many years did the Israelites wander in the wilderness?", options: ["20 years", "30 years", "40 years", "50 years"], correct: 2, explanation: "The Israelites wandered in the wilderness for 40 years due to their unbelief at Kadesh Barnea. (Numbers 14:33-34)" },
+    { question: "Who was Ruth's mother-in-law?", options: ["Naomi", "Hannah", "Deborah", "Miriam"], correct: 0, explanation: "Naomi was Ruth's mother-in-law. Ruth's famous declaration of loyalty to Naomi is found in Ruth 1:16." },
+    { question: "Which disciple walked on water with Jesus?", options: ["John", "James", "Peter", "Andrew"], correct: 2, explanation: "Peter stepped out of the boat and walked on water toward Jesus, but sank when he took his eyes off Jesus. (Matthew 14:29)" },
+    { question: "What did Elijah call down from heaven to defeat the prophets of Baal?", options: ["An angel", "Fire from heaven", "A great wind", "A plague"], correct: 1, explanation: "Elijah prayed and God sent fire from heaven that consumed the sacrifice, altar and even the water. (1 Kings 18:38)" },
+    { question: "What psalm begins with 'The Lord is my shepherd'?", options: ["Psalm 1", "Psalm 22", "Psalm 23", "Psalm 91"], correct: 2, explanation: "Psalm 23, written by David, begins with the famous words 'The Lord is my shepherd, I shall not want.'" },
+    { question: "What was the name of the tax collector who climbed a tree to see Jesus?", options: ["Matthew", "Zacchaeus", "Levi", "Simon"], correct: 1, explanation: "Zacchaeus was a chief tax collector who climbed a sycamore tree to see Jesus. Jesus went to his house that day. (Luke 19:1-10)" },
+    { question: "How many times did Peter deny Jesus?", options: ["Once", "Twice", "Three times", "Four times"], correct: 2, explanation: "Peter denied Jesus three times before the rooster crowed, just as Jesus had predicted. (Matthew 26:75)" },
+    { question: "Who wrote the book of Revelation?", options: ["Paul", "Peter", "John", "James"], correct: 2, explanation: "The Apostle John wrote the book of Revelation while exiled on the island of Patmos. (Revelation 1:9)" },
+    { question: "What was the name of Abraham's son of promise?", options: ["Ishmael", "Isaac", "Jacob", "Esau"], correct: 1, explanation: "Isaac was the son of promise born to Abraham and Sarah in their old age. (Genesis 21:1-3)" },
+    { question: "What was Samson's source of supernatural strength?", options: ["His prayer life", "His armor", "His long hair", "His staff"], correct: 2, explanation: "Samson's strength came from his Nazirite vow, symbolized by his uncut hair. When Delilah cut it, he lost his strength. (Judges 16:17)" },
+    { question: "Which apostle doubted the resurrection until he saw Jesus' wounds?", options: ["Peter", "John", "James", "Thomas"], correct: 3, explanation: "Thomas said he would not believe unless he saw and touched Jesus' wounds. When Jesus appeared, Thomas declared 'My Lord and my God!' (John 20:24-28)" },
+    { question: "What was the name of the pool where Jesus healed the paralyzed man in John 5?", options: ["Pool of Siloam", "Pool of Bethesda", "Pool of Solomon", "Pool of Gibeon"], correct: 1, explanation: "Jesus healed a man who had been paralyzed for 38 years at the Pool of Bethesda. (John 5:2-9)" },
+    { question: "How many books did Paul write in the New Testament?", options: ["9", "11", "13", "15"], correct: 2, explanation: "Paul wrote 13 epistles in the New Testament, from Romans to Philemon." },
+    { question: "Who was the first Christian martyr?", options: ["James", "Stephen", "Philip", "Barnabas"], correct: 1, explanation: "Stephen became the first Christian martyr when he was stoned to death for his faith. (Acts 7:59-60)" },
+    { question: "What did the prodigal son demand before leaving home?", options: ["His father's blessing", "His inheritance early", "A servant and horse", "His brother's share too"], correct: 1, explanation: "The prodigal son demanded his share of the inheritance while his father was still alive. (Luke 15:12)" },
+    { question: "Who appeared with Jesus on the Mount of Transfiguration?", options: ["Abraham and Isaac", "Moses and Elijah", "David and Solomon", "Isaiah and Jeremiah"], correct: 1, explanation: "Moses and Elijah appeared and spoke with Jesus on the Mount of Transfiguration. (Matthew 17:3)" },
+    { question: "What was the name of the servant whose ear Peter cut off in the Garden of Gethsemane?", options: ["Cornelius", "Malchus", "Silas", "Agabus"], correct: 1, explanation: "Peter cut off the ear of Malchus, servant of the high priest. Jesus healed the ear immediately. (John 18:10, Luke 22:51)" },
+    { question: "Which book of the Bible contains the Sermon on the Mount?", options: ["Mark", "Luke", "John", "Matthew"], correct: 3, explanation: "The Sermon on the Mount, including the Beatitudes and the Lord's Prayer, is found in Matthew 5-7." },
+    { question: "What was the name of the Ethiopian eunuch who was baptized by Philip?", options: ["The Bible does not give his name", "Cornelius", "Simon", "Apollos"], correct: 0, explanation: "The Ethiopian eunuch is not named in Scripture. Philip explained Isaiah to him and baptized him. (Acts 8:26-38)" },
+    { question: "How many plagues did God send on Egypt?", options: ["7", "9", "10", "12"], correct: 2, explanation: "God sent 10 plagues on Egypt to convince Pharaoh to release the Israelites. (Exodus 7-12)" },
+    { question: "Who was the first judge of Israel mentioned in the book of Judges?", options: ["Samson", "Gideon", "Deborah", "Othniel"], correct: 3, explanation: "Othniel was the first judge of Israel. God raised him up to deliver Israel from Cushan-Rishathaim. (Judges 3:9)" },
+    { question: "What river did Naaman dip in seven times to be healed of leprosy?", options: ["The Nile", "The Euphrates", "The Jordan", "The Tigris"], correct: 2, explanation: "Elisha told Naaman to dip in the Jordan River seven times and he was healed of leprosy. (2 Kings 5:14)" },
+    { question: "What was the name of the city whose walls fell after Israel marched around it?", options: ["Ai", "Jericho", "Hebron", "Lachish"], correct: 1, explanation: "The walls of Jericho fell after Israel marched around the city seven days, then shouted and blew trumpets. (Joshua 6)" },
+    { question: "How many times did the prophet Elisha restore someone to life?", options: ["Once", "Twice", "Three times", "Never"], correct: 1, explanation: "Elisha raised the Shunammite woman's son to life (2 Kings 4) and a dead man's body revived when it touched Elisha's bones (2 Kings 13:21)." },
+    { question: "What was Paul's name before his conversion?", options: ["Simon", "Saul", "Silas", "Sergius"], correct: 1, explanation: "Paul was originally named Saul, a zealous Pharisee who persecuted Christians before his dramatic encounter with Jesus. (Acts 9)" },
+  ],
+  advanced: [
+    { question: "What was the name of the king who had John the Baptist beheaded?", options: ["Herod the Great", "Herod Antipas", "Herod Agrippa", "Pontius Pilate"], correct: 1, explanation: "Herod Antipas had John the Baptist beheaded to fulfill his oath to his stepdaughter Salome. (Matthew 14:1-12)" },
+    { question: "In which city was the church that received the most letters in the New Testament?", options: ["Rome", "Ephesus", "Corinth", "Galatia"], correct: 2, explanation: "Paul wrote two lengthy epistles to the church in Corinth, addressing their many divisions and problems." },
+    { question: "How many years did Solomon reign over Israel?", options: ["20 years", "30 years", "40 years", "50 years"], correct: 2, explanation: "Solomon reigned over all Israel for 40 years, just as his father David had. (1 Kings 11:42)" },
+    { question: "Which Old Testament prophet foretold the virgin birth most specifically?", options: ["Jeremiah", "Ezekiel", "Isaiah", "Micah"], correct: 2, explanation: "Isaiah 7:14 prophesied that a virgin would give birth to a son called Immanuel, fulfilled in Jesus Christ." },
+    { question: "Who was Barnabas's cousin who traveled with Paul and Barnabas before leaving them?", options: ["Timothy", "Titus", "John Mark", "Silas"], correct: 2, explanation: "John Mark, Barnabas's cousin, left Paul and Barnabas during their first missionary journey, causing a dispute later. (Acts 15:37-39, Colossians 4:10)" },
+    { question: "What was the name of the prophetess who identified Jesus as the Messiah in the temple?", options: ["Deborah", "Anna", "Priscilla", "Miriam"], correct: 1, explanation: "Anna, an 84-year-old prophetess, recognized Jesus as the Messiah in the temple and gave thanks to God. (Luke 2:36-38)" },
+    { question: "Which king's prayer caused the shadow on the sundial to go back ten steps?", options: ["David", "Solomon", "Josiah", "Hezekiah"], correct: 3, explanation: "God caused the shadow on the sundial of Ahaz to go back ten steps as a sign to King Hezekiah that he would be healed. (Isaiah 38:8)" },
+    { question: "What was the Hebrew name for the city of Jerusalem in the time of Abraham?", options: ["Jebusah", "Salem", "Zion", "Moriah"], correct: 1, explanation: "Jerusalem was called Salem when Melchizedek was its king and priest who blessed Abraham. (Genesis 14:18)" },
+    { question: "Who was the Gentile woman whose faith Jesus praised as great?", options: ["The Samaritan woman at the well", "A Syrophoenician woman", "A Greek woman from Athens", "A Roman woman from Caesarea"], correct: 1, explanation: "Jesus praised the faith of the Syrophoenician (Canaanite) woman who asked for her demon-possessed daughter to be healed. (Matthew 15:28)" },
+    { question: "What was the name of Abraham's nephew who traveled with him from Ur?", options: ["Haran", "Nahor", "Lot", "Terah"], correct: 2, explanation: "Lot, Abraham's nephew, traveled with him from Ur and later chose the well-watered plains of Jordan. (Genesis 12:4-5)" },
+    { question: "Who wrote the book of Hebrews?", options: ["Paul", "Apollos", "Peter", "The author is unknown"], correct: 3, explanation: "The authorship of Hebrews is one of the great mysteries of biblical scholarship. The author is not identified in the text." },
+    { question: "What was the length of Jesus' earthly ministry?", options: ["One year", "Two years", "About three years", "Seven years"], correct: 2, explanation: "Based on the three Passovers recorded in John's Gospel, Jesus' public ministry lasted approximately three years." },
+    { question: "Which prophet was taken to heaven in a chariot of fire without dying?", options: ["Enoch", "Elijah", "Elisha", "Isaiah"], correct: 1, explanation: "Elijah was taken to heaven in a whirlwind with a chariot and horses of fire. (2 Kings 2:11)" },
+    { question: "What was the name of the sorcerer who was struck blind for opposing Paul on Cyprus?", options: ["Simon Magus", "Elymas", "Apollos", "Demetrius"], correct: 1, explanation: "Elymas the sorcerer was struck blind by Paul for trying to turn the proconsul Sergius Paulus away from the faith. (Acts 13:6-12)" },
+    { question: "Which of these is NOT one of the seven churches addressed in Revelation?", options: ["Smyrna", "Antioch", "Pergamum", "Thyatira"], correct: 1, explanation: "The seven churches in Revelation are Ephesus, Smyrna, Pergamum, Thyatira, Sardis, Philadelphia and Laodicea. Antioch is not among them." },
+    { question: "What was the first miracle performed by the prophet Elisha after Elijah's departure?", options: ["Healing of Naaman", "Parting the Jordan River", "Raising the Shunammite's son", "Multiplying the widow's oil"], correct: 1, explanation: "Elisha's first miracle was striking the Jordan River with Elijah's cloak, causing it to part. (2 Kings 2:14)" },
+    { question: "How many elders surround the throne of God in Revelation?", options: ["7", "12", "24", "144"], correct: 2, explanation: "John saw 24 elders surrounding the throne of God, clothed in white with golden crowns. (Revelation 4:4)" },
+    { question: "Which prophet did God command to marry a prostitute as a symbol of Israel's unfaithfulness?", options: ["Amos", "Hosea", "Micah", "Joel"], correct: 1, explanation: "God commanded Hosea to marry Gomer, a promiscuous woman, to symbolize God's relationship with unfaithful Israel. (Hosea 1:2)" },
+    { question: "What was the name of the centurion whose servant Jesus healed from a distance?", options: ["Cornelius", "Julius", "A centurion in Capernaum whose name is not given", "Longinus"], correct: 2, explanation: "The centurion at Capernaum is not named in Matthew 8 or Luke 7. Jesus marveled at his great faith." },
+    { question: "In Ezekiel's vision, how many faces did each of the four living creatures have?", options: ["One face each", "Two faces each", "Four faces each", "Six faces each"], correct: 2, explanation: "Each of the four living creatures in Ezekiel's vision had four faces: human, lion, ox, and eagle. (Ezekiel 1:6)" },
+    { question: "Which king of Judah is noted for finding the book of the Law during temple repairs?", options: ["Hezekiah", "Asa", "Jehoshaphat", "Josiah"], correct: 3, explanation: "During temple repairs ordered by King Josiah, the book of the Law was found. Josiah led a great national revival. (2 Kings 22)" },
+    { question: "What was the Apostle Paul's occupation?", options: ["Fisherman", "Tax collector", "Tentmaker", "Carpenter"], correct: 2, explanation: "Paul was a tentmaker by trade. He worked alongside Aquila and Priscilla making tents in Corinth. (Acts 18:3)" },
+    { question: "Who was the high priest when Jesus was crucified?", options: ["Annas", "Caiaphas", "Eli", "Ananias"], correct: 1, explanation: "Caiaphas was the high priest who declared it was better for one man to die for the people. (John 18:14)" },
+    { question: "What does the Hebrew name 'Immanuel' mean?", options: ["God saves", "God with us", "God is great", "God is King"], correct: 1, explanation: "Immanuel means 'God with us' — the name prophesied in Isaiah 7:14 and fulfilled in Jesus Christ. (Matthew 1:23)" },
+    { question: "How many times is the word 'love' found in 1 Corinthians 13?", options: ["5 times", "9 times", "The exact count varies by translation", "13 times"], correct: 2, explanation: "The exact number of times 'love' appears in 1 Corinthians 13 varies depending on the Bible translation used." },
+    { question: "Who was Barnabas in relation to the early church before Paul's conversion?", options: ["He was a Pharisee", "He sold property and gave the money to the apostles", "He was a Roman centurion", "He was one of the original 12 disciples"], correct: 1, explanation: "Barnabas sold a field and laid the money at the apostles' feet, exemplifying radical generosity. (Acts 4:36-37)" },
+    { question: "What was the name of the woman who hid the two Israelite spies in Jericho?", options: ["Delilah", "Rahab", "Tamar", "Jezebel"], correct: 1, explanation: "Rahab the prostitute hid the two spies sent by Joshua and was saved when Jericho fell. (Joshua 2)" },
+    { question: "Which letter did Paul write from prison that contains the famous Philippians 4:13?", options: ["Ephesians", "Colossians", "Philippians", "Philemon"], correct: 2, explanation: "'I can do all things through Christ who strengthens me' is from Paul's letter to the Philippians, written during his imprisonment. (Philippians 4:13)" },
+    { question: "What was the sign of the covenant God made with Noah?", options: ["Circumcision", "A rainbow", "The Passover lamb", "The Sabbath day"], correct: 1, explanation: "God set a rainbow in the clouds as the sign of His covenant never to flood the entire earth again. (Genesis 9:13)" },
+    { question: "Which book of the Bible never mentions the name of God?", options: ["Song of Solomon only", "Esther only", "Both Esther and Song of Solomon", "Ecclesiastes"], correct: 2, explanation: "Both Esther and Song of Solomon are unique in that the name of God does not appear in either book." },
+  ],
+};
 const quizBadges = [
   { id: "first_quiz", label: "First Step 🎯", desc: "Complete your very first quiz", color: "#4CAF50", bg: "#F1F8E9", check: (p) => (p.totalQuizzes || 0) >= 1 },
   { id: "word_seeker", label: "Word Seeker 📖", desc: "Complete 5 quizzes total", color: "#C9972A", bg: "#FDF8EE", check: (p) => (p.totalQuizzes || 0) >= 5 },
@@ -1214,7 +1312,7 @@ const tabs = [
   { id: "prayer", label: "Prayer", icon: "🙏" },
   { id: "vision", label: "Vision", icon: "📋" },
   { id: "sermon", label: "Sermon", icon: "🎙️" },
-  { id: "salvation", label: "Jesus", icon: "✝️" },
+  { id: "quiz", label: "Quiz", icon: "📝" },
   { id: "about", label: "About", icon: "💛" },
 ];
 
@@ -1400,6 +1498,15 @@ export default function App() {
   const [quizAnswers, setQuizAnswers] = useState({});
   const [quizResult, setQuizResult] = useState(null);
   const [newSticker, setNewSticker] = useState(null);
+  const [quizLevel, setQuizLevel] = useState(null);
+  const [activeQuizQuestions, setActiveQuizQuestions] = useState([]);
+  const [quizIndex, setQuizIndex] = useState(0);
+  const [quizScore, setQuizScore] = useState(0);
+  const [selectedAnswer, setSelectedAnswer] = useState(null);
+  const [quizComplete, setQuizComplete] = useState(false);
+  const [quizProgress, setQuizProgress] = useState(null);
+  const [quizView, setQuizView] = useState("play");
+  const [quizBadgeCelebration, setQuizBadgeCelebration] = useState(null);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => { setUser(firebaseUser); });
@@ -1567,6 +1674,14 @@ export default function App() {
     if (newProgress !== memGoal.progress) updateDoc(doc(db, "visionGoals", user.uid, "goals", memGoal.id), { progress: newProgress }).catch(() => {});
   }, [totalMemorized, user, visionGoals]);
 
+useEffect(() => {
+    if (!user) { setQuizProgress(null); return; }
+    const unsubscribe = onSnapshot(doc(db, "quizProgress", user.uid), (snap) => {
+      if (snap.exists()) { setQuizProgress(snap.data()); }
+      else { setQuizProgress({ totalQuizzes: 0, beginner: { taken: 0, bestScore: 0 }, intermediate: { taken: 0, bestScore: 0 }, advanced: { taken: 0, bestScore: 0 } }); }
+    });
+    return () => unsubscribe();
+  }, [user]);
   const todayVerse = dailyVerses[new Date().getDay() % dailyVerses.length];
   const bibleProgress = Math.min(100, Math.round((totalRead / TOTAL_CHAPTERS) * 100));
 
@@ -1695,6 +1810,64 @@ export default function App() {
       }
     } catch (err) { console.error(err); }
   };
+const startQuiz = (level) => {
+    const pool = bibleQuizQuestions[level];
+    const shuffled = [...pool].sort(() => Math.random() - 0.5);
+    const selected = shuffled.slice(0, 15);
+    setQuizLevel(level);
+    setActiveQuizQuestions(selected);
+    setQuizIndex(0);
+    setQuizScore(0);
+    setSelectedAnswer(null);
+    setQuizComplete(false);
+  };
+
+  const handleQuizAnswer = (optionIndex) => {
+    if (selectedAnswer !== null) return;
+    setSelectedAnswer(optionIndex);
+    if (optionIndex === activeQuizQuestions[quizIndex].correct) {
+      setQuizScore(prev => prev + 1);
+    }
+  };
+
+  const nextQuizQuestion = async () => {
+    const isLastQuestion = quizIndex + 1 >= activeQuizQuestions.length;
+    if (isLastQuestion) {
+      setQuizComplete(true);
+      if (user) {
+        try {
+          const prev = quizProgress || { totalQuizzes: 0, beginner: { taken: 0, bestScore: 0 }, intermediate: { taken: 0, bestScore: 0 }, advanced: { taken: 0, bestScore: 0 } };
+          const levelPrev = prev[quizLevel] || { taken: 0, bestScore: 0 };
+          const newBest = Math.max(levelPrev.bestScore || 0, quizScore);
+          const newProgress = {
+            ...prev,
+            totalQuizzes: (prev.totalQuizzes || 0) + 1,
+            [quizLevel]: { taken: (levelPrev.taken || 0) + 1, bestScore: newBest }
+          };
+          await setDoc(doc(db, "quizProgress", user.uid), newProgress, { merge: true });
+          const prevEarned = quizBadges.filter(b => b.check(prev)).map(b => b.id);
+          const nowEarned = quizBadges.filter(b => b.check(newProgress));
+          const freshBadges = nowEarned.filter(b => !prevEarned.includes(b.id));
+          if (freshBadges.length > 0) {
+            setQuizBadgeCelebration(freshBadges[0]);
+            setTimeout(() => setQuizBadgeCelebration(null), 5000);
+          }
+        } catch (err) { console.error(err); }
+      }
+    } else {
+      setQuizIndex(prev => prev + 1);
+      setSelectedAnswer(null);
+    }
+  };
+
+  const resetQuiz = () => {
+    setQuizLevel(null);
+    setActiveQuizQuestions([]);
+    setQuizIndex(0);
+    setQuizScore(0);
+    setSelectedAnswer(null);
+    setQuizComplete(false);
+  };
   const submitQuiz = () => {
     if (!quizVerse) return;
     const { words, blankIndices } = createFillInBlank(quizVerse.text);
@@ -1790,8 +1963,20 @@ export default function App() {
       {newSticker && (<div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.7)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center" }}><div style={{ background: WHITE, borderRadius: 20, padding: 32, textAlign: "center", margin: 24 }}><div style={{ fontSize: 48, marginBottom: 12 }}>🌟</div><p style={{ color: GOLD, fontSize: 20, fontWeight: "bold", margin: "0 0 8px", fontFamily: "sans-serif" }}>New Badge Earned!</p><p style={{ color: newSticker.color, fontSize: 22, fontWeight: "bold", margin: "0 0 12px", fontFamily: "sans-serif" }}>{newSticker.label}</p><p style={{ color: BROWN, fontSize: 14, margin: "0 0 16px", lineHeight: 1.5 }}>Your word is a lamp to my feet and a light to my path. — Psalm 119:105 🙏</p><button style={s.btn} onClick={() => setNewSticker(null)}>Praise God! 🙌</button></div></div>)}
       {streakCelebration && (<div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.7)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center" }}><div style={{ background: WHITE, borderRadius: 20, padding: 32, textAlign: "center", margin: 24 }}><div style={{ fontSize: 48, marginBottom: 12 }}>🔥</div><p style={{ color: GOLD, fontSize: 20, fontWeight: "bold", margin: "0 0 8px", fontFamily: "sans-serif" }}>🎉 {streak} Day Streak!</p><p style={{ color: BROWN_DARK, fontSize: 15, fontWeight: "bold", margin: "0 0 8px" }}>You are on fire for God! 🔥</p><p style={{ color: BROWN, fontSize: 13, margin: "0 0 16px", lineHeight: 1.5 }}>Those who wait on the Lord shall renew their strength. — Isaiah 40:31</p><button style={s.btn} onClick={() => setStreakCelebration(false)}>Keep Going! ✝️</button></div></div>)}
       {fastCelebration && (<div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.7)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center" }}><div style={{ background: WHITE, borderRadius: 20, padding: 32, textAlign: "center", margin: 24 }}><div style={{ fontSize: 48, marginBottom: 12 }}>⚡</div><p style={{ color: GOLD, fontSize: 20, fontWeight: "bold", margin: "0 0 8px", fontFamily: "sans-serif" }}>Fasting Badge Earned!</p><p style={{ color: fastCelebration.color, fontSize: 22, fontWeight: "bold", margin: "0 0 12px", fontFamily: "sans-serif" }}>{fastCelebration.label}</p><p style={{ color: BROWN, fontSize: 14, margin: "0 0 6px", lineHeight: 1.5 }}>Is not this the kind of fasting I have chosen:</p><p style={{ color: BROWN, fontSize: 13, fontStyle: "italic", margin: "0 0 16px" }}>to loose the chains of injustice — Isaiah 58:6 🙏</p><button style={s.btn} onClick={() => setFastCelebration(null)}>To God Be the Glory! 🙌</button></div></div>)}
-
-      <div style={s.header}>
+      
+{quizBadgeCelebration && (
+  <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.7)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center" }}>
+    <div style={{ background: WHITE, borderRadius: 20, padding: 32, textAlign: "center", margin: 24 }}>
+      <div style={{ fontSize: 48, marginBottom: 12 }}>🏅</div>
+      <p style={{ color: GOLD, fontSize: 20, fontWeight: "bold", margin: "0 0 8px", fontFamily: "sans-serif" }}>New Badge Earned!</p>
+      <p style={{ color: quizBadgeCelebration.color, fontSize: 22, fontWeight: "bold", margin: "0 0 12px", fontFamily: "sans-serif" }}>{quizBadgeCelebration.label}</p>
+      <p style={{ color: BROWN, fontSize: 14, margin: "0 0 16px", lineHeight: 1.5 }}>{quizBadgeCelebration.desc}</p>
+      <p style={{ color: BROWN_DARK, fontSize: 13, fontStyle: "italic", margin: "0 0 16px" }}>Your word I have hidden in my heart — Psalm 119:11 🙏</p>
+      <button style={s.btn} onClick={() => setQuizBadgeCelebration(null)}>Praise God! 🙌</button>
+    </div>
+  </div>
+)}
+        <div style={s.header}>
         <div style={s.headerTop}>
           <div style={{ width: 60 }} />
           <div style={s.headerCenter}>
@@ -2071,6 +2256,132 @@ export default function App() {
           </div>
         )}
 
+{activeTab === "quiz" && (
+  <div>
+    <p style={s.sectionTitle}>🎯 Bible Quiz</p>
+    <div style={{ display: "flex", background: WHITE, borderRadius: 12, padding: 4, marginBottom: 14, border: `1px solid ${GOLD_LIGHT}` }}>
+      {[["play","🎮 Play"],["progress","📊 Progress"]].map(([id, label]) => (
+        <button key={id} onClick={() => { setQuizView(id); resetQuiz(); }} style={{ flex: 1, padding: "10px 4px", border: "none", borderRadius: 10, background: quizView === id ? `linear-gradient(135deg, ${GOLD}, ${BROWN})` : "none", color: quizView === id ? WHITE : BROWN, fontSize: 13, fontFamily: "sans-serif", fontWeight: quizView === id ? "bold" : "normal", cursor: "pointer" }}>{label}</button>
+      ))}
+    </div>
+    {quizView === "play" && !quizLevel && (
+      <div>
+        <div style={s.cardGold}>
+          <p style={{ color: GOLD_LIGHT, fontSize: 11, fontFamily: "sans-serif", margin: "0 0 6px", letterSpacing: 1, textTransform: "uppercase" }}>Test Your Knowledge</p>
+          <h2 style={{ color: WHITE, fontSize: 20, margin: "0 0 6px" }}>📖 Bible Quiz</h2>
+          <p style={{ color: GOLD_LIGHT, fontSize: 13, margin: 0, lineHeight: 1.6 }}>15 questions per quiz. Choose your level and test what you know!</p>
+        </div>
+        {[{ level: "beginner", icon: "🌱", label: "Beginner", desc: "Basic Bible knowledge — great for new believers", color: "#4CAF50" }, { level: "intermediate", icon: "⚡", label: "Intermediate", desc: "Deeper Bible stories and teachings", color: GOLD }, { level: "advanced", icon: "🔥", label: "Advanced", desc: "Challenging questions for serious students", color: "#FF5722" }].map(({ level, icon, label, desc, color }) => (
+          <div key={level} style={{ ...s.card, border: `2px solid ${color}22` }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 10 }}>
+              <span style={{ fontSize: 32 }}>{icon}</span>
+              <div style={{ flex: 1 }}>
+                <p style={{ color: BROWN_DARK, fontSize: 16, fontWeight: "bold", margin: "0 0 2px" }}>{label}</p>
+                <p style={{ color: BROWN, fontSize: 13, margin: 0, fontFamily: "sans-serif" }}>{desc}</p>
+              </div>
+            </div>
+            {quizProgress && quizProgress[level]?.taken > 0 && (
+              <p style={{ color: GOLD, fontSize: 12, fontFamily: "sans-serif", margin: "0 0 8px" }}>Best score: {quizProgress[level].bestScore}/15 · Played {quizProgress[level].taken} times</p>
+            )}
+            <button style={{ ...s.btn, marginTop: 0, background: `linear-gradient(135deg, ${color}, ${BROWN_DARK})` }} onClick={() => startQuiz(level)}>Start {label} Quiz →</button>
+          </div>
+        ))}
+      </div>
+    )}
+    {quizView === "play" && quizLevel && !quizComplete && activeQuizQuestions.length > 0 && (
+      <div>
+        <div style={s.cardGold}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+            <p style={{ color: GOLD_LIGHT, fontSize: 12, fontFamily: "sans-serif", margin: 0, textTransform: "uppercase", letterSpacing: 1 }}>{quizLevel.charAt(0).toUpperCase() + quizLevel.slice(1)} Quiz</p>
+            <p style={{ color: WHITE, fontSize: 13, fontFamily: "sans-serif", margin: 0, fontWeight: "bold" }}>{quizIndex + 1} / {activeQuizQuestions.length}</p>
+          </div>
+          <div style={{ height: 6, borderRadius: 4, background: "rgba(255,255,255,0.2)", marginBottom: 12 }}>
+            <div style={{ height: 6, borderRadius: 4, background: GOLD_MID, width: `${((quizIndex + 1) / activeQuizQuestions.length) * 100}%`, transition: "width 0.3s ease" }} />
+          </div>
+          <p style={{ color: WHITE, fontSize: 15, lineHeight: 1.7, margin: 0 }}>{activeQuizQuestions[quizIndex].question}</p>
+        </div>
+        <div>
+          {activeQuizQuestions[quizIndex].options.map((option, idx) => {
+            let bg = WHITE; let borderColor = GOLD_LIGHT; let textColor = BROWN_DARK;
+            if (selectedAnswer !== null) {
+              if (idx === activeQuizQuestions[quizIndex].correct) { bg = "#E8F5E9"; borderColor = "#4CAF50"; textColor = "#2E7D32"; }
+              else if (idx === selectedAnswer && selectedAnswer !== activeQuizQuestions[quizIndex].correct) { bg = "#FFEBEE"; borderColor = "#EF5350"; textColor = "#C62828"; }
+            }
+            return (
+              <button key={idx} onClick={() => handleQuizAnswer(idx)} style={{ display: "block", width: "100%", background: bg, border: `2px solid ${borderColor}`, borderRadius: 12, padding: "14px 16px", marginBottom: 10, cursor: selectedAnswer !== null ? "default" : "pointer", textAlign: "left", color: textColor, fontSize: 14, fontFamily: "Georgia, serif", lineHeight: 1.5 }}>
+                <span style={{ fontWeight: "bold", marginRight: 8, fontFamily: "sans-serif" }}>{String.fromCharCode(65 + idx)}.</span>{option}
+              </button>
+            );
+          })}
+        </div>
+        {selectedAnswer !== null && (
+          <div>
+            <div style={{ ...s.card, background: selectedAnswer === activeQuizQuestions[quizIndex].correct ? "#E8F5E9" : "#FFEBEE", border: `2px solid ${selectedAnswer === activeQuizQuestions[quizIndex].correct ? "#4CAF50" : "#EF5350"}` }}>
+              <p style={{ color: selectedAnswer === activeQuizQuestions[quizIndex].correct ? "#2E7D32" : "#C62828", fontSize: 14, fontWeight: "bold", margin: "0 0 4px", fontFamily: "sans-serif" }}>{selectedAnswer === activeQuizQuestions[quizIndex].correct ? "✅ Correct!" : "❌ Not quite!"}</p>
+              <p style={{ color: BROWN_DARK, fontSize: 13, lineHeight: 1.6, margin: 0 }}>{activeQuizQuestions[quizIndex].explanation}</p>
+            </div>
+            <p style={{ color: GOLD, fontSize: 14, fontWeight: "bold", fontFamily: "sans-serif", textAlign: "center", margin: "0 0 8px" }}>Score: {quizScore} / {quizIndex + 1}</p>
+            <button style={s.btn} onClick={nextQuizQuestion}>{quizIndex + 1 >= activeQuizQuestions.length ? "See Results 🎉" : "Next Question →"}</button>
+          </div>
+        )}
+      </div>
+    )}
+    {quizView === "play" && quizComplete && (
+      <div>
+        <div style={{ ...s.cardGold, textAlign: "center" }}>
+          <div style={{ fontSize: 48, marginBottom: 12 }}>{quizScore >= 12 ? "🏆" : quizScore >= 8 ? "⭐" : "💪"}</div>
+          <h2 style={{ color: WHITE, fontSize: 22, margin: "0 0 8px" }}>Quiz Complete!</h2>
+          <p style={{ color: GOLD_MID, fontSize: 28, fontWeight: "bold", margin: "0 0 4px", fontFamily: "sans-serif" }}>{quizScore} / {activeQuizQuestions.length}</p>
+          <p style={{ color: GOLD_LIGHT, fontSize: 14, margin: 0 }}>{quizScore >= 12 ? "Outstanding! You know God's Word! 🔥" : quizScore >= 8 ? "Great job! Keep studying! 📖" : "Keep going — every quiz makes you stronger! 💪"}</p>
+        </div>
+        <div style={{ ...s.card, background: GOLD_LIGHT }}>
+          <p style={{ color: BROWN_DARK, fontSize: 14, fontStyle: "italic", lineHeight: 1.7, margin: 0 }}>"Your word I have hidden in my heart, that I might not sin against you." — Psalm 119:11 🙏</p>
+        </div>
+        <div style={{ display: "flex", gap: 8 }}>
+          <button style={{ ...s.btn, flex: 1, marginTop: 0 }} onClick={() => startQuiz(quizLevel)}>Play Again 🔄</button>
+          <button style={{ ...s.btnOutline, flex: 1 }} onClick={resetQuiz}>Change Level</button>
+        </div>
+      </div>
+    )}
+    {quizView === "progress" && (
+      <div>
+        <div style={s.cardGold}>
+          <p style={{ color: GOLD_LIGHT, fontSize: 11, fontFamily: "sans-serif", margin: "0 0 6px", letterSpacing: 1, textTransform: "uppercase" }}>Your Quiz Journey</p>
+          <p style={{ color: WHITE, fontSize: 24, fontWeight: "bold", margin: "0 0 4px", fontFamily: "sans-serif" }}>{quizProgress?.totalQuizzes || 0} <span style={{ fontSize: 14, opacity: 0.7 }}>quizzes completed</span></p>
+        </div>
+        {[{ level: "beginner", icon: "🌱", label: "Beginner", color: "#4CAF50" }, { level: "intermediate", icon: "⚡", label: "Intermediate", color: GOLD }, { level: "advanced", icon: "🔥", label: "Advanced", color: "#FF5722" }].map(({ level, icon, label, color }) => (
+          <div key={level} style={s.card}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
+              <span style={{ fontSize: 24 }}>{icon}</span>
+              <p style={{ color: BROWN_DARK, fontSize: 15, fontWeight: "bold", margin: 0 }}>{label}</p>
+            </div>
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
+              <p style={{ color: BROWN, fontSize: 13, margin: 0, fontFamily: "sans-serif" }}>Played: {quizProgress?.[level]?.taken || 0} times</p>
+              <p style={{ color: color, fontSize: 13, fontWeight: "bold", margin: 0, fontFamily: "sans-serif" }}>Best: {quizProgress?.[level]?.bestScore || 0}/15</p>
+            </div>
+            <div style={s.progressBg}><div style={{ height: 10, borderRadius: 6, background: `linear-gradient(90deg, ${color}, ${BROWN})`, width: `${Math.round(((quizProgress?.[level]?.bestScore || 0) / 15) * 100)}%`, transition: "width 0.3s ease" }} /></div>
+          </div>
+        ))}
+        <div style={s.card}>
+          <p style={{ color: GOLD, fontSize: 14, fontWeight: "bold", margin: "0 0 12px", fontFamily: "sans-serif" }}>🏅 Quiz Badges</p>
+          {quizBadges.map(badge => {
+            const earned = quizProgress ? badge.check(quizProgress) : false;
+            return (
+              <div key={badge.id} style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12, opacity: earned ? 1 : 0.5 }}>
+                <div style={{ width: 40, height: 40, borderRadius: "50%", background: earned ? badge.bg : CREAM_DARK, border: `2px solid ${earned ? badge.color : GOLD_LIGHT}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>{badge.label.split(" ").slice(-1)[0]}</div>
+                <div style={{ flex: 1 }}>
+                  <p style={{ color: earned ? badge.color : BROWN, fontSize: 13, fontWeight: "bold", margin: "0 0 2px", fontFamily: "sans-serif" }}>{badge.label}</p>
+                  <p style={{ color: BROWN, fontSize: 11, margin: 0, fontFamily: "sans-serif" }}>{badge.desc}</p>
+                </div>
+                {earned && <span style={{ color: badge.color, fontSize: 12, fontFamily: "sans-serif", fontWeight: "bold" }}>✅</span>}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    )}
+  </div>
+)}
         {activeTab === "salvation" && (
           <div>
             <div style={s.cardGold}><p style={{ color: GOLD_MID, fontSize: 11, fontFamily: "sans-serif", margin: "0 0 6px", letterSpacing: 1, textTransform: "uppercase" }}>The Greatest Decision</p><h2 style={{ color: WHITE, fontSize: 22, margin: "0 0 8px" }}>Who is Jesus Christ?</h2><p style={{ color: GOLD_LIGHT, fontSize: 14, lineHeight: 1.6, margin: 0 }}>Jesus is the Son of God, who came to earth to save humanity from sin and give us eternal life. He is the Way, the Truth, and the Life.</p></div>
