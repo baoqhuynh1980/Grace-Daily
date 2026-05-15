@@ -1158,6 +1158,19 @@ const emotionVerses = {
   strength: { keywords: ["strength","strong","power","courage","bold","brave","overcome","victory","conquer","persevere"], verses: ["philippians 4:13","isaiah 40:29","psalm 46:1","2 corinthians 12:9","ephesians 6:10","joshua 1:9","psalm 18:32","isaiah 41:10","habakkuk 3:19","1 chronicles 16:11"], reflection: "God is your strength when you are weak. His power is made perfect in weakness.", prayer: "Father in the name of Jesus Christ be my strength today. In the name of Jesus Christ. Amen." },
 };
 
+const quizBadges = [
+  { id: "first_quiz", label: "First Step 🎯", desc: "Complete your very first quiz", color: "#4CAF50", bg: "#F1F8E9", check: (p) => (p.totalQuizzes || 0) >= 1 },
+  { id: "word_seeker", label: "Word Seeker 📖", desc: "Complete 5 quizzes total", color: "#C9972A", bg: "#FDF8EE", check: (p) => (p.totalQuizzes || 0) >= 5 },
+  { id: "on_fire", label: "On Fire 🔥", desc: "Complete 10 quizzes total", color: "#FF5722", bg: "#FBE9E7", check: (p) => (p.totalQuizzes || 0) >= 10 },
+  { id: "quiz_champion", label: "Quiz Champion 👑", desc: "Complete 25 quizzes total", color: "#FFD700", bg: "#FFFFF0", check: (p) => (p.totalQuizzes || 0) >= 25 },
+  { id: "beginner_scholar", label: "Beginner Scholar 🌱", desc: "Score 12 or higher on Beginner", color: "#4CAF50", bg: "#F1F8E9", check: (p) => (p.beginner?.bestScore || 0) >= 12 },
+  { id: "intermediate_scholar", label: "Intermediate Scholar ⚡", desc: "Score 12 or higher on Intermediate", color: "#C9972A", bg: "#FDF8EE", check: (p) => (p.intermediate?.bestScore || 0) >= 12 },
+  { id: "advanced_scholar", label: "Advanced Scholar 🔥", desc: "Score 12 or higher on Advanced", color: "#FF5722", bg: "#FBE9E7", check: (p) => (p.advanced?.bestScore || 0) >= 12 },
+  { id: "perfect_beginner", label: "Perfect Beginner ✨", desc: "Score 15 out of 15 on Beginner", color: "#4CAF50", bg: "#F1F8E9", check: (p) => (p.beginner?.bestScore || 0) >= 15 },
+  { id: "perfect_intermediate", label: "Perfect Intermediate 💎", desc: "Score 15 out of 15 on Intermediate", color: "#9C27B0", bg: "#F3E5F5", check: (p) => (p.intermediate?.bestScore || 0) >= 15 },
+  { id: "perfect_advanced", label: "Perfect Advanced 🏆", desc: "Score 15 out of 15 on Advanced", color: "#FFD700", bg: "#FFFFF0", check: (p) => (p.advanced?.bestScore || 0) >= 15 },
+  { id: "all_levels", label: "All Levels Conquered 🎓", desc: "Complete all three difficulty levels", color: "#1565C0", bg: "#E3F2FD", check: (p) => (p.beginner?.taken || 0) >= 1 && (p.intermediate?.taken || 0) >= 1 && (p.advanced?.taken || 0) >= 1 },
+];
 const getEmotionCategory = (feeling) => {
   const lowerFeeling = feeling.toLowerCase();
   for (const [category, data] of Object.entries(emotionVerses)) {
