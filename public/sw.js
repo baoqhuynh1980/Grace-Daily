@@ -2,8 +2,6 @@ const CACHE_NAME = 'grace-daily-v1';
 const urlsToCache = [
   '/',
   '/index.html',
-  '/static/js/main.chunk.js',
-  '/static/js/bundle.js',
   '/manifest.json'
 ];
 
