@@ -1526,6 +1526,7 @@ export default function App() {
     if (!user) return;
     requestNotificationPermission().then(token => {
       if (token) { setNotifEnabled(true); setShowNotifBanner(false); }
+    if (token) { setDoc(doc(db, "users", user.uid), { fcmToken: token }, { merge: true }).catch(e => console.error("FCM save error:", e)); }  
     });
   }, [user]);
 
