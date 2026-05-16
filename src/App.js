@@ -1450,7 +1450,7 @@ export default function App() {
   const [streakLoading, setStreakLoading] = useState(true);
   const [streakCelebration, setStreakCelebration] = useState(false);
   const [notifEnabled, setNotifEnabled] = useState(false);
-  const [showNotifBanner, setShowNotifBanner] = useState(true);
+  const [showNotifBanner, setShowNotifBanner] = useState(typeof Notification !== 'undefined' ? Notification.permission !== 'granted' : true);
   const [isPremium, setIsPremium] = useState(false);
 
   const [fastingTab, setFastingTab] = useState("foundation");
