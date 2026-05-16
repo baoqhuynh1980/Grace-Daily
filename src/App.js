@@ -1955,7 +1955,7 @@ const startQuiz = (level) => {
             <p style={{ color: GOLD_LIGHT, fontSize: 11, margin: 0, fontFamily: "sans-serif" }}>Get daily prayer, streak and verse reminders!</p>
           </div>
           <div style={{ display: "flex", gap: 8 }}>
-            <button style={{ background: GOLD, border: "none", borderRadius: 8, padding: "6px 12px", color: WHITE, fontSize: 12, cursor: "pointer", fontFamily: "sans-serif", fontWeight: "bold" }} onClick={() => { requestNotificationPermission().then(token => { if (token) { setNotifEnabled(true); setShowNotifBanner(false); } }); }}>Enable 🔔</button>
+            <button style={{ background: GOLD, border: "none", borderRadius: 8, padding: "6px 12px", color: WHITE, fontSize: 12, cursor: "pointer", fontFamily: "sans-serif", fontWeight: "bold" }} onClick={() => { requestNotificationPermission().then(token => { if (token) { setNotifEnabled(true); setShowNotifBanner(false); setDoc(doc(db, "users", user.uid), { fcmToken: token }, { merge: true }).catch(e => console.error("FCM save error:", e)); } }); }}>Enable 🔔</button>
             <button style={{ background: "none", border: `1px solid ${GOLD_LIGHT}`, borderRadius: 8, padding: "6px 10px", color: GOLD_LIGHT, fontSize: 11, cursor: "pointer", fontFamily: "sans-serif" }} onClick={() => setShowNotifBanner(false)}>Later</button>
           </div>
         </div>
