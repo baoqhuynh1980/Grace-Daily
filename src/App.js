@@ -2239,7 +2239,17 @@ const startQuiz = (level) => {
               </div>
             )}
             {!user && (<div style={{ ...s.card, border: `2px solid ${GOLD_MID}`, background: GOLD_LIGHT }}><p style={{ color: BROWN_DARK, fontSize: 14, fontWeight: "bold", margin: "0 0 6px" }}>✝️ Save Your Progress</p><p style={{ color: BROWN, fontSize: 13, margin: "0 0 10px", lineHeight: 1.5 }}>Create a free account to save your streak, Bible reading, memory verses, and more — forever!</p><button style={s.btn} onClick={() => setShowAuth(true)}>Create Free Account →</button></div>)}
-            <div style={s.card}>
+    <div style={{ ...s.cardGold, cursor: "pointer" }} onClick={() => setActiveTab("today")}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <div style={{ flex: 1 }}>
+                  <p style={{ color: GOLD_LIGHT, fontSize: 11, fontFamily: "sans-serif", margin: "0 0 6px", letterSpacing: 1, textTransform: "uppercase" }}>✦ Today's Verse</p>
+                  <p style={{ color: WHITE, fontSize: 16, fontWeight: "bold", margin: "0 0 4px", fontFamily: "Georgia, serif" }}>{dailyContent ? dailyContent.verseReference : "Fresh devotional inside →"}</p>
+                  <p style={{ color: GOLD_MID, fontSize: 12, margin: 0, fontFamily: "sans-serif" }}>Tap to read today's full devotional 🙏</p>
+                </div>
+                <div style={{ fontSize: 28, marginLeft: 12 }}>→</div>
+              </div>
+            </div>        
+              <div style={s.card}>
               <p style={{ ...s.sectionTitle, fontSize: 15, marginBottom: 8 }}>Quick Actions</p>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
                 {[["📖","Read\nthe Bible","bible"],["✍️","Memorize\nScripture","memory"],["🙏","Pray with\nothers","prayer"],["📋","My faith\ngoals","vision"]].map(([icon, label, tab]) => (
