@@ -1689,6 +1689,8 @@ export default function App() {
   const [quizBadgeCelebration, setQuizBadgeCelebration] = useState(null);
   const [dailyContent, setDailyContent] = useState(null);
   const [dailyContentLoading, setDailyContentLoading] = useState(true);
+  const [isSaved, setIsSaved] = useState(false);
+  const [savedToast, setSavedToast] = useState("");
 
   useEffect(() => {
     const loadDailyContent = async () => {
@@ -1707,6 +1709,25 @@ export default function App() {
       setDailyContentLoading(false);
     };
     loadDailyContent();
+
+    // Check if today's verse is already saved by the user
+  useEffect(() => {
+    const checkIfSaved = async () => {
+      if (!user) {
+        setIsSaved(false);
+        return;
+      }
+      try {
+        const today = getTodayString();
+        const snap = await getDoc(doc(db, "users", user.uid, "savedVerses", today));
+        setIsSaved(snap.exists());
+      } catch (err) {
+        console.error("Failed to check saved status:", err);
+        setIsSaved(false);
+      }
+    };
+    checkIfSaved();
+  }, [user, dailyContent]);
   }, []);
 
   useEffect(() => {
