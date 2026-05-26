@@ -1744,7 +1744,7 @@ export default function App() {
     return () => unsub();
   }, [user]);
 
-  const toggleSave = async () => {
+  const shareVerse = async (v) => { if (!v) return; const nl = String.fromCharCode(10); const t = '"' + v.verseText + '"' + nl + nl + "— " + v.verseReference + nl + nl + "Shared from Grace Daily 🙏" + nl + "https://grace-daily-iolb.vercel.app"; try { if (navigator.share) { await navigator.share({ title: "Grace Daily", text: t }); } else { await navigator.clipboard.writeText(t); setSavedToast("Copied to clipboard!"); setTimeout(() => setSavedToast(""), 2000); } } catch (err) { if (err.name !== "AbortError") console.error("Share failed:", err); } }; const toggleSave = async () => {
     if (!user || !user.uid) {
       setSavedToast("Sign in to save verses 🙏");
       setTimeout(() => setSavedToast(""), 2000);
@@ -2339,9 +2339,9 @@ const startQuiz = (level) => {
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
               <button style={{ ...s.backBtn, marginBottom: 0 }} onClick={() => setActiveTab("home")}>← Back to Home</button>
               {dailyContent && (
-                <button onClick={toggleSave} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 28, padding: "0 4px", lineHeight: 1, color: isSaved ? "#E53935" : BROWN }} aria-label={isSaved ? "Remove from library" : "Save to library"}>
+                <div style={{ display: "flex", gap: 8, alignItems: "center" }}><button onClick={() => shareVerse(dailyContent)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 24, padding: "0 4px", lineHeight: 1, color: BROWN }} aria-label="Share verse">📤</button><button onClick={toggleSave} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 28, padding: "0 4px", lineHeight: 1, color: isSaved ? "#E53935" : BROWN }} aria-label={isSaved ? "Remove from library" : "Save to library"}>
                   {isSaved ? "❤️" : "♡"}
-                </button>
+                </button></div>
               )}
             </div>
 
@@ -2436,7 +2436,7 @@ const startQuiz = (level) => {
                     setSavedToast("Removed from library");
                     setTimeout(() => setSavedToast(""), 2000);
                   } catch (err) { console.error(err); }
-                }}>❤️ Remove from Library</button>
+                }}>❤️ Remove from Library</button><button style={{ ...s.btnOutline, marginTop: 8 }} onClick={() => shareVerse(viewingSavedVerse)}>📤 Share Verse</button>
               </div>
             ) : (
               <div>
