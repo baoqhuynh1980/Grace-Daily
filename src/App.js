@@ -1709,11 +1709,12 @@ export default function App() {
       setDailyContentLoading(false);
     };
     loadDailyContent();
+}, []);
 
-    // Check if today's verse is already saved by the user
+  // Check if today's verse is already saved by the user
   useEffect(() => {
     const checkIfSaved = async () => {
-      if (!user) {
+      if (!user || !user.uid) {
         setIsSaved(false);
         return;
       }
@@ -1727,8 +1728,34 @@ export default function App() {
       }
     };
     checkIfSaved();
-  }, [user, dailyContent]);
-  }, []);
+  }, [user]);
+
+  const toggleSave = async () => {
+    if (!user || !user.uid) {
+      setSavedToast("Sign in to save verses 🙏");
+      setTimeout(() => setSavedToast(""), 2000);
+      return;
+    }
+    if (!dailyContent) return;
+    try {
+      const today = getTodayString();
+      const ref = doc(db, "users", user.uid, "savedVerses", today);
+      if (isSaved) {
+        await deleteDoc(ref);
+        setIsSaved(false);
+        setSavedToast("Removed from library");
+      } else {
+        await setDoc(ref, { ...dailyContent, date: today, savedAt: new Date() });
+        setIsSaved(true);
+        setSavedToast("Saved to your library ✓");
+      }
+      setTimeout(() => setSavedToast(""), 2000);
+    } catch (err) {
+      console.error("Failed to toggle save:", err);
+      setSavedToast("Something went wrong");
+      setTimeout(() => setSavedToast(""), 2000);
+    }
+  };
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => { setUser(firebaseUser); });
@@ -2199,6 +2226,11 @@ const startQuiz = (level) => {
     </div>
   </div>
 )}
+{savedToast && (
+        <div style={{ position: "fixed", bottom: 100, left: "50%", transform: "translateX(-50%)", background: BROWN_DARK, color: WHITE, padding: "12px 24px", borderRadius: 24, fontSize: 14, fontFamily: "sans-serif", fontWeight: "bold", zIndex: 2000, boxShadow: "0 4px 16px rgba(0,0,0,0.3)", border: `1.5px solid ${GOLD}`, whiteSpace: "nowrap" }}>
+          {savedToast}
+        </div>
+      )}
         <div style={s.header}>
         <div style={s.headerTop}>
           <div style={{ width: 60 }} />
@@ -2290,7 +2322,14 @@ const startQuiz = (level) => {
 
   {activeTab === "today" && (
           <div>
-            <button style={s.backBtn} onClick={() => setActiveTab("home")}>← Back to Home</button>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+              <button style={{ ...s.backBtn, marginBottom: 0 }} onClick={() => setActiveTab("home")}>← Back to Home</button>
+              {dailyContent && (
+                <button onClick={toggleSave} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 28, padding: "0 4px", lineHeight: 1, color: isSaved ? "#E53935" : BROWN }} aria-label={isSaved ? "Remove from library" : "Save to library"}>
+                  {isSaved ? "❤️" : "♡"}
+                </button>
+              )}
+            </div>
 
             {dailyContentLoading && (
               <div style={{ ...s.card, textAlign: "center", padding: 32 }}>
