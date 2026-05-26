@@ -2257,7 +2257,66 @@ const startQuiz = (level) => {
           </div>
         )}
 
-        {activeTab === "bible" && (
+  {activeTab === "today" && (
+          <div>
+            <button style={s.backBtn} onClick={() => setActiveTab("home")}>← Back to Home</button>
+
+            {dailyContentLoading && (
+              <div style={{ ...s.card, textAlign: "center", padding: 32 }}>
+                <div style={{ fontSize: 28, marginBottom: 8 }}>🙏</div>
+                <p style={{ color: BROWN, fontStyle: "italic" }}>Loading today's verse...</p>
+              </div>
+            )}
+
+            {!dailyContentLoading && !dailyContent && (
+              <div style={{ ...s.card, textAlign: "center", padding: 32 }}>
+                <div style={{ fontSize: 36, marginBottom: 12 }}>🌅</div>
+                <p style={{ color: BROWN_DARK, fontSize: 15, fontWeight: "bold", margin: "0 0 8px" }}>Today's Verse Coming Soon</p>
+                <p style={{ color: BROWN, fontSize: 13, lineHeight: 1.6, margin: 0 }}>Your fresh devotional is prepared each morning at 5:30 AM Central. Check back shortly! 🙏</p>
+              </div>
+            )}
+
+            {!dailyContentLoading && dailyContent && (
+              <div>
+                <div style={{ textAlign: "center", padding: "8px 0 4px" }}>
+                  <p style={{ color: BROWN_DARK, fontSize: 18, fontWeight: "bold", margin: "0 0 4px", fontFamily: "Georgia, serif" }}>Good morning, beloved 🙏</p>
+                  <p style={{ color: BROWN, fontSize: 12, margin: 0, fontFamily: "sans-serif", letterSpacing: 1 }}>{new Date().toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}</p>
+                </div>
+
+                <div style={{ textAlign: "center", margin: "18px 0", color: GOLD, fontSize: 16, letterSpacing: 4 }}>─── ✦ ───</div>
+
+                <div style={{ textAlign: "center", padding: "0 8px" }}>
+                  <p style={{ color: GOLD, fontSize: 12, fontWeight: "bold", margin: "0 0 14px", letterSpacing: 2, textTransform: "uppercase", fontFamily: "sans-serif" }}>{dailyContent.verseReference}</p>
+                  <p style={{ color: BROWN_DARK, fontSize: 18, fontStyle: "italic", lineHeight: 1.8, margin: 0, fontFamily: "Georgia, serif" }}>"{dailyContent.verseText}"</p>
+                </div>
+
+                <div style={{ textAlign: "center", margin: "22px 0", color: GOLD, fontSize: 16, letterSpacing: 4 }}>─── ✦ ───</div>
+
+                <div style={{ padding: "0 4px" }}>
+                  <p style={{ color: GOLD, fontSize: 12, fontWeight: "bold", margin: "0 0 10px", letterSpacing: 2, textTransform: "uppercase", fontFamily: "sans-serif", textAlign: "center" }}>✦ Today's Takeaway</p>
+                  <p style={{ color: BROWN_DARK, fontSize: 14, lineHeight: 1.8, margin: 0 }}>{dailyContent.takeaway}</p>
+                </div>
+
+                <div style={{ textAlign: "center", margin: "22px 0", color: GOLD, fontSize: 16, letterSpacing: 4 }}>─── ✦ ───</div>
+
+                <div style={{ padding: "0 4px" }}>
+                  <p style={{ color: GOLD, fontSize: 12, fontWeight: "bold", margin: "0 0 10px", letterSpacing: 2, textTransform: "uppercase", fontFamily: "sans-serif", textAlign: "center" }}>✦ How to Apply This Today</p>
+                  <p style={{ color: BROWN_DARK, fontSize: 14, lineHeight: 1.8, margin: 0 }}>{dailyContent.application}</p>
+                </div>
+
+                <div style={{ textAlign: "center", margin: "22px 0", color: GOLD, fontSize: 16, letterSpacing: 4 }}>─── ✦ ───</div>
+
+                <div style={{ ...s.card, background: GOLD_LIGHT, marginTop: 4 }}>
+                  <p style={{ color: GOLD, fontSize: 12, fontWeight: "bold", margin: "0 0 10px", letterSpacing: 2, textTransform: "uppercase", fontFamily: "sans-serif", textAlign: "center" }}>✦ Today's Prayer</p>
+                  <p style={{ color: BROWN_DARK, fontSize: 14, lineHeight: 1.8, margin: 0, fontStyle: "italic" }}>{dailyContent.prayer}</p>
+                </div>
+
+                <p style={{ color: BROWN, fontSize: 11, textAlign: "center", margin: "20px 0 0", fontFamily: "sans-serif", opacity: 0.6 }}>To God be the glory ✝️</p>
+              </div>
+            )}
+          </div>
+        )}      
+{activeTab === "bible" && (
           <div>
             {selectedBook && selectedChapter && (<div><button style={s.backBtn} onClick={() => { setSelectedChapter(null); setChapterText(null); setHighlightVerse(null); }}>← Back to {selectedBook.name}</button><div style={s.cardGold}><div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}><div><p style={{ color: GOLD_LIGHT, fontSize: 11, fontFamily: "sans-serif", margin: "0 0 4px", letterSpacing: 1, textTransform: "uppercase" }}>{selectedBook.name}</p><h2 style={{ color: WHITE, fontSize: 20, margin: 0 }}>Chapter {selectedChapter}</h2></div><div style={{ display: "flex", gap: 6 }}>{bibleVersions.map(v => (<button key={v.id} onClick={() => { setBibleVersion(v.id); loadChapter(selectedBook, selectedChapter); }} style={{ background: bibleVersion === v.id ? GOLD : "rgba(255,255,255,0.2)", border: "none", borderRadius: 8, padding: "4px 10px", color: WHITE, fontSize: 11, cursor: "pointer", fontFamily: "sans-serif", fontWeight: bibleVersion === v.id ? "bold" : "normal" }}>{v.name}</button>))}</div></div></div>{bibleLoading && <div style={{ ...s.card, textAlign: "center", padding: 32 }}><div style={{ fontSize: 28, marginBottom: 8 }}>📖</div><p style={{ color: BROWN, fontStyle: "italic" }}>Loading chapter...</p></div>}{chapterText && chapterText.error && <div style={s.card}><p style={{ color: BROWN, textAlign: "center" }}>{chapterText.error}</p></div>}{chapterText && chapterText.verses && (<div><div style={s.card}>{highlightVerse && (<div style={{ background: GOLD_LIGHT, borderRadius: 10, padding: "8px 12px", marginBottom: 12, border: `2px solid ${GOLD}` }}><p style={{ color: BROWN, fontSize: 11, fontFamily: "sans-serif", margin: 0 }}>📌 Tapped from Sermon — verse {highlightVerse} highlighted below</p></div>)}{chapterText.verses.map((v, i) => { const isHighlighted = highlightVerse && v.verse === highlightVerse; return (<div key={i} id={`verse-${v.verse}`} style={{ display: "flex", gap: 10, marginBottom: 12, alignItems: "flex-start", background: isHighlighted ? GOLD_LIGHT : "transparent", borderRadius: isHighlighted ? 10 : 0, padding: isHighlighted ? "8px" : 0, border: isHighlighted ? `2px solid ${GOLD}` : "none" }}><span style={{ color: isHighlighted ? BROWN_DARK : GOLD, fontSize: 11, fontWeight: "bold", fontFamily: "sans-serif", minWidth: 20, marginTop: 2 }}>{v.verse}</span><p style={{ color: BROWN_DARK, fontSize: 15, lineHeight: 1.8, margin: 0, flex: 1, fontWeight: isHighlighted ? "bold" : "normal" }}>{v.text}</p></div>); })}</div>{isChapterRead(selectedBook, selectedChapter) ? (<div style={{ ...s.card, background: GOLD_LIGHT, textAlign: "center" }}><p style={{ color: GOLD, fontSize: 15, fontWeight: "bold", margin: "0 0 4px", fontFamily: "sans-serif" }}>✅ Chapter Completed!</p><p style={{ color: BROWN, fontSize: 13, margin: 0 }}>This chapter is marked as read. Keep going! 🔥</p></div>) : (<button style={s.btn} onClick={markChapterRead}>{user ? "✅ Mark as Read" : "Sign in to Track Progress"}</button>)}<div style={{ display: "flex", gap: 8, marginTop: 8 }}>{selectedChapter > 1 && <button style={{ ...s.btnOutline, flex: 1 }} onClick={() => { setHighlightVerse(null); loadChapter(selectedBook, selectedChapter - 1); }}>← Previous</button>}{selectedChapter < selectedBook.chapters && <button style={{ ...s.btn, flex: 1, marginTop: 0 }} onClick={() => { setHighlightVerse(null); loadChapter(selectedBook, selectedChapter + 1); }}>Next Chapter →</button>}</div></div>)}</div>)}
             {selectedBook && !selectedChapter && (<div><button style={s.backBtn} onClick={() => setSelectedBook(null)}>← Back to Books</button><div style={s.cardGold}><p style={{ color: GOLD_LIGHT, fontSize: 11, fontFamily: "sans-serif", margin: "0 0 4px", letterSpacing: 1, textTransform: "uppercase" }}>{selectedBook.testament === "OT" ? "Old Testament" : "New Testament"}</p><h2 style={{ color: WHITE, fontSize: 20, margin: "0 0 6px" }}>{selectedBook.name}</h2><p style={{ color: GOLD_LIGHT, fontSize: 13, margin: 0 }}>{getBookProgress(selectedBook)} of {selectedBook.chapters} chapters read</p></div><div style={s.card}><p style={{ color: BROWN, fontSize: 13, marginBottom: 12, fontFamily: "sans-serif", fontWeight: "bold" }}>Select a Chapter:</p><div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 8 }}>{Array.from({ length: selectedBook.chapters }, (_, i) => i + 1).map(ch => { const read = isChapterRead(selectedBook, ch); return (<button key={ch} onClick={() => loadChapter(selectedBook, ch)} style={{ background: read ? GOLD : CREAM_DARK, border: read ? `2px solid ${GOLD}` : `1px solid ${GOLD_LIGHT}`, borderRadius: 10, padding: "10px 4px", cursor: "pointer", textAlign: "center", color: read ? WHITE : BROWN_DARK, fontSize: 13, fontWeight: "bold", fontFamily: "sans-serif" }}>{read ? "✓" : ch}</button>); })}</div></div></div>)}
