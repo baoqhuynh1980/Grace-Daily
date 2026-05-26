@@ -1687,6 +1687,27 @@ export default function App() {
   const [quizProgress, setQuizProgress] = useState(null);
   const [quizView, setQuizView] = useState("play");
   const [quizBadgeCelebration, setQuizBadgeCelebration] = useState(null);
+  const [dailyContent, setDailyContent] = useState(null);
+  const [dailyContentLoading, setDailyContentLoading] = useState(true);
+
+  useEffect(() => {
+    const loadDailyContent = async () => {
+      try {
+        const today = getTodayString();
+        const snap = await getDoc(doc(db, "dailyContent", today));
+        if (snap.exists()) {
+          setDailyContent(snap.data());
+        } else {
+          setDailyContent(null);
+        }
+      } catch (err) {
+        console.error("Failed to load daily content:", err);
+        setDailyContent(null);
+      }
+      setDailyContentLoading(false);
+    };
+    loadDailyContent();
+  }, []);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => { setUser(firebaseUser); });
