@@ -2309,7 +2309,7 @@ const startQuiz = (level) => {
     <div style={{ ...s.cardGold, cursor: "pointer" }} onClick={() => setActiveTab("today")}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <div style={{ flex: 1 }}>
-                  <p style={{ color: GOLD_LIGHT, fontSize: 11, fontFamily: "sans-serif", margin: "0 0 6px", letterSpacing: 1, textTransform: "uppercase" }}>✦ Today's Verse</p>
+                  <p style={{ color: GOLD_LIGHT, fontSize: 11, fontFamily: "sans-serif", margin: "0 0 6px", letterSpacing: 1, textTransform: "uppercase" }}>✦ Today's Devotional</p>
                   <p style={{ color: WHITE, fontSize: 16, fontWeight: "bold", margin: "0 0 4px", fontFamily: "Georgia, serif" }}>{dailyContent ? dailyContent.verseReference : "Fresh devotional inside →"}</p>
                   <p style={{ color: GOLD_MID, fontSize: 12, margin: 0, fontFamily: "sans-serif" }}>Tap to read today's full devotional 🙏</p>
                 </div>
