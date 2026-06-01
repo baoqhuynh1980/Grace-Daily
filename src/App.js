@@ -1946,7 +1946,7 @@ useEffect(() => {
     });
     return () => unsubscribe();
   }, [user]);
-  const todayVerse = dailyVerses[new Date().getDay() % dailyVerses.length];
+
   const bibleProgress = Math.min(100, Math.round((totalRead / TOTAL_CHAPTERS) * 100));
 
   const navigateToVerse = (scriptureString) => {
@@ -2264,12 +2264,8 @@ const startQuiz = (level) => {
 
         {activeTab === "home" && (
           <div>
-            <div style={s.cardGold}>
-              <p style={{ color: GOLD_LIGHT, fontSize: 11, fontFamily: "sans-serif", margin: "0 0 8px", letterSpacing: 1, textTransform: "uppercase" }}>Today's Verse</p>
-              <p style={{ color: WHITE, fontSize: 15, fontStyle: "italic", lineHeight: 1.7, margin: "0 0 10px" }}>"{todayVerse.text}"</p>
-              <p style={{ color: GOLD_MID, fontSize: 13, fontFamily: "sans-serif", margin: 0, fontWeight: "bold" }}>— {todayVerse.ref}</p>
-            </div>
-            <div style={s.streakBox}>
+            
+           <div style={s.streakBox}>
               <div style={{ textAlign: "center" }}>
                 <div style={{ fontSize: 36, fontWeight: "bold", color: WHITE }}>{streakLoading ? "..." : streak}</div>
                 <div style={{ color: GOLD_LIGHT, fontSize: 11, fontFamily: "sans-serif" }}>day streak 🔥</div>
