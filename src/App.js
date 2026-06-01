@@ -2309,7 +2309,12 @@ const startQuiz = (level) => {
                   <p style={{ color: WHITE, fontSize: 16, fontWeight: "bold", margin: "0 0 4px", fontFamily: "Georgia, serif" }}>{dailyContent ? dailyContent.verseReference : "Fresh devotional inside →"}</p>
                   <p style={{ color: GOLD_MID, fontSize: 12, margin: 0, fontFamily: "sans-serif" }}>Tap to read today's full devotional 🙏</p>
                 </div>
-                <div style={{ fontSize: 28, marginLeft: 12 }}>→</div>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginLeft: 12 }}>
+                    {dailyContent && dailyContent.audioUrl && (
+                      <button onClick={(e) => { e.stopPropagation(); const a = window.__graceAudio; if (a && !a.paused) { a.pause(); window.__graceAudio = null; } else { const audio = new Audio(dailyContent.audioUrl); window.__graceAudio = audio; audio.play(); } }} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 24, padding: 0, lineHeight: 1, color: WHITE }} aria-label="Listen to devotional">🔊</button>
+                    )}
+                    <div style={{ fontSize: 28 }}>→</div>
+                  </div>
               </div>
             </div>        
               <div style={s.card}>
