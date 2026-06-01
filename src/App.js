@@ -1612,6 +1612,8 @@ export default function App() {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedTopic, setSelectedTopic] = useState(null);
   const [topicContent, setTopicContent] = useState(null);
+  const [sermonAudioState, setSermonAudioState] = useState("idle"); // idle | loading | playing
+    const [sermonAudioError, setSermonAudioError] = useState("");
   const [sermonSearch, setSermonSearch] = useState("");
   const [prayerTab, setPrayerTab] = useState("how");
   const [journalTitle, setJournalTitle] = useState("");
@@ -2612,6 +2614,76 @@ const startQuiz = (level) => {
                 <div style={s.cardGold}>
                   <p style={{ color: GOLD_LIGHT, fontSize: 11, fontFamily: "sans-serif", margin: "0 0 6px", letterSpacing: 1, textTransform: "uppercase" }}>Sermon Companion</p>
                   <h2 style={{ color: WHITE, fontSize: 20, margin: 0 }}>{selectedTopic}</h2>
+                  <button
+                onClick={async () => {
+                  // If audio is currently playing, stop it
+                  if (sermonAudioState === "playing") {
+                    const a = window.__graceSermonAudio;
+                    if (a) { a.pause(); window.__graceSermonAudio = null; }
+                    setSermonAudioState("idle");
+                    return;
+                  }
+                  if (sermonAudioState === "loading") return;
+                  setSermonAudioError("");
+                  setSermonAudioState("loading");
+                  try {
+                    // Build the text to read: main message + takeaways + scriptures + prayer
+                    const parts = [];
+                    parts.push(topicContent.mainMessage);
+                    parts.push("Key takeaways.");
+                    topicContent.keyTakeaways.forEach((t) => parts.push(t));
+                    parts.push("Scriptures.");
+                    topicContent.scriptures.forEach((s) => parts.push(s));
+                    parts.push("Let us pray.");
+                    parts.push(topicContent.prayer);
+                    const text = parts.join("\n\n");
+
+                    const resp = await fetch(
+                      "https://us-central1-grace-daily-6f520.cloudfunctions.net/generateSermonAudio",
+                      {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ topic: selectedTopic, text }),
+                      }
+                    );
+                    const data = await resp.json();
+                    if (!resp.ok || !data.audioUrl) {
+                      throw new Error(data.error || "Could not load audio");
+                    }
+                    const audio = new Audio(data.audioUrl);
+                    window.__graceSermonAudio = audio;
+                    audio.onended = () => setSermonAudioState("idle");
+                    audio.play();
+                    setSermonAudioState("playing");
+                  } catch (err) {
+                    setSermonAudioError("Audio unavailable right now. Please try again.");
+                    setSermonAudioState("idle");
+                  }
+                }}
+                style={{
+                  marginTop: 12,
+                  background: WHITE,
+                  color: BROWN,
+                  border: "none",
+                  borderRadius: 8,
+                  padding: "8px 16px",
+                  fontSize: 14,
+                  fontWeight: "bold",
+                  fontFamily: "sans-serif",
+                  cursor: "pointer",
+                }}
+              >
+                {sermonAudioState === "loading"
+                  ? "⏳ Preparing audio..."
+                  : sermonAudioState === "playing"
+                  ? "⏸ Stop"
+                  : "🔊 Listen to this sermon"}
+              </button>
+              {sermonAudioError && (
+                <p style={{ color: "#B00020", fontSize: 12, marginTop: 6, fontFamily: "sans-serif" }}>
+                  {sermonAudioError}
+                </p>
+              )}
                 </div>
                 <div style={s.card}>
                   <p style={{ color: GOLD, fontSize: 13, fontWeight: "bold", marginBottom: 8, fontFamily: "sans-serif" }}>📝 Main Message</p>
