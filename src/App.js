@@ -2337,7 +2337,25 @@ const startQuiz = (level) => {
               {dailyContent && (
                 <div style={{ display: "flex", gap: 8, alignItems: "center" }}><button onClick={() => shareVerse(dailyContent)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 24, padding: "0 4px", lineHeight: 1, color: BROWN }} aria-label="Share verse">📤</button><button onClick={toggleSave} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 28, padding: "0 4px", lineHeight: 1, color: isSaved ? "#E53935" : BROWN }} aria-label={isSaved ? "Remove from library" : "Save to library"}>
                   {isSaved ? "❤️" : "♡"}
-                </button></div>
+</button>
+              {dailyContent.audioUrl && (
+                <button
+                  onClick={() => {
+                    const a = window.__graceAudio;
+                    if (a && !a.paused) {
+                      a.pause();
+                      window.__graceAudio = null;
+                    } else {
+                      const audio = new Audio(dailyContent.audioUrl);
+                      window.__graceAudio = audio;
+                      audio.play();
+                    }
+                  }}
+                  style={{ background: "none", border: "none", cursor: "pointer", fontSize: 26, padding: "0 4px", lineHeight: 1, color: BROWN }}
+                  aria-label="Listen to devotional"
+                >🔊</button>
+              )}
+                </div>
               )}
             </div>
 
