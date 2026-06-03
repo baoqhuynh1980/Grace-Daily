@@ -2024,7 +2024,7 @@ useEffect(() => {
     setSelectedChapter(chapter); setBibleLoading(true); setChapterText(null);
     if (verseToHighlight) setHighlightVerse(verseToHighlight);
     try {
-      const ref = `${book.abbrev}+${chapter}`;
+      const ref = book.chapters === 1 ? book.name : `${book.abbrev}+${chapter}`;
       const response = await fetch(`https://bible-api.com/${encodeURIComponent(ref)}?translation=${bibleVersion}`);
       const data = await response.json();
       if (data.verses) setChapterText({ verses: data.verses, reference: data.reference });
