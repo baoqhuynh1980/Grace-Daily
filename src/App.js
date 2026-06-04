@@ -1753,7 +1753,7 @@ function WordSearchGame() {
           <button key={d} onClick={() => setDifficulty(d)} style={{ flex: 1, border: "none", cursor: "pointer", borderRadius: 10, padding: "9px 4px", fontSize: 12, fontWeight: "bold", fontFamily: "sans-serif", background: d === difficulty ? `linear-gradient(135deg, ${GOLD}, ${BROWN})` : WHITE, color: d === difficulty ? WHITE : BROWN, boxShadow: d === difficulty ? "none" : `inset 0 0 0 1px ${GOLD_LIGHT}` }}>{d}</button>
         ))}
       </div>
-      <div ref={gridRef} onPointerDown={onDown} onPointerMove={onMove} onPointerUp={finish} onPointerCancel={finish} style={{ display: "grid", gridTemplateColumns: `repeat(${cfg.grid}, 1fr)`, gap: 3, padding: 10, background: WHITE, borderRadius: 16, border: `1px solid ${GOLD_LIGHT}`, touchAction: "none", userSelect: "none", WebkitUserSelect: "none", outline: flash === "bad" ? "2px solid #d9534f" : "none" }}>
+      <div ref={gridRef} onPointerDown={onDown} onPointerMove={onMove} onPointerUp={finish} onPointerCancel={finish} style={{ display: "grid", gridTemplateColumns: `repeat(${cfg.grid}, minmax(0, 1fr))`, gap: 3, padding: 10, width: "100%", maxWidth: 460, margin: "0 auto", boxSizing: "border-box", background: WHITE, borderRadius: 16, border: `1px solid ${GOLD_LIGHT}`, touchAction: "none", userSelect: "none", WebkitUserSelect: "none", outline: flash === "bad" ? "2px solid #d9534f" : "none" }}>
         {grid.map((row, r) => row.map((ch, c) => {
           const key = r + "-" + c;
           const isFound = foundCellSet.has(key);
