@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { auth, db, messaging, requestNotificationPermission, onMessage } from "./firebase";
 import {
   createUserWithEmailAndPassword,
@@ -1492,7 +1492,7 @@ const tabs = [
   { id: "prayer", label: "Prayer", icon: "🙏" },
   { id: "vision", label: "Vision", icon: "📋" },
   { id: "sermon", label: "Sermon", icon: "🎙️" },
-  { id: "quiz", label: "Quiz", icon: "📝" },
+  { id: "quiz", label: "Play", icon: "🎮" },
   { id: "about", label: "About", icon: "💛" },
 ];
 
@@ -1597,7 +1597,192 @@ function AuthScreen({ onAuthSuccess }) {
     </div>
   );
 }
-export default function App() {
+/* ===== Scripture Word Search (Play tab) ===== */
+const WS_BOARDS = [
+  { title: "Fruit of the Spirit", verse: "Galatians 5:22", words: ["LOVE","JOY","PEACE","FAITH","GRACE","MERCY","SPIRIT","GENTLE","CONTROL","KINDNESS","GOODNESS","PATIENCE"] },
+  { title: "Names of Jesus", verse: "He shall be called Wonderful", words: ["LORD","KING","LAMB","LIGHT","RABBI","MASTER","SAVIOR","MESSIAH","TEACHER","EMMANUEL","REDEEMER","SHEPHERD"] },
+  { title: "Old Testament Books", verse: "Thy word is truth", words: ["RUTH","EZRA","JONAH","PSALMS","ISAIAH","ESTHER","DANIEL","JUDGES","EXODUS","JOSHUA","GENESIS","PROVERBS"] },
+  { title: "New Testament Books", verse: "All Scripture is God-breathed", words: ["MARK","LUKE","JOHN","ACTS","JUDE","JAMES","TITUS","ROMANS","MATTHEW","HEBREWS","PHILEMON","GALATIANS"] },
+  { title: "Heroes of Faith", verse: "Hebrews 11", words: ["NOAH","ENOCH","RAHAB","MOSES","DAVID","JOSEPH","DANIEL","SAMSON","GIDEON","ELIJAH","JOSHUA","ABRAHAM"] },
+  { title: "The Twelve Disciples", verse: "Follow Me", words: ["PETER","JOHN","JAMES","SIMON","JUDAS","PHILIP","THOMAS","ANDREW","MATTHEW","MATTHIAS","THADDEUS","NATHANAEL"] },
+  { title: "Armor of God", verse: "Ephesians 6:11", words: ["BELT","SWORD","TRUTH","FAITH","PEACE","SHIELD","HELMET","SPIRIT","GOSPEL","SALVATION","RIGHTEOUS","BREASTPLATE"] },
+  { title: "The Beatitudes", verse: "Blessed are the meek", words: ["POOR","MEEK","PURE","PEACE","MOURN","HUMBLE","HUNGER","KINGDOM","BLESSED","COMFORT","MERCIFUL","RIGHTEOUS"] },
+  { title: "Miracles of Jesus", verse: "Nothing is impossible", words: ["WINE","LAME","LEPER","BLIND","WATER","STORM","FISHES","LOAVES","DEMONS","LAZARUS","HEALING","WALKING"] },
+  { title: "Parables of Jesus", verse: "He taught in parables", words: ["SEED","LAMP","PEARL","WEEDS","SOWER","FIGTREE","MUSTARD","TALENTS","PRODIGAL","VINEYARD","TREASURE","SAMARITAN"] },
+  { title: "Days of Creation", verse: "In the beginning God created", words: ["SKY","SEAS","MOON","LAND","FISH","STARS","BIRDS","LIGHT","WATERS","BEASTS","SABBATH","MANKIND"] },
+  { title: "The Nativity", verse: "Unto us a child is born", words: ["STAR","MARY","GIFTS","ANGELS","STABLE","MANGER","JOSEPH","WISEMEN","SWADDLING","BETHLEHEM","SHEPHERDS","NEWBORN"] },
+  { title: "The Resurrection", verse: "He is risen!", words: ["TOMB","CROSS","RISEN","STONE","ALIVE","EMPTY","ANGEL","GLORY","GARDEN","SAVIOR","VICTORY","MORNING"] },
+  { title: "Psalms of Praise", verse: "Bless the Lord, O my soul", words: ["ROCK","GLORY","MERCY","PRAISE","REFUGE","SHIELD","COMFORT","DELIVER","REJOICE","BLESSED","STRENGTH","SHEPHERD"] },
+  { title: "Attributes of God", verse: "Holy, holy, holy", words: ["HOLY","JUST","LOVING","MIGHTY","ETERNAL","PATIENT","FAITHFUL","GRACIOUS","GLORIOUS","RIGHTEOUS","SOVEREIGN","MERCIFUL"] },
+  { title: "Heaven and Angels", verse: "Worthy is the Lamb", words: ["GOLD","GATES","CROWN","GLORY","THRONE","ANGELS","HEAVEN","PRAISE","WORSHIP","MANSION","ETERNAL","CHERUBIM"] },
+  { title: "Women of the Bible", verse: "She is clothed with strength", words: ["EVE","RUTH","MARY","SARAH","NAOMI","LYDIA","RAHAB","MARTHA","HANNAH","ESTHER","DEBORAH","REBEKAH"] },
+  { title: "The Prophets", verse: "Thus says the Lord", words: ["JOEL","AMOS","JONAH","MICAH","HOSEA","ISAIAH","DANIEL","ELIJAH","ELISHA","EZEKIEL","MALACHI","JEREMIAH"] },
+  { title: "Kings of Israel", verse: "The Lord raised up kings", words: ["ASA","SAUL","AHAB","OMRI","JOASH","DAVID","JOSIAH","UZZIAH","SOLOMON","JEROBOAM","REHOBOAM","HEZEKIAH"] },
+  { title: "The Exodus", verse: "Let my people go", words: ["MANNA","QUAIL","SINAI","AARON","MOSES","DESERT","PILLAR","FREEDOM","PLAGUES","PHARAOH","COVENANT","DELIVERED"] },
+  { title: "Noahs Ark", verse: "Genesis 7", words: ["ARK","RAIN","DOVE","NOAH","OLIVE","FLOOD","RAVEN","PROMISE","RAINBOW","ANIMALS","MOUNTAIN","COVENANT"] },
+  { title: "The I AM Statements", verse: "Before Abraham was, I AM", words: ["WAY","VINE","GATE","DOOR","LIFE","BREAD","TRUTH","LIGHT","ALPHA","OMEGA","LIVING","SHEPHERD"] },
+  { title: "The Lords Prayer", verse: "Our Father in heaven", words: ["WILL","DEBTS","DAILY","BREAD","GLORY","FATHER","HEAVEN","KINGDOM","FORGIVE","DELIVER","HALLOWED","TEMPTATION"] },
+  { title: "Worship Words", verse: "Make a joyful noise", words: ["SING","HOLY","BLESS","EXALT","ADORE","HONOR","GLORY","THANKS","PRAISE","REJOICE","WORSHIP","MAGNIFY"] },
+  { title: "Gifts of the Spirit", verse: "1 Corinthians 12", words: ["FAITH","MERCY","GIVING","WISDOM","HEALING","SERVING","TONGUES","TEACHING","MIRACLES","PROPHECY","KNOWLEDGE","DISCERNMENT"] },
+  { title: "The Garden of Eden", verse: "Genesis 2", words: ["EVE","ADAM","TREE","EDEN","GOOD","EVIL","FRUIT","NAKED","RIVERS","GARDEN","SERPENT","KNOWLEDGE"] },
+  { title: "The Last Supper", verse: "Do this in remembrance", words: ["CUP","BODY","WINE","BLOOD","TABLE","BREAD","JUDAS","PETER","PASSOVER","BETRAYAL","COVENANT","UPPERROOM"] },
+  { title: "Pentecost", verse: "Acts 2", words: ["FIRE","WIND","POWER","PETER","PREACH","SPIRIT","CHURCH","GOSPEL","TONGUES","BAPTISM","BELIEVE","APOSTLES"] },
+  { title: "Names of God", verse: "I AM that I AM", words: ["SHALOM","ADONAI","YAHWEH","ELOHIM","FATHER","HEALER","CREATOR","JEHOVAH","MOSTHIGH","PROVIDER","ALMIGHTY","SHEPHERD"] },
+  { title: "Animals of the Bible", verse: "The earth is the Lords", words: ["LAMB","LION","DOVE","GOAT","SHEEP","CAMEL","EAGLE","WHALE","RAVEN","DONKEY","LOCUST","SERPENT"] },
+  { title: "Holy Land Places", verse: "Pray for Jerusalem", words: ["ZION","EDEN","EGYPT","SINAI","JORDAN","CALVARY","JERICHO","GALILEE","BABYLON","NAZARETH","BETHLEHEM","JERUSALEM"] },
+  { title: "Faith and Salvation", verse: "By grace through faith", words: ["HOPE","LOVE","GRACE","FAITH","CROSS","MERCY","REPENT","REBORN","ETERNAL","BELIEVE","FORGIVEN","SALVATION"] },
+  { title: "Books of Wisdom", verse: "The fear of the Lord is wisdom", words: ["JOB","WISDOM","FOLLY","PROVERB","RICHES","HONOR","TONGUE","HUMBLE","DILIGENT","INSTRUCT","UNDERSTAND","DISCIPLINE"] },
+];
+const WS_DIFF = {
+  Easy:   { grid: 10, count: 8,  dirs: [[0,1],[1,0]] },
+  Medium: { grid: 12, count: 10, dirs: [[0,1],[1,0],[1,1],[1,-1]] },
+  Hard:   { grid: 13, count: 12, dirs: [[0,1],[0,-1],[1,0],[-1,0],[1,1],[1,-1],[-1,1],[-1,-1]] },
+};
+const WS_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+const WS_CARD = { background: `linear-gradient(135deg, ${BROWN_DARK}, ${BROWN})`, borderRadius: 16, padding: "18px", marginBottom: 14 };
+function wsBuild(rawWords, gridSize, dirs) {
+  const grid = Array.from({ length: gridSize }, () => Array(gridSize).fill(""));
+  const placements = {};
+  const ordered = [...rawWords].sort((a, b) => b.length - a.length);
+  for (const word of ordered) {
+    let placed = false;
+    for (let attempt = 0; attempt < 600 && !placed; attempt++) {
+      const [dr, dc] = dirs[Math.floor(Math.random() * dirs.length)];
+      const r0 = Math.floor(Math.random() * gridSize);
+      const c0 = Math.floor(Math.random() * gridSize);
+      const rEnd = r0 + dr * (word.length - 1);
+      const cEnd = c0 + dc * (word.length - 1);
+      if (rEnd < 0 || rEnd >= gridSize || cEnd < 0 || cEnd >= gridSize) continue;
+      let ok = true;
+      for (let i = 0; i < word.length; i++) {
+        const ch = grid[r0 + dr * i][c0 + dc * i];
+        if (ch !== "" && ch !== word[i]) { ok = false; break; }
+      }
+      if (!ok) continue;
+      const cells = [];
+      for (let i = 0; i < word.length; i++) {
+        const r = r0 + dr * i, c = c0 + dc * i;
+        grid[r][c] = word[i];
+        cells.push(r + "-" + c);
+      }
+      placements[word] = cells;
+      placed = true;
+    }
+  }
+  for (let r = 0; r < gridSize; r++)
+    for (let c = 0; c < gridSize; c++)
+      if (grid[r][c] === "") grid[r][c] = WS_ALPHABET[Math.floor(Math.random() * 26)];
+  return { grid, placements };
+}
+function wsLine(a, b) {
+  if (!a || !b) return [];
+  const dr = b.r - a.r, dc = b.c - a.c;
+  if (dr === 0 && dc === 0) return [a.r + "-" + a.c];
+  const aligned = dr === 0 || dc === 0 || Math.abs(dr) === Math.abs(dc);
+  if (!aligned) return [a.r + "-" + a.c];
+  const steps = Math.max(Math.abs(dr), Math.abs(dc));
+  const sr = Math.sign(dr), sc = Math.sign(dc);
+  const out = [];
+  for (let i = 0; i <= steps; i++) out.push((a.r + sr * i) + "-" + (a.c + sc * i));
+  return out;
+}
+function WordSearchGame() {
+  const [boardIndex, setBoardIndex] = useState(0);
+  const [difficulty, setDifficulty] = useState("Medium");
+  const [seed, setSeed] = useState(0);
+  const board = WS_BOARDS[boardIndex];
+  const cfg = WS_DIFF[difficulty];
+  const activeWords = useMemo(() => [...board.words].sort((a, b) => a.length - b.length).slice(0, cfg.count), [board, cfg.count]);
+  const built = useMemo(() => wsBuild(activeWords, cfg.grid, cfg.dirs), [boardIndex, difficulty, seed]); // eslint-disable-line react-hooks/exhaustive-deps
+  const grid = built.grid, placements = built.placements;
+  const displayWords = useMemo(() => activeWords.filter((w) => placements[w]), [activeWords, placements]);
+  const [found, setFound] = useState({});
+  const [startCell, setStartCell] = useState(null);
+  const [curCell, setCurCell] = useState(null);
+  const [selecting, setSelecting] = useState(false);
+  const [flash, setFlash] = useState(null);
+  const gridRef = useRef(null);
+  useEffect(() => { setFound({}); setStartCell(null); setCurCell(null); setSelecting(false); }, [boardIndex, difficulty, seed]);
+  const foundCellSet = useMemo(() => { const s = new Set(); Object.values(found).forEach((cells) => cells.forEach((k) => s.add(k))); return s; }, [found]);
+  const selPath = useMemo(() => new Set(wsLine(startCell, curCell)), [startCell, curCell]);
+  const cellFromPoint = (x, y) => {
+    const el = document.elementFromPoint(x, y);
+    if (!el) return null;
+    const cell = el.closest("[data-wscell]");
+    if (!cell) return null;
+    const parts = cell.getAttribute("data-wscell").split("-");
+    return { r: Number(parts[0]), c: Number(parts[1]) };
+  };
+  const finish = useCallback(() => {
+    const path = wsLine(startCell, curCell);
+    if (path.length > 1) {
+      const letters = path.map((k) => { const p = k.split("-"); return grid[Number(p[0])][Number(p[1])]; }).join("");
+      const rev = letters.split("").reverse().join("");
+      const hit = displayWords.find((w) => !found[w] && (w === letters || w === rev));
+      if (hit) { setFound((f) => ({ ...f, [hit]: path })); setFlash("good"); setTimeout(() => setFlash(null), 500); }
+      else { setFlash("bad"); setTimeout(() => setFlash(null), 350); }
+    }
+    setStartCell(null); setCurCell(null); setSelecting(false);
+  }, [startCell, curCell, grid, displayWords, found]);
+  const onDown = (e) => {
+    const pt = cellFromPoint(e.clientX, e.clientY);
+    if (!pt) return;
+    e.preventDefault();
+    try { gridRef.current.setPointerCapture(e.pointerId); } catch (err) {}
+    setStartCell(pt); setCurCell(pt); setSelecting(true);
+  };
+  const onMove = (e) => { if (selecting) { const pt = cellFromPoint(e.clientX, e.clientY); if (pt) setCurCell(pt); } };
+  const shuffleBoard = () => { let next = boardIndex; while (next === boardIndex && WS_BOARDS.length > 1) next = Math.floor(Math.random() * WS_BOARDS.length); setBoardIndex(next); setSeed((s) => s + 1); };
+  const allFound = displayWords.length > 0 && Object.keys(found).length === displayWords.length;
+  return (
+    <div style={{ color: BROWN_DARK }}>
+      <style>{"@keyframes wspop{0%{transform:scale(.6);opacity:0}60%{transform:scale(1.12)}100%{transform:scale(1);opacity:1}}@keyframes wsrise{from{transform:translateY(10px);opacity:0}to{transform:translateY(0);opacity:1}}.wsword-done{text-decoration:line-through;opacity:.55}"}</style>
+      <div style={WS_CARD}>
+        <p style={{ color: GOLD_LIGHT, fontSize: 11, fontFamily: "sans-serif", margin: "0 0 4px", letterSpacing: 1, textTransform: "uppercase" }}>Scripture Word Search</p>
+        <h2 style={{ color: WHITE, fontSize: 20, margin: "0 0 4px" }}>{board.title}</h2>
+        <p style={{ color: GOLD_LIGHT, fontSize: 13, margin: 0, fontStyle: "italic" }}>{board.verse}</p>
+      </div>
+      <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 10, flexWrap: "wrap" }}>
+        <select value={boardIndex} onChange={(e) => { setBoardIndex(Number(e.target.value)); setSeed((sv) => sv + 1); }} style={{ flex: 1, minWidth: 150, border: "1px solid " + GOLD_LIGHT, background: WHITE, color: BROWN_DARK, borderRadius: 10, padding: "10px 12px", fontSize: 13, fontWeight: "bold", fontFamily: "sans-serif" }}>
+          {WS_BOARDS.map((b, i) => (<option key={b.title} value={i}>{b.title}</option>))}
+        </select>
+        <button onClick={shuffleBoard} style={{ border: "none", cursor: "pointer", borderRadius: 10, padding: "11px 14px", fontSize: 13, fontWeight: "bold", background: GOLD, color: WHITE, fontFamily: "sans-serif" }}>🎲 Shuffle</button>
+      </div>
+      <div style={{ display: "flex", gap: 6, marginBottom: 14 }}>
+        {Object.keys(WS_DIFF).map((d) => (
+          <button key={d} onClick={() => setDifficulty(d)} style={{ flex: 1, border: "none", cursor: "pointer", borderRadius: 10, padding: "9px 4px", fontSize: 12, fontWeight: "bold", fontFamily: "sans-serif", background: d === difficulty ? `linear-gradient(135deg, ${GOLD}, ${BROWN})` : WHITE, color: d === difficulty ? WHITE : BROWN, boxShadow: d === difficulty ? "none" : `inset 0 0 0 1px ${GOLD_LIGHT}` }}>{d}</button>
+        ))}
+      </div>
+      <div ref={gridRef} onPointerDown={onDown} onPointerMove={onMove} onPointerUp={finish} onPointerCancel={finish} style={{ display: "grid", gridTemplateColumns: `repeat(${cfg.grid}, 1fr)`, gap: 3, padding: 10, background: WHITE, borderRadius: 16, border: `1px solid ${GOLD_LIGHT}`, touchAction: "none", userSelect: "none", WebkitUserSelect: "none", outline: flash === "bad" ? "2px solid #d9534f" : "none" }}>
+        {grid.map((row, r) => row.map((ch, c) => {
+          const key = r + "-" + c;
+          const isFound = foundCellSet.has(key);
+          const isSel = selPath.has(key);
+          return (
+            <div key={key} data-wscell={key} style={{ aspectRatio: "1 / 1", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 5, fontSize: "clamp(11px, 3.2vw, 16px)", fontWeight: "bold", fontFamily: "sans-serif", cursor: "pointer", color: isSel ? WHITE : isFound ? BROWN_DARK : BROWN, background: isSel ? GOLD : isFound ? GOLD_LIGHT : CREAM, boxShadow: isFound && !isSel ? `inset 0 0 0 1px ${GOLD_MID}` : "none" }}>{ch}</div>
+          );
+        }))}
+      </div>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", margin: "14px 0 8px" }}>
+        <span style={{ color: BROWN, fontSize: 13, fontWeight: "bold", fontFamily: "sans-serif" }}>{Object.keys(found).length} / {displayWords.length} found</span>
+        <button onClick={() => setSeed((sv) => sv + 1)} style={{ border: "none", cursor: "pointer", borderRadius: 8, padding: "7px 14px", fontSize: 12, fontWeight: "bold", background: WHITE, color: BROWN, boxShadow: `inset 0 0 0 1px ${GOLD_LIGHT}`, fontFamily: "sans-serif" }}>↻ Reshuffle</button>
+      </div>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+        {displayWords.map((w) => (
+          <span key={w} className={found[w] ? "wsword-done" : ""} style={{ background: found[w] ? "transparent" : WHITE, border: `1px solid ${found[w] ? "transparent" : GOLD_LIGHT}`, color: found[w] ? GOLD : BROWN_DARK, borderRadius: 8, padding: "5px 10px", fontSize: 13, fontWeight: "bold", letterSpacing: 0.5, fontFamily: "sans-serif" }}>{w}</span>
+        ))}
+      </div>
+      {allFound && (
+        <div style={{ ...WS_CARD, textAlign: "center", marginTop: 16, animation: "wsrise .35s ease" }}>
+          <div style={{ fontSize: 34, animation: "wspop .4s ease" }}>🎉</div>
+          <p style={{ color: GOLD_MID, fontWeight: "bold", fontSize: 18, margin: "4px 0 2px" }}>Well done!</p>
+          <p style={{ color: GOLD_LIGHT, fontSize: 13, margin: "0 0 12px" }}>You found every word on {board.title}. 🔥</p>
+          <button onClick={shuffleBoard} style={{ border: "none", cursor: "pointer", borderRadius: 10, padding: "10px 18px", fontSize: 14, fontWeight: "bold", background: GOLD, color: WHITE, fontFamily: "sans-serif" }}>🎲 Next Board →</button>
+        </div>
+      )}
+    </div>
+  );
+}export default function App() {
   const [user, setUser] = useState(undefined);
   const [showAuth, setShowAuth] = useState(false);
   const [activeTab, setActiveTab] = useState("home");
@@ -2779,15 +2964,15 @@ const startQuiz = (level) => {
 
 {activeTab === "quiz" && (
   <div>
-    <p style={s.sectionTitle}>🎯 Bible Quiz</p>
+    <p style={s.sectionTitle}>🎮 Play</p>
     {!isPremium && <PremiumGate onUpgrade={() => window.open(STRIPE_LINK, "_blank")} />}
 {isPremium && (<>
     <div style={{ display: "flex", background: WHITE, borderRadius: 12, padding: 4, marginBottom: 14, border: `1px solid ${GOLD_LIGHT}` }}>
-      {[["play","🎮 Play"],["progress","📊 Progress"]].map(([id, label]) => (
+      {[["play","📖 Quiz"],["wordsearch","🧩 Word Search"],["progress","📊 Progress"]].map(([id, label]) => (
         <button key={id} onClick={() => { setQuizView(id); resetQuiz(); }} style={{ flex: 1, padding: "10px 4px", border: "none", borderRadius: 10, background: quizView === id ? `linear-gradient(135deg, ${GOLD}, ${BROWN})` : "none", color: quizView === id ? WHITE : BROWN, fontSize: 13, fontFamily: "sans-serif", fontWeight: quizView === id ? "bold" : "normal", cursor: "pointer" }}>{label}</button>
       ))}
     </div>
-    {quizView === "play" && !quizLevel && (
+    {quizView === "wordsearch" && <WordSearchGame />}{quizView === "play" && !quizLevel && (
       <div>
         <div style={s.cardGold}>
           <p style={{ color: GOLD_LIGHT, fontSize: 11, fontFamily: "sans-serif", margin: "0 0 6px", letterSpacing: 1, textTransform: "uppercase" }}>Test Your Knowledge</p>
