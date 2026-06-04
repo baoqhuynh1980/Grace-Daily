@@ -1693,7 +1693,7 @@ function WordSearchGame() {
   const board = WS_BOARDS[boardIndex];
   const cfg = WS_DIFF[difficulty];
   const activeWords = useMemo(() => [...board.words].sort((a, b) => a.length - b.length).slice(0, cfg.count), [board, cfg.count]);
-  const built = useMemo(() => wsBuild(activeWords, cfg.grid, cfg.dirs), [boardIndex, difficulty, seed]); // eslint-disable-line react-hooks/exhaustive-deps
+  const built = useMemo(() => wsBuild(activeWords, cfg.grid, cfg.dirs), [boardIndex, difficulty, seed]);
   const grid = built.grid, placements = built.placements;
   const displayWords = useMemo(() => activeWords.filter((w) => placements[w]), [activeWords, placements]);
   const [found, setFound] = useState({});
