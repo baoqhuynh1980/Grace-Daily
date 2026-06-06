@@ -19,7 +19,7 @@ import {
   deleteDoc,
   getDoc,
   getDocs
-} from "firebase/firestore";
+, where } from "firebase/firestore";
 
 const GOLD = "#C9972A";
 const GOLD_LIGHT = "#F5E6C0";
@@ -2063,8 +2063,8 @@ function WordSearchGame() {
   };
 
   useEffect(() => {
-    const q = query(collection(db, "prayerWall"), orderBy("createdAt", "desc"));
-    const unsubscribe = onSnapshot(q, (snapshot) => { setPrayerList(snapshot.docs.map(d => ({ id: d.id, ...d.data() }))); setPrayerLoading(false); });
+    const q = query(collection(db, "prayerWall"), where("approved", "==", true));
+    const unsubscribe = onSnapshot(q, (snapshot) => { setPrayerList(snapshot.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0))); setPrayerLoading(false); });
     return () => unsubscribe();
   }, []);
 
