@@ -36,7 +36,7 @@ export default async function handler(req, res) {
   } catch (err) {
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
-  if (event.type === 'customer.subscription.created' || event.type === 'customer.subscription.updated') {
+  if (event.type === 'checkout.session.completed') { const session = event.data.object; const uid = session.client_reference_id; const customerId = session.customer; if (uid) { try { await db.collection('users').doc(uid).set({ isPremium: true, stripeCustomerId: customerId }, { merge: true }); } catch (err) { console.error(err); return res.status(500).end(); } } } if (event.type === 'customer.subscription.created' || event.type === 'customer.subscription.updated') {
     const subscription = event.data.object;
     const customerId = subscription.customer;
     const isActive = subscription.status === 'active' || subscription.status === 'trialing';
