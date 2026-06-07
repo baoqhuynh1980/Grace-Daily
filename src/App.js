@@ -1820,7 +1820,7 @@ function WordSearchGame() {
   const [streakCelebration, setStreakCelebration] = useState(false);
   const [notifEnabled, setNotifEnabled] = useState(false);
   const [showNotifBanner, setShowNotifBanner] = useState(typeof Notification !== 'undefined' ? Notification.permission !== 'granted' : true);
-  const [isPremium, setIsPremium] = useState(false); const openUpgrade = () => { if (!user) { setShowAuth(true); return; } const params = new URLSearchParams(); params.set("client_reference_id", user.uid); if (user.email) params.set("prefilled_email", user.email); window.open(STRIPE_LINK + "?" + params.toString(), "_blank"); };
+  const [isPremium, setIsPremium] = useState(false); const [portalLoading, setPortalLoading] = useState(false); const openUpgrade = () => { if (!user) { setShowAuth(true); return; } const params = new URLSearchParams(); params.set("client_reference_id", user.uid); if (user.email) params.set("prefilled_email", user.email); window.open(STRIPE_LINK + "?" + params.toString(), "_blank"); };
 
   const [fastingTab, setFastingTab] = useState("foundation");
   const [fastingLog, setFastingLog] = useState([]);
@@ -3125,7 +3125,7 @@ const startQuiz = (level) => {
                 </div>
               ))}
             </div>
-            <div style={{ ...s.card, background: BROWN_DARK, textAlign: "center", marginBottom: 20 }}>
+            {user && isPremium && (<div style={s.card}><p style={{ color: GOLD, fontSize: 14, fontWeight: "bold", margin: "0 0 10px", fontFamily: "sans-serif" }}>💳 Your Subscription</p><p style={{ color: BROWN_DARK, fontSize: 14, lineHeight: 1.8, margin: "0 0 12px" }}>You are a Grace Daily Premium member — thank you for supporting this ministry. 🙏 You can update your payment method, view past invoices, or cancel anytime.</p><button style={s.btn} disabled={portalLoading} onClick={async () => { setPortalLoading(true); try { const resp = await fetch("https://us-central1-grace-daily-6f520.cloudfunctions.net/createPortalSession", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ uid: user.uid }) }); const data = await resp.json(); if (!resp.ok || !data.url) { throw new Error(data.error || "Could not open"); } window.open(data.url, "_blank"); } catch (err) { alert("Could not open subscription management right now. Please try again."); } setPortalLoading(false); }}>{portalLoading ? "⏳ Opening..." : "💳 Manage Subscription"}</button></div>)}<div style={{ ...s.card, background: BROWN_DARK, textAlign: "center", marginBottom: 20 }}>
               <div style={{ fontSize: 32, marginBottom: 8 }}>✝️</div>
               <p style={{ color: GOLD_MID, fontSize: 15, fontWeight: "bold", margin: "0 0 4px", fontFamily: "sans-serif" }}>Grace Daily</p>
               <p style={{ color: GOLD_LIGHT, fontSize: 12, margin: "0 0 6px", fontFamily: "sans-serif" }}>His Grace is Sufficient — 2 Corinthians 12:9</p>
