@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo, useRef, useCallback } from "react"
 import { auth, db, messaging, requestNotificationPermission, onMessage } from "./firebase";
 import {
   createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
+  signInWithEmailAndPassword, sendPasswordResetEmail,
   signOut,
   onAuthStateChanged
 } from "firebase/auth";
@@ -1585,7 +1585,7 @@ function AuthScreen({ onAuthSuccess }) {
         <input style={s.input} type="email" placeholder="your@email.com" value={email} onChange={e => setEmail(e.target.value)} />
         <label style={s.label}>PASSWORD</label>
         <input style={s.input} type="password" placeholder={mode === "signup" ? "At least 6 characters" : "Your password"} value={password} onChange={e => setPassword(e.target.value)} onKeyDown={e => e.key === "Enter" && handleSubmit()} />
-        <button style={s.btn} onClick={handleSubmit} disabled={loading}>{loading ? "Please wait..." : mode === "login" ? "Sign In →" : "Create Account →"}</button>
+        <button style={s.btn} onClick={handleSubmit} disabled={loading}>{loading ? "Please wait..." : mode === "login" ? "Sign In →" : "Create Account →"}</button>{mode === "login" && (<button onClick={async () => { if (!email.trim()) { setError("Please enter your email above first, then tap Forgot Password."); return; } setError(""); try { await sendPasswordResetEmail(auth, email.trim()); alert("Password reset email sent! 🙏 Check your inbox (and your spam folder) for a link to set a new password."); } catch (err) { const m = { "auth/invalid-email": "Please enter a valid email address.", "auth/user-not-found": "No account found with this email.", "auth/too-many-requests": "Too many attempts. Please wait a moment.", "auth/network-request-failed": "Network error. Please check your connection." }; setError(m[err.code] || "Could not send reset email. Please try again."); } }} style={{ background: "none", border: "none", color: BROWN, fontSize: 13, fontFamily: "sans-serif", cursor: "pointer", textDecoration: "underline", display: "block", margin: "12px auto 0", padding: 0 }}>Forgot password?</button>)}
         <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "16px 0" }}>
           <div style={s.dividerLine} /><span style={{ color: BROWN + "88", fontSize: 12, fontFamily: "sans-serif" }}>or</span><div style={s.dividerLine} />
         </div>
