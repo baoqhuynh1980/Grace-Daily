@@ -1488,7 +1488,7 @@ const tabs = [
   { id: "home", label: "Home", icon: "🏠" },
   { id: "bible", label: "Bible", icon: "📖" },
   { id: "memory", label: "Memory", icon: "✍️" },
-  { id: "study", label: "Study", icon: "📖" },
+  { id: "study", label: "Study", icon: "📜" },
   { id: "prayer", label: "Prayer", icon: "🙏" },
   { id: "vision", label: "Vision", icon: "📋" },
   { id: "sermon", label: "Sermon", icon: "🎙️" },
