@@ -2935,7 +2935,7 @@ const startQuiz = (level) => {
 
 {activeTab === "quiz" && (
   <div>
-    <p style={s.sectionTitle}>🎮 Play</p>
+    <p style={s.sectionTitle}>🎮 Play</p><div style={{ borderRadius: 16, overflow: "hidden", marginBottom: 14, position: "relative", boxShadow: "0 12px 30px -14px rgba(74,53,16,0.45)" }}><div style={{ position: "relative", minHeight: 132, padding: "18px 16px", display: "flex", flexDirection: "column", justifyContent: "flex-end", backgroundImage: `linear-gradient(180deg, rgba(34,46,16,0.05) 0%, rgba(34,46,16,0.7) 100%), url(${process.env.PUBLIC_URL}/play-meadow.jpg)`, backgroundSize: "cover", backgroundPosition: "center" }}><p style={{ color: WHITE, fontSize: 10, fontWeight: "bold", letterSpacing: 1.5, textTransform: "uppercase", margin: "0 0 3px", fontFamily: "sans-serif", textShadow: "0 1px 6px rgba(0,0,0,0.55)" }}>Play</p><p style={{ color: WHITE, fontSize: 23, fontWeight: "bold", margin: 0, fontFamily: "Georgia, serif", lineHeight: 1.1, textShadow: "0 2px 12px rgba(0,0,0,0.55)" }}>Faith, the Fun Way</p></div></div>
     {!isPremium && <PremiumGate onUpgrade={() => openUpgrade()} />}
 {isPremium && (<>
     <div style={{ display: "flex", background: WHITE, borderRadius: 12, padding: 4, marginBottom: 14, border: `1px solid ${GOLD_LIGHT}` }}>
