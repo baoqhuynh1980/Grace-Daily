@@ -2914,7 +2914,7 @@ const startQuiz = (level) => {
               </div>
             ) : (
               <div>
-                <p style={s.sectionTitle}>🎙️ Sermon Companion</p>
+                <p style={s.sectionTitle}>🎙️ Sermon Companion</p><div style={{ borderRadius: 16, overflow: "hidden", marginBottom: 14, position: "relative", boxShadow: "0 12px 30px -14px rgba(74,53,16,0.5)" }}><div style={{ position: "relative", minHeight: 132, padding: "18px 16px", display: "flex", flexDirection: "column", justifyContent: "flex-end", backgroundImage: `linear-gradient(180deg, rgba(36,26,12,0.15) 0%, rgba(36,26,12,0.8) 100%), url(${process.env.PUBLIC_URL}/sermon-chapel.jpg)`, backgroundSize: "cover", backgroundPosition: "center" }}><p style={{ color: GOLD_LIGHT, fontSize: 10, fontWeight: "bold", letterSpacing: 1.5, textTransform: "uppercase", margin: "0 0 3px", fontFamily: "sans-serif", textShadow: "0 1px 6px rgba(0,0,0,0.6)" }}>Sermon Companion</p><p style={{ color: WHITE, fontSize: 23, fontWeight: "bold", margin: 0, fontFamily: "Georgia, serif", lineHeight: 1.1, textShadow: "0 2px 12px rgba(0,0,0,0.6)" }}>A Word for Today</p></div></div>
                 <div style={s.card}><p style={{ color: BROWN, fontSize: 13, marginBottom: 10, lineHeight: 1.5 }}>Search any topic or browse by category.</p><input style={s.input} placeholder="Search topics — Faith, Fear, Marriage..." value={sermonSearch} onChange={e => setSermonSearch(e.target.value)} /></div>
                 {filteredCategories.map(cat => (
                   <div key={cat.id} style={s.card}>
