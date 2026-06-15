@@ -2435,8 +2435,8 @@ const startQuiz = (level) => {
             </div>
     <div style={{ ...s.cardGold, cursor: "pointer", padding: 0, overflow: "hidden" }} onClick={() => setActiveTab("today")}>
               <div style={{ height: 150, backgroundImage: `url(${process.env.PUBLIC_URL}/devotional-path.jpg)`, backgroundSize: "cover", backgroundPosition: "center", position: "relative" }}>
-                <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: 72, background: "linear-gradient(180deg, rgba(58,46,22,0) 0%, rgba(58,46,22,0.55) 100%)" }} />
-                <span style={{ position: "absolute", top: 12, left: 14, fontSize: 10, fontWeight: "bold", letterSpacing: 1.5, textTransform: "uppercase", color: WHITE, background: "rgba(20,35,63,0.45)", padding: "5px 10px", borderRadius: 20, fontFamily: "sans-serif" }}>✦ Today's Devotional</span>
+                <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: 96, background: "linear-gradient(180deg, rgba(58,46,22,0) 0%, rgba(58,46,22,0.72) 100%)" }} />
+                <span style={{ position: "absolute", top: 12, left: 14, fontSize: 10, fontWeight: "bold", letterSpacing: 1.5, textTransform: "uppercase", color: WHITE, background: "rgba(20,35,63,0.45)", padding: "5px 10px", borderRadius: 20, fontFamily: "sans-serif" }}>✦ Today's Devotional</span><p style={{ position: "absolute", left: 14, bottom: 12, margin: 0, color: WHITE, fontSize: 22, fontWeight: "bold", fontFamily: "Georgia, serif", lineHeight: 1.1, textShadow: "0 2px 10px rgba(0,0,0,0.6)" }}>Walk With Him Today</p>
               </div>
               <div style={{ padding: 18, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <div style={{ flex: 1 }}>
