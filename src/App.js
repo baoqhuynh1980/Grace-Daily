@@ -2433,11 +2433,14 @@ const startQuiz = (level) => {
                 <button style={{ ...s.btnOutline, color: streakLogged ? GOLD_LIGHT : WHITE, borderColor: streakLogged ? GOLD_LIGHT : WHITE, fontSize: 12, padding: "6px 14px", opacity: streakLogged ? 0.7 : 1 }} onClick={logPrayer} disabled={streakLogged}>{streakLogged ? "✓ Prayed Today" : "🔥 Log Today's Prayer"}</button>
               </div>
             </div>
-    <div style={{ ...s.cardGold, cursor: "pointer" }} onClick={() => setActiveTab("today")}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+    <div style={{ ...s.cardGold, cursor: "pointer", padding: 0, overflow: "hidden" }} onClick={() => setActiveTab("today")}>
+              <div style={{ height: 150, backgroundImage: `url(${process.env.PUBLIC_URL}/devotional-path.jpg)`, backgroundSize: "cover", backgroundPosition: "center", position: "relative" }}>
+                <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: 72, background: "linear-gradient(180deg, rgba(58,46,22,0) 0%, rgba(58,46,22,0.55) 100%)" }} />
+                <span style={{ position: "absolute", top: 12, left: 14, fontSize: 10, fontWeight: "bold", letterSpacing: 1.5, textTransform: "uppercase", color: WHITE, background: "rgba(20,35,63,0.45)", padding: "5px 10px", borderRadius: 20, fontFamily: "sans-serif" }}>✦ Today's Devotional</span>
+              </div>
+              <div style={{ padding: 18, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <div style={{ flex: 1 }}>
-                  <p style={{ color: GOLD_LIGHT, fontSize: 11, fontFamily: "sans-serif", margin: "0 0 6px", letterSpacing: 1, textTransform: "uppercase" }}>✦ Today's Devotional</p>
-                  <p style={{ color: WHITE, fontSize: 16, fontWeight: "bold", margin: "0 0 4px", fontFamily: "Georgia, serif" }}>{dailyContent ? dailyContent.verseReference : "Fresh devotional inside →"}</p>
+                  <p style={{ color: WHITE, fontSize: 18, fontWeight: "bold", margin: "0 0 4px", fontFamily: "Georgia, serif" }}>{dailyContent ? dailyContent.verseReference : "Fresh devotional inside →"}</p>
                   <p style={{ color: GOLD_MID, fontSize: 12, margin: 0, fontFamily: "sans-serif" }}>Tap to read today's full devotional 🙏</p>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginLeft: 12 }}>
@@ -2447,7 +2450,7 @@ const startQuiz = (level) => {
                     <div style={{ fontSize: 28 }}>→</div>
                   </div>
               </div>
-            </div>        
+            </div>
             {!isPremium && (
               <div style={{ background: `linear-gradient(135deg, ${BROWN_DARK}, ${BROWN})`, borderRadius: 16, padding: 18, marginBottom: 14, border: `2px solid ${GOLD}` }}>
                 <p style={{ color: GOLD_MID, fontSize: 11, fontFamily: "sans-serif", margin: "0 0 4px", letterSpacing: 1, textTransform: "uppercase" }}>Unlock Everything 👑</p>
