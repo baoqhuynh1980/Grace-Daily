@@ -1798,7 +1798,7 @@ function WordSearchGame() {
   const [streakCelebration, setStreakCelebration] = useState(false);
   const [notifEnabled, setNotifEnabled] = useState(false);
   const [showNotifBanner, setShowNotifBanner] = useState(typeof Notification !== 'undefined' ? Notification.permission !== 'granted' : true);
-  const [isPremium, setIsPremium] = useState(false); const [portalLoading, setPortalLoading] = useState(false); const openUpgrade = () => { if (!user) { setShowAuth(true); return; } const params = new URLSearchParams(); params.set("client_reference_id", user.uid); if (user.email) params.set("prefilled_email", user.email); window.location.href = STRIPE_LINK + "?" + params.toString(); };
+  const [isPremium, setIsPremium] = useState(false); const [userName, setUserName] = useState(""); const [portalLoading, setPortalLoading] = useState(false); const openUpgrade = () => { if (!user) { setShowAuth(true); return; } const params = new URLSearchParams(); params.set("client_reference_id", user.uid); if (user.email) params.set("prefilled_email", user.email); window.location.href = STRIPE_LINK + "?" + params.toString(); };
 
   const [fastingTab, setFastingTab] = useState("foundation");
   const [fastingLog, setFastingLog] = useState([]);
@@ -1946,8 +1946,8 @@ function WordSearchGame() {
   useEffect(() => {
     if (!user) { setIsPremium(false); return; }
     const unsubscribe = onSnapshot(doc(db, "users", user.uid), (snap) => {
-      if (snap.exists()) { setIsPremium(snap.data().isPremium === true); }
-      else { setIsPremium(false); }
+      if (snap.exists()) { setIsPremium(snap.data().isPremium === true); setUserName((snap.data().name || "").trim().split(" ")[0]); }
+      else { setIsPremium(false); setUserName(""); }
     });
     return () => unsubscribe();
   }, [user]);
@@ -2414,7 +2414,7 @@ const startQuiz = (level) => {
             {user ? <button style={s.signOutBtn} onClick={handleSignOut}>Sign Out</button> : <button style={s.signInBtn} onClick={() => setShowAuth(true)}>Sign In</button>}
           </div>
         </div>
-        {user && <p style={{ color: GOLD_LIGHT, fontSize: 12, textAlign: "center", margin: "12px 0 0", fontFamily: "sans-serif", opacity: 0.85, position: "relative", zIndex: 2 }}>{(new Date().getHours() < 12 ? "Good morning" : new Date().getHours() < 17 ? "Good afternoon" : "Good evening")} 🙏</p>}
+        {user && <p style={{ color: GOLD_LIGHT, fontSize: 12, textAlign: "center", margin: "12px 0 0", fontFamily: "sans-serif", opacity: 0.85, position: "relative", zIndex: 2 }}>{(new Date().getHours() < 12 ? "Good morning" : new Date().getHours() < 17 ? "Good afternoon" : "Good evening")}{userName ? ", " + userName : ""} 🙏</p>}
       </div>
 
       <div style={s.content}>
@@ -2433,6 +2433,21 @@ const startQuiz = (level) => {
                 <button style={{ ...s.btnOutline, color: streakLogged ? GOLD_LIGHT : WHITE, borderColor: streakLogged ? GOLD_LIGHT : WHITE, fontSize: 12, padding: "6px 14px", opacity: streakLogged ? 0.7 : 1 }} onClick={logPrayer} disabled={streakLogged}>{streakLogged ? "✓ Prayed Today" : "🔥 Log Today's Prayer"}</button>
               </div>
             </div>
+    <div style={{ ...s.cardGold, cursor: "pointer" }} onClick={() => setActiveTab("today")}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <div style={{ flex: 1 }}>
+                  <p style={{ color: GOLD_LIGHT, fontSize: 11, fontFamily: "sans-serif", margin: "0 0 6px", letterSpacing: 1, textTransform: "uppercase" }}>✦ Today's Devotional</p>
+                  <p style={{ color: WHITE, fontSize: 16, fontWeight: "bold", margin: "0 0 4px", fontFamily: "Georgia, serif" }}>{dailyContent ? dailyContent.verseReference : "Fresh devotional inside →"}</p>
+                  <p style={{ color: GOLD_MID, fontSize: 12, margin: 0, fontFamily: "sans-serif" }}>Tap to read today's full devotional 🙏</p>
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginLeft: 12 }}>
+                    {dailyContent && dailyContent.audioUrl && (
+                      <button onClick={(e) => { e.stopPropagation(); const a = window.__graceAudio; if (a && !a.paused) { a.pause(); window.__graceAudio = null; } else { const audio = new Audio(dailyContent.audioUrl); window.__graceAudio = audio; audio.play(); } }} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 24, padding: 0, lineHeight: 1, color: WHITE }} aria-label="Listen to devotional">🔊</button>
+                    )}
+                    <div style={{ fontSize: 28 }}>→</div>
+                  </div>
+              </div>
+            </div>        
             {!isPremium && (
               <div style={{ background: `linear-gradient(135deg, ${BROWN_DARK}, ${BROWN})`, borderRadius: 16, padding: 18, marginBottom: 14, border: `2px solid ${GOLD}` }}>
                 <p style={{ color: GOLD_MID, fontSize: 11, fontFamily: "sans-serif", margin: "0 0 4px", letterSpacing: 1, textTransform: "uppercase" }}>Unlock Everything 👑</p>
@@ -2459,21 +2474,6 @@ const startQuiz = (level) => {
               </div>
             )}
             {user && isPremium && (<button style={{ ...s.btn, marginTop: 0, marginBottom: 14 }} disabled={portalLoading} onClick={async () => { setPortalLoading(true); try { const resp = await fetch("https://us-central1-grace-daily-6f520.cloudfunctions.net/createPortalSession", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ uid: user.uid }) }); const data = await resp.json(); if (!resp.ok || !data.url) { throw new Error(data.error || "Could not open"); } window.location.href = data.url; } catch (err) { alert("Could not open subscription management right now. Please try again."); setPortalLoading(false); } }}>{portalLoading ? "⏳ Opening..." : "💳 Manage Subscription"}</button>)}{!user && (<div style={{ ...s.card, border: `2px solid ${GOLD_MID}`, background: GOLD_LIGHT }}><p style={{ color: BROWN_DARK, fontSize: 14, fontWeight: "bold", margin: "0 0 6px" }}>✝️ Save Your Progress</p><p style={{ color: BROWN, fontSize: 13, margin: "0 0 10px", lineHeight: 1.5 }}>Create a free account to save your streak, Bible reading, memory verses, and more — forever!</p><button style={s.btn} onClick={() => setShowAuth(true)}>Create Free Account →</button></div>)}
-    <div style={{ ...s.cardGold, cursor: "pointer" }} onClick={() => setActiveTab("today")}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <div style={{ flex: 1 }}>
-                  <p style={{ color: GOLD_LIGHT, fontSize: 11, fontFamily: "sans-serif", margin: "0 0 6px", letterSpacing: 1, textTransform: "uppercase" }}>✦ Today's Devotional</p>
-                  <p style={{ color: WHITE, fontSize: 16, fontWeight: "bold", margin: "0 0 4px", fontFamily: "Georgia, serif" }}>{dailyContent ? dailyContent.verseReference : "Fresh devotional inside →"}</p>
-                  <p style={{ color: GOLD_MID, fontSize: 12, margin: 0, fontFamily: "sans-serif" }}>Tap to read today's full devotional 🙏</p>
-                </div>
-                <div style={{ display: "flex", alignItems: "center", gap: 8, marginLeft: 12 }}>
-                    {dailyContent && dailyContent.audioUrl && (
-                      <button onClick={(e) => { e.stopPropagation(); const a = window.__graceAudio; if (a && !a.paused) { a.pause(); window.__graceAudio = null; } else { const audio = new Audio(dailyContent.audioUrl); window.__graceAudio = audio; audio.play(); } }} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 24, padding: 0, lineHeight: 1, color: WHITE }} aria-label="Listen to devotional">🔊</button>
-                    )}
-                    <div style={{ fontSize: 28 }}>→</div>
-                  </div>
-              </div>
-            </div>        
               <div style={s.card}>
               <p style={{ ...s.sectionTitle, fontSize: 15, marginBottom: 8 }}>Quick Actions</p>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
