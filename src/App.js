@@ -2298,8 +2298,8 @@ const startQuiz = (level) => {
 
   const s = {
     app: { background: CREAM, minHeight: "100vh", fontFamily: "Georgia, serif", paddingBottom: 80 },
-    header: { background: `linear-gradient(135deg, ${BROWN_DARK} 0%, ${BROWN} 100%)`, padding: "20px 20px 16px" },
-    headerTop: { display: "flex", justifyContent: "space-between", alignItems: "flex-start" },
+    header: { background: `radial-gradient(420px 240px at 50% 6%, rgba(245,230,192,0.55) 0%, rgba(245,230,192,0) 62%), linear-gradient(168deg, #14233F 0%, #1F3252 28%, ${BROWN} 86%, ${GOLD} 116%)`, padding: "30px 20px 20px", position: "relative", overflow: "hidden" },
+    headerTop: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", position: "relative", zIndex: 2 },
     headerCenter: { textAlign: "center", flex: 1 },
     headerTitle: { color: GOLD_MID, fontSize: 26, fontWeight: "bold", margin: 0, letterSpacing: 1 },
     headerSub: { color: GOLD_LIGHT, fontSize: 13, margin: "4px 0 0", opacity: 0.9 },
@@ -2402,10 +2402,11 @@ const startQuiz = (level) => {
         </div>
       )}
         <div style={s.header}>
+        {["-16deg","-6deg","6deg","16deg"].map((r,i)=>(<div key={i} aria-hidden="true" style={{ position:"absolute", top:-40, left:"50%", width:2, height:230, transformOrigin:"top center", transform:`translateX(-50%) rotate(${r})`, background:"linear-gradient(to bottom, rgba(255,246,220,0.5), rgba(255,246,220,0))", opacity:0.5, pointerEvents:"none", zIndex:0 }} />))}
         <div style={s.headerTop}>
           <div style={{ width: 60 }} />
           <div style={s.headerCenter}>
-            <div style={{ fontSize: 22, marginBottom: 4 }}>✝️</div>
+            <div style={{ width: 46, height: 46, borderRadius: 14, margin: "0 auto 14px", background: `linear-gradient(150deg, ${GOLD_LIGHT}, ${GOLD})`, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 8px 22px rgba(201,151,42,0.45), inset 0 1px 2px rgba(255,255,255,0.6)", position: "relative", zIndex: 2 }}><span style={{ color: "#3A2E16", fontSize: 26, lineHeight: 1 }}>✝</span></div>
             <h1 style={s.headerTitle}>Grace Daily</h1>
             <p style={s.headerSub}>His Grace is Sufficient — 2 Corinthians 12:9</p>
           </div>
@@ -2413,7 +2414,7 @@ const startQuiz = (level) => {
             {user ? <button style={s.signOutBtn} onClick={handleSignOut}>Sign Out</button> : <button style={s.signInBtn} onClick={() => setShowAuth(true)}>Sign In</button>}
           </div>
         </div>
-        {user && <p style={{ color: GOLD_LIGHT, fontSize: 11, textAlign: "center", margin: "8px 0 0", fontFamily: "sans-serif", opacity: 0.8 }}>Welcome back, {user.email.split("@")[0]} 🙏</p>}
+        {user && <p style={{ color: GOLD_LIGHT, fontSize: 12, textAlign: "center", margin: "12px 0 0", fontFamily: "sans-serif", opacity: 0.85, position: "relative", zIndex: 2 }}>{(new Date().getHours() < 12 ? "Good morning" : new Date().getHours() < 17 ? "Good afternoon" : "Good evening")} 🙏</p>}
       </div>
 
       <div style={s.content}>
