@@ -1813,8 +1813,25 @@ function WordSearchGame() {
   const [stillSession, setStillSession] = useState(null);
   const [stillStep, setStillStep] = useState(0);
   const [stillPaused, setStillPaused] = useState(false);
+  const [stillAudioState, setStillAudioState] = useState("idle");
+  const [stillAudioUrl, setStillAudioUrl] = useState("");
+  const [stillAudioErr, setStillAudioErr] = useState("");
   const musicBeforeSession = useRef(false);
-  const closeStillSession = () => { setStillSession(null); if (!musicBeforeSession.current) setMusicOn(false); };
+  const closeStillSession = () => { setStillSession(null); if (!musicBeforeSession.current) setMusicOn(false); if (window.__graceStillAudio) { window.__graceStillAudio.pause(); window.__graceStillAudio = null; } setStillAudioState("idle"); };
+  const playStillAudio = async () => {
+    if (!stillSession) return;
+    if (stillAudioState === "playing") { const a = window.__graceStillAudio; if (a) { a.pause(); window.__graceStillAudio = null; } setStillAudioState("idle"); return; }
+    if (stillAudioState === "loading") return;
+    setStillAudioErr(""); setStillAudioState("loading");
+    try {
+      const text = stillSession.steps.map((st) => st.text).join("\n\n");
+      const resp = await fetch("https://us-central1-grace-daily-6f520.cloudfunctions.net/generateStillnessAudio", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: stillSession.key, text }) });
+      const data = await resp.json();
+      if (!resp.ok || !data.audioUrl) { throw new Error(data.error || "Could not load audio"); }
+      setStillAudioUrl(data.audioUrl);
+      const audio = new Audio(data.audioUrl); window.__graceStillAudio = audio; audio.onended = () => setStillAudioState("idle"); audio.play(); setStillAudioState("playing");
+    } catch (err) { setStillAudioErr("Voice unavailable right now. Please try again."); setStillAudioState("idle"); }
+  };
   const STILL_PACE = { Welcome: 40, Breathe: 50, "The Word": 45, Reflection: 70, "Guided Prayer": 90, Stillness: 75, Blessing: 40 };
   const STILL_SECTIONS = ["Hard Places", "Drawing Near", "Strength & Battle", "Rhythms of the Day", "Seasons"];
   useEffect(() => {
@@ -3393,7 +3410,7 @@ const startQuiz = (level) => {
             <div style={{ borderRadius: 16, overflow: "hidden", marginBottom: 14, position: "relative" }}><div style={{ position: "relative", minHeight: 152, padding: "18px 16px", display: "flex", flexDirection: "column", justifyContent: "flex-end", backgroundImage: `linear-gradient(180deg, rgba(16,29,51,0.18) 0%, rgba(16,29,51,0.78) 100%), url(${process.env.PUBLIC_URL}/stillness-dove.jpg)`, backgroundSize: "cover", backgroundPosition: "center" }}><p style={{ color: WHITE, fontSize: 27, fontWeight: "bold", margin: 0, fontFamily: "Georgia, serif", textShadow: "0 2px 12px rgba(0,0,0,0.7)" }}>Be Still</p><p style={{ color: GOLD_LIGHT, fontSize: 12.5, fontStyle: "italic", margin: "4px 0 0", textShadow: "0 1px 6px rgba(0,0,0,0.7)" }}>"Be still, and know that I am God." — Psalm 46:10</p></div></div>
             <p style={{ color: BROWN, fontSize: 13, lineHeight: 1.6, margin: "0 0 14px" }}>Quiet your heart and let His Word draw you near. Choose where you need Him today — each is a guided few minutes with worship underneath. 🕊️</p>
             {STILL_SECTIONS.map((sec) => { const items = STILL_SESSIONS.filter((x) => x.section === sec); if (!items.length) return null; return (<div key={sec}><p style={{ color: BROWN, fontSize: 11, fontWeight: "bold", letterSpacing: 1.5, textTransform: "uppercase", margin: "18px 0 8px", fontFamily: "sans-serif", opacity: 0.65 }}>{sec}</p>{items.map((se) => (
-              <div key={se.key} onClick={() => { musicBeforeSession.current = musicOn; setStillSession(se); setStillStep(0); setStillPaused(false); setMusicOn(true); }} style={{ display: "flex", alignItems: "center", gap: 13, background: WHITE, border: `1px solid ${GOLD_LIGHT}`, borderRadius: 16, padding: 11, marginBottom: 10, cursor: "pointer", boxShadow: "0 6px 16px -12px rgba(74,53,16,0.4)" }}>
+              <div key={se.key} onClick={() => { if (window.__graceStillAudio) { window.__graceStillAudio.pause(); window.__graceStillAudio = null; } setStillAudioState("idle"); setStillAudioUrl(""); setStillAudioErr(""); musicBeforeSession.current = musicOn; setStillSession(se); setStillStep(0); setStillPaused(false); setMusicOn(true); }} style={{ display: "flex", alignItems: "center", gap: 13, background: WHITE, border: `1px solid ${GOLD_LIGHT}`, borderRadius: 16, padding: 11, marginBottom: 10, cursor: "pointer", boxShadow: "0 6px 16px -12px rgba(74,53,16,0.4)" }}>
                 <div style={{ width: 52, height: 52, borderRadius: 13, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 23, background: se.grad }}>{se.icon}</div>
                 <div style={{ flex: 1, minWidth: 0 }}><p style={{ fontFamily: "Georgia, serif", fontSize: 15, color: BROWN_DARK, fontWeight: "bold", margin: 0 }}>{se.name}</p><p style={{ color: GOLD, fontSize: 11, fontStyle: "italic", margin: "1px 0 4px" }}>{se.ref}</p><div style={{ display: "flex", gap: 6 }}><span style={{ background: GOLD_LIGHT, color: BROWN_DARK, fontSize: 9.5, fontWeight: "bold", borderRadius: 20, padding: "2px 8px" }}>{se.theme}</span><span style={{ background: GOLD_LIGHT, color: BROWN_DARK, fontSize: 9.5, fontWeight: "bold", borderRadius: 20, padding: "2px 8px" }}>{se.min} min</span></div></div>
                 <div style={{ width: 33, height: 33, borderRadius: "50%", background: `linear-gradient(135deg, ${GOLD}, ${BROWN})`, color: WHITE, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, flexShrink: 0 }}>►</div>
@@ -3450,6 +3467,7 @@ const startQuiz = (level) => {
             <span style={{ color: GOLD_LIGHT, fontSize: 11, fontWeight: "bold", opacity: 0.85 }}>{musicOn ? "♪ Worship" : "♪ off"}</span>
           </div>
           <p style={{ color: GOLD_MID, fontSize: 11, fontWeight: "bold", letterSpacing: 2, textTransform: "uppercase", marginTop: 24 }}>{stillSession.name} · {stillSession.ref}</p>
+          <div style={{ display: "flex", gap: 10, justifyContent: "center", marginTop: 12, flexWrap: "wrap" }}><button onClick={playStillAudio} disabled={stillAudioState === "loading"} style={{ background: "rgba(245,230,192,0.14)", border: `1px solid ${GOLD_MID}`, color: GOLD_LIGHT, borderRadius: 30, padding: "7px 16px", fontSize: 12.5, fontWeight: "bold", fontFamily: "sans-serif", cursor: "pointer" }}>{stillAudioState === "loading" ? "⏳ Preparing voice…" : stillAudioState === "playing" ? "⏸ Stop voice" : "🔊 Listen in voice"}</button>{stillAudioUrl && (<a href={stillAudioUrl} download style={{ background: "rgba(245,230,192,0.14)", border: `1px solid ${GOLD_MID}`, color: GOLD_LIGHT, borderRadius: 30, padding: "7px 16px", fontSize: 12.5, fontWeight: "bold", fontFamily: "sans-serif", cursor: "pointer", textDecoration: "none" }}>⬇ Save</a>)}</div>{stillAudioErr && (<p style={{ color: "#FFD9D9", fontSize: 11, marginTop: 8 }}>{stillAudioErr}</p>)}
           <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
             {(stillSession.steps[stillStep].label === "Breathe" || stillSession.steps[stillStep].label === "Stillness") ? (
               <div style={{ width: 132, height: 132, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 18, background: "radial-gradient(circle, rgba(245,230,192,0.5) 0%, rgba(245,230,192,0.04) 70%)", animation: "gdBreath 8s ease-in-out infinite", animationPlayState: stillPaused ? "paused" : "running" }}><span style={{ fontSize: 40 }}>{stillSession.steps[stillStep].icon}</span></div>
@@ -3470,7 +3488,7 @@ const startQuiz = (level) => {
             ) : (
               <button onClick={closeStillSession} style={{ background: `linear-gradient(135deg, ${GOLD_LIGHT}, ${GOLD})`, color: "#3A2E16", border: "none", borderRadius: 30, padding: "13px 36px", fontSize: 15, fontWeight: "bold", fontFamily: "sans-serif", cursor: "pointer", boxShadow: "0 10px 26px rgba(201,151,42,0.4)" }}>Amen 🙏</button>
             )}
-            <button onClick={() => { const np = !stillPaused; setStillPaused(np); setMusicOn(!np); }} style={{ background: "none", border: "none", color: GOLD_LIGHT, fontSize: 12.5, cursor: "pointer", opacity: 0.75, width: 64, fontFamily: "sans-serif" }}>{stillPaused ? "▶ Resume" : "⏸ Pause"}</button>
+            <button onClick={() => { const np = !stillPaused; setStillPaused(np); setMusicOn(!np); const a = window.__graceStillAudio; if (a) { if (np) a.pause(); else a.play(); } }} style={{ background: "none", border: "none", color: GOLD_LIGHT, fontSize: 12.5, cursor: "pointer", opacity: 0.75, width: 64, fontFamily: "sans-serif" }}>{stillPaused ? "▶ Resume" : "⏸ Pause"}</button>
           </div>
         </div>
       )}
