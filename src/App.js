@@ -3470,7 +3470,7 @@ const startQuiz = (level) => {
             ) : (
               <button onClick={closeStillSession} style={{ background: `linear-gradient(135deg, ${GOLD_LIGHT}, ${GOLD})`, color: "#3A2E16", border: "none", borderRadius: 30, padding: "13px 36px", fontSize: 15, fontWeight: "bold", fontFamily: "sans-serif", cursor: "pointer", boxShadow: "0 10px 26px rgba(201,151,42,0.4)" }}>Amen 🙏</button>
             )}
-            <button onClick={() => setStillPaused((p) => !p)} style={{ background: "none", border: "none", color: GOLD_LIGHT, fontSize: 12.5, cursor: "pointer", opacity: 0.75, width: 64, fontFamily: "sans-serif" }}>{stillPaused ? "▶ Resume" : "⏸ Pause"}</button>
+            <button onClick={() => { const np = !stillPaused; setStillPaused(np); setMusicOn(!np); }} style={{ background: "none", border: "none", color: GOLD_LIGHT, fontSize: 12.5, cursor: "pointer", opacity: 0.75, width: 64, fontFamily: "sans-serif" }}>{stillPaused ? "▶ Resume" : "⏸ Pause"}</button>
           </div>
         </div>
       )}
