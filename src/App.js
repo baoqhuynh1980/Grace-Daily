@@ -1816,6 +1816,7 @@ function WordSearchGame() {
   const musicBeforeSession = useRef(false);
   const closeStillSession = () => { setStillSession(null); if (!musicBeforeSession.current) setMusicOn(false); };
   const STILL_PACE = { Welcome: 40, Breathe: 50, "The Word": 45, Reflection: 70, "Guided Prayer": 90, Stillness: 75, Blessing: 40 };
+  const STILL_SECTIONS = ["Hard Places", "Drawing Near", "Strength & Battle", "Rhythms of the Day", "Seasons"];
   useEffect(() => {
     if (!stillSession || stillPaused) return;
     if (stillStep >= stillSession.steps.length - 1) return;
@@ -1824,7 +1825,7 @@ function WordSearchGame() {
     return () => clearTimeout(t);
   }, [stillSession, stillStep, stillPaused]);
   const STILL_SESSIONS = [
-    { key: "bestill", name: "Be Still & Know", icon: "🕊️", ref: "Psalm 46:10", theme: "Peace", min: 7, grad: "linear-gradient(150deg, #2E5A6E, #1F3252)", steps: [
+    { key: "bestill", section: "Drawing Near", name: "Be Still & Know", icon: "🕊️", ref: "Psalm 46:10", theme: "Peace", min: 7, grad: "linear-gradient(150deg, #2E5A6E, #1F3252)", steps: [
       { label: "Welcome", icon: "🕊️", text: `Welcome. For these few minutes, there's nothing you need to do and nothing you need to fix. Find a comfortable place. Let your shoulders drop. You've come to be with your Father — and He is glad you came.` },
       { label: "Breathe", icon: "🌬️", text: `Let's breathe slow. Breathe in… and let it out. Again — breathe in His peace… breathe out all you've been carrying. One more, and let the noise of the day grow quiet.` },
       { label: "The Word", icon: "📖", text: `Hear the Word of God, from Psalm 46, verse 10: "Be still, and know that I am God." Let it settle over you. Be still… and know.` },
@@ -1833,7 +1834,7 @@ function WordSearchGame() {
       { label: "Stillness", icon: "✨", text: `Now simply be still before Him. No words needed. Let the worship hold you. Let Him love you.` },
       { label: "Blessing", icon: "✝️", text: `As you go, carry this: He is God, and He is with you. Go in His peace. Amen.` },
     ]},
-    { key: "anxiety", name: "Anxiety & Worry", icon: "😟", ref: "Philippians 4:6-7", theme: "Calm", min: 7, grad: "linear-gradient(150deg, #6E5A8E, #3a2e56)", steps: [
+    { key: "anxiety", section: "Hard Places", name: "Anxiety & Worry", icon: "😟", ref: "Philippians 4:6-7", theme: "Calm", min: 7, grad: "linear-gradient(150deg, #6E5A8E, #3a2e56)", steps: [
       { label: "Welcome", icon: "🕊️", text: `Welcome. Whatever you carried in here — the worries, the what-ifs, the racing thoughts — you can set them down for a few minutes. You're safe here, with your Father. He already knows, and He already cares.` },
       { label: "Breathe", icon: "🌬️", text: `Let's breathe slow. Breathe in… and out. Again — breathe in His peace… and breathe out the worry you've been holding. One more slow breath, and let your body begin to rest.` },
       { label: "The Word", icon: "📖", text: `Hear the Word of God, from Philippians 4: "Be careful for nothing; but in every thing by prayer and supplication with thanksgiving, let your requests be made known unto God. And the peace of God, which passeth all understanding, shall keep your hearts and minds through Christ Jesus."` },
@@ -1842,7 +1843,7 @@ function WordSearchGame() {
       { label: "Stillness", icon: "✨", text: `Now rest for a moment. Nothing to solve. Let His peace settle over you like light.` },
       { label: "Blessing", icon: "✝️", text: `Go now in the peace of God that passes all understanding. He's got you. Amen.` },
     ]},
-    { key: "sleep", name: "Sleep in His Word", icon: "🌙", ref: "Psalm 4:8", theme: "Sleep", min: 7, grad: "linear-gradient(150deg, #3a4a6e, #1b2240)", steps: [
+    { key: "sleep", section: "Rhythms of the Day", name: "Sleep in His Word", icon: "🌙", ref: "Psalm 4:8", theme: "Sleep", min: 7, grad: "linear-gradient(150deg, #3a4a6e, #1b2240)", steps: [
       { label: "Welcome", icon: "🕊️", text: `Welcome. The day is done, and you don't have to carry it into the night. Let your body sink down. Let your breathing slow. You're not alone in the dark — your Father is here, and He never sleeps.` },
       { label: "Breathe", icon: "🌬️", text: `Breathe in slowly… and let it go. Again — breathe in His peace… and breathe out the whole day. One more, slower still, and let every muscle begin to rest.` },
       { label: "The Word", icon: "📖", text: `Hear the Word of God, from Psalm 4, verse 8: "I will both lay me down in peace, and sleep: for thou, Lord, only makest me dwell in safety."` },
@@ -1850,6 +1851,60 @@ function WordSearchGame() {
       { label: "Guided Prayer", icon: "🙏", text: `Let's pray. Father, I lay this day down — the good and the hard… I give You what's unfinished and what's unresolved. Watch over me as I sleep. Quiet my mind, and let me rest in Your safety. In Jesus' name.` },
       { label: "Stillness", icon: "✨", text: `Now just rest. Let the worship carry you. Let your thoughts grow soft and still.` },
       { label: "Blessing", icon: "✝️", text: `Sleep now in peace, for the Lord keeps you safe. Goodnight, beloved child of God. Amen.` },
+    ]},
+    { key: "fear", section: "Hard Places", name: "Fear", icon: "🦁", ref: "Isaiah 41:10", theme: "Courage", min: 7, grad: "linear-gradient(150deg, #3a5a6e, #1b2a40)", steps: [
+      { label: "Welcome", icon: "🕊️", text: `Welcome. Whatever you're afraid of right now — you don't have to face it alone, and you don't have to face it in this moment. For these few minutes, you're simply here, with a Father who is bigger than the thing you fear. Let your shoulders come down.` },
+      { label: "Breathe", icon: "🌬️", text: `Let's breathe slow. Breathe in… and let it out. Again — breathe in His nearness… and breathe out the fear you've been carrying. One more, and let your body begin to steady.` },
+      { label: "The Word", icon: "📖", text: `Hear the Word of God, from Isaiah 41, verse 10: "Fear thou not; for I am with thee: be not dismayed; for I am thy God: I will strengthen thee; yea, I will help thee."` },
+      { label: "Reflection", icon: "💭", text: `Notice what God puts underneath your fear — not a pep talk, but His presence. "I am with thee." He doesn't promise the hard thing will vanish. He promises something better: that you will not face it without Him. He will strengthen you. He will help you. He will hold you up with His own hand.` },
+      { label: "Guided Prayer", icon: "🙏", text: `Let's pray. Father, here is what I'm afraid of… (name it to Him)… I bring it into Your presence. Thank You that You are with me and for me. Strengthen me where I am weak. Help me where I cannot help myself. I trust You with what I cannot control.` },
+      { label: "Stillness", icon: "✨", text: `Now be still, and let His nearness be louder than the fear. You are held.` },
+      { label: "Blessing", icon: "✝️", text: `Go now without dread, for your God goes with you. Be strong and take heart. Amen.` },
+    ]},
+    { key: "grief", section: "Hard Places", name: "Grief & Loss", icon: "🕯️", ref: "Psalm 34:18", theme: "Comfort", min: 7, grad: "linear-gradient(150deg, #4a4a6e, #232036)", steps: [
+      { label: "Welcome", icon: "🕊️", text: `Welcome. You've come carrying something heavy — a loss, an ache, a sorrow that words can't quite hold. You don't have to be strong here. You don't have to explain. You only have to be near to the One who is near to the brokenhearted.` },
+      { label: "Breathe", icon: "🌬️", text: `Let's breathe slow. Breathe in… and let it out. There's no rush here. Again — breathe in His comfort… and breathe out, even just a little of the weight. One more gentle breath.` },
+      { label: "The Word", icon: "📖", text: `Hear the Word of God, from Psalm 34, verse 18: "The Lord is nigh unto them that are of a broken heart; and saveth such as be of a contrite spirit."` },
+      { label: "Reflection", icon: "💭", text: `God does not stand far off from your grief. Scripture says He draws near to the brokenhearted — He comes close to exactly where it hurts. Jesus Himself wept at a graveside. Your tears are not a lack of faith; they are seen, and they are held. And one day, He has promised, He will wipe every one of them away.` },
+      { label: "Guided Prayer", icon: "🙏", text: `Let's pray. Father, You see what I've lost… You see this ache I carry… I bring it to You, because I cannot carry it alone. Be near to my broken heart. Comfort me as only You can. Hold what I cannot hold.` },
+      { label: "Stillness", icon: "✨", text: `Now rest in His nearness. You don't have to do anything. Let Him sit with you in this.` },
+      { label: "Blessing", icon: "✝️", text: `You are not alone in your sorrow — the God of all comfort is with you, and He will carry you. And if the weight ever feels like too much to bear alone, reach for someone you trust and let them help carry it too. Go gently. Amen.` },
+    ]},
+    { key: "anger", section: "Hard Places", name: "Anger", icon: "🔥", ref: "James 1:19-20", theme: "Peace", min: 7, grad: "linear-gradient(150deg, #6e4a3a, #3a2018)", steps: [
+      { label: "Welcome", icon: "🕊️", text: `Welcome. Something has stirred you up — and you don't have to pretend it away. You've come to the right place to set it down. For these few minutes, let's bring the heat of it before God, and let Him cool it into peace.` },
+      { label: "Breathe", icon: "🌬️", text: `Let's breathe slow. Breathe in… and let it out, long and slow. Again — breathe in His calm… and breathe out the heat you've been holding. One more, slower still, and let your jaw and your shoulders unclench.` },
+      { label: "The Word", icon: "📖", text: `Hear the Word of God, from James 1: "Let every man be swift to hear, slow to speak, slow to wrath: for the wrath of man worketh not the righteousness of God."` },
+      { label: "Reflection", icon: "💭", text: `God doesn't shame you for feeling anger — even Jesus felt it. But He invites you to slow it down, so it doesn't master you. Anger held too long hardens into bitterness, and bitterness poisons the one who holds it. So bring it to Him now. Let Him be the One who carries the offense and sets things right in His time.` },
+      { label: "Guided Prayer", icon: "🙏", text: `Let's pray. Father, You know what stirred this up in me… I bring my anger to You instead of letting it rule me. Cool my heart. Help me to forgive as You have forgiven me. Where there has been wrong, I trust You to make it right. Give me Your peace in place of this heat.` },
+      { label: "Stillness", icon: "✨", text: `Now be still, and let the fire settle. Let His peace take the place the anger held.` },
+      { label: "Blessing", icon: "✝️", text: `Go in peace, slow to wrath and quick to grace, carrying no offense into the night. Amen.` },
+    ]},
+    { key: "lonely", section: "Hard Places", name: "Loneliness", icon: "🤍", ref: "Hebrews 13:5", theme: "Nearness", min: 7, grad: "linear-gradient(150deg, #3a4a6e, #20283f)", steps: [
+      { label: "Welcome", icon: "🕊️", text: `Welcome. Maybe you feel unseen tonight — like no one quite knows what it's like to be you right now. Hear this gently: in this moment, you are not alone. You've stepped into the presence of the One who has never once left your side.` },
+      { label: "Breathe", icon: "🌬️", text: `Let's breathe slow. Breathe in… and let it out. Again — breathe in His presence… and breathe out the ache of feeling alone. One more, and let yourself simply be here, with Him.` },
+      { label: "The Word", icon: "📖", text: `Hear the Word of God, from Hebrews 13, verse 5: "He hath said, I will never leave thee, nor forsake thee."` },
+      { label: "Reflection", icon: "💭", text: `Read those words slowly — never, and nor. There is no version of your life, no room, no night, no low place where God is absent. Even when you can't feel Him, He is there, as near as your own breath. You may feel lonely; you are not alone. The God who made you delights to be with you.` },
+      { label: "Guided Prayer", icon: "🙏", text: `Let's pray. Father, sometimes the loneliness feels heavy… I bring it to You now. Thank You that You are with me even here. Help me to feel Your nearness. And lead me to the people You have for me — Your family — so I'm not meant to walk alone.` },
+      { label: "Stillness", icon: "✨", text: `Now be still, and let His presence fill the quiet. You are seen. You are known. You are His.` },
+      { label: "Blessing", icon: "✝️", text: `Go now knowing you are never truly alone — He is with you always, even unto the end. And reach out to His people too; you were made to belong. Amen.` },
+    ]},
+    { key: "shame", section: "Hard Places", name: "Shame & Guilt", icon: "🌅", ref: "Romans 8:1", theme: "Grace", min: 7, grad: "linear-gradient(150deg, #6e5a3a, #3a2e18)", steps: [
+      { label: "Welcome", icon: "🕊️", text: `Welcome. Maybe you've come in here weighed down — feeling like you're not enough, or like what you've done is too much. Set the weight down for a few minutes. You've come to the One whose grace is bigger than your worst day.` },
+      { label: "Breathe", icon: "🌬️", text: `Let's breathe slow. Breathe in… and let it out. Again — breathe in His mercy… and breathe out the shame you've been carrying. One more, and let your heart begin to soften.` },
+      { label: "The Word", icon: "📖", text: `Hear the Word of God, from Romans 8, verse 1: "There is therefore now no condemnation to them which are in Christ Jesus."` },
+      { label: "Reflection", icon: "💭", text: `Hear that word — no condemnation. Not less. None. If you belong to Jesus, the case against you was already closed at the cross. The voice of shame says you are what you've done; the voice of grace says you are who Christ has made you — forgiven, washed, a new creation. As far as the east is from the west, that is how far He has carried your sin away from you.` },
+      { label: "Guided Prayer", icon: "🙏", text: `Let's pray. Father, here is what I've been carrying… (confess it honestly to Him)… Thank You that the blood of Jesus is enough to cover even this. I receive Your forgiveness. Lift this shame off of me, and let me walk as Your child — clean and free.` },
+      { label: "Stillness", icon: "✨", text: `Now be still, and let His grace wash over you. There is nothing left to prove. You are loved.` },
+      { label: "Blessing", icon: "✝️", text: `Go now forgiven and free, with your head lifted — there is no condemnation for you in Christ. Amen.` },
+    ]},
+    { key: "overwhelm", section: "Hard Places", name: "Overwhelm", icon: "🌊", ref: "Matthew 11:28", theme: "Rest", min: 7, grad: "linear-gradient(150deg, #2e5a6e, #1b3340)", steps: [
+      { label: "Welcome", icon: "🕊️", text: `Welcome. Maybe everything feels like too much right now — too many demands, too much weight, the water rising over your head. For these few minutes, you can stop holding it all. You've come to the One who holds you.` },
+      { label: "Breathe", icon: "🌬️", text: `Let's breathe slow. Breathe in… and let it out. Again — breathe in His rest… and breathe out everything you've been carrying. One more, and let your body remember it doesn't have to hold it all.` },
+      { label: "The Word", icon: "📖", text: `Hear the Word of God, from Matthew 11, verse 28: "Come unto me, all ye that labour and are heavy laden, and I will give you rest."` },
+      { label: "Reflection", icon: "💭", text: `Jesus doesn't say solve it all and then come. He says come — as you are, heavy-laden, stretched thin — and let Me carry it. When your heart is overwhelmed, you don't have to climb out by your own strength. He is the rock that is higher than you. You can hand Him the whole weight, and find He was holding you the entire time.` },
+      { label: "Guided Prayer", icon: "🙏", text: `Let's pray. Father, here is everything that feels like too much… (lay it before Him, piece by piece)… I cast it on You, because You promised to sustain me. I can't carry it all, and I don't have to. Give me Your rest, and show me the next small step.` },
+      { label: "Stillness", icon: "✨", text: `Now be still, and let the weight lift. Just for now, there is nothing to carry. Rest.` },
+      { label: "Blessing", icon: "✝️", text: `Go now lighter, leaving the weight with Him — His yoke is easy, and His burden is light. Amen.` },
     ]},
   ];
   const musicRef = useRef(null);
@@ -3157,14 +3212,15 @@ const startQuiz = (level) => {
             <button onClick={() => setActiveTab("prayer")} style={{ background: "none", border: "none", color: BROWN, fontSize: 13, fontWeight: "bold", cursor: "pointer", padding: "0 0 8px", fontFamily: "sans-serif" }}>‹ Prayer</button>
             <div style={{ borderRadius: 16, overflow: "hidden", marginBottom: 14, position: "relative" }}><div style={{ position: "relative", minHeight: 152, padding: "18px 16px", display: "flex", flexDirection: "column", justifyContent: "flex-end", backgroundImage: `linear-gradient(180deg, rgba(16,29,51,0.18) 0%, rgba(16,29,51,0.78) 100%), url(${process.env.PUBLIC_URL}/stillness-dove.jpg)`, backgroundSize: "cover", backgroundPosition: "center" }}><p style={{ color: WHITE, fontSize: 27, fontWeight: "bold", margin: 0, fontFamily: "Georgia, serif", textShadow: "0 2px 12px rgba(0,0,0,0.7)" }}>Be Still</p><p style={{ color: GOLD_LIGHT, fontSize: 12.5, fontStyle: "italic", margin: "4px 0 0", textShadow: "0 1px 6px rgba(0,0,0,0.7)" }}>"Be still, and know that I am God." — Psalm 46:10</p></div></div>
             <p style={{ color: BROWN, fontSize: 13, lineHeight: 1.6, margin: "0 0 14px" }}>Quiet your heart and let His Word draw you near. Choose where you need Him today — each is a guided few minutes with worship underneath. 🕊️</p>
-            {STILL_SESSIONS.map((se) => (
+            {STILL_SECTIONS.map((sec) => { const items = STILL_SESSIONS.filter((x) => x.section === sec); if (!items.length) return null; return (<div key={sec}><p style={{ color: BROWN, fontSize: 11, fontWeight: "bold", letterSpacing: 1.5, textTransform: "uppercase", margin: "18px 0 8px", fontFamily: "sans-serif", opacity: 0.65 }}>{sec}</p>{items.map((se) => (
               <div key={se.key} onClick={() => { musicBeforeSession.current = musicOn; setStillSession(se); setStillStep(0); setStillPaused(false); setMusicOn(true); }} style={{ display: "flex", alignItems: "center", gap: 13, background: WHITE, border: `1px solid ${GOLD_LIGHT}`, borderRadius: 16, padding: 11, marginBottom: 10, cursor: "pointer", boxShadow: "0 6px 16px -12px rgba(74,53,16,0.4)" }}>
                 <div style={{ width: 52, height: 52, borderRadius: 13, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 23, background: se.grad }}>{se.icon}</div>
                 <div style={{ flex: 1, minWidth: 0 }}><p style={{ fontFamily: "Georgia, serif", fontSize: 15, color: BROWN_DARK, fontWeight: "bold", margin: 0 }}>{se.name}</p><p style={{ color: GOLD, fontSize: 11, fontStyle: "italic", margin: "1px 0 4px" }}>{se.ref}</p><div style={{ display: "flex", gap: 6 }}><span style={{ background: GOLD_LIGHT, color: BROWN_DARK, fontSize: 9.5, fontWeight: "bold", borderRadius: 20, padding: "2px 8px" }}>{se.theme}</span><span style={{ background: GOLD_LIGHT, color: BROWN_DARK, fontSize: 9.5, fontWeight: "bold", borderRadius: 20, padding: "2px 8px" }}>{se.min} min</span></div></div>
                 <div style={{ width: 33, height: 33, borderRadius: "50%", background: `linear-gradient(135deg, ${GOLD}, ${BROWN})`, color: WHITE, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, flexShrink: 0 }}>►</div>
               </div>
-            ))}
-            <p style={{ color: BROWN, fontSize: 11.5, textAlign: "center", margin: "10px 0 0", fontStyle: "italic" }}>More sessions coming — 29 in all. 🙏</p>
+            ))}</div>); })}
+            <p style={{ color: BROWN, fontSize: 11.5, textAlign: "center", margin: "16px 0 0", fontStyle: "italic" }}>{STILL_SESSIONS.length} of 29 ready — more coming. 🙏</p>
+            <p style={{ color: BROWN, fontSize: 11, textAlign: "center", lineHeight: 1.6, margin: "14px auto 0", maxWidth: 344, opacity: 0.7 }}>💛 If you are in real crisis or thinking of harming yourself, please reach out now — in the U.S., call or text <b>988</b> (Suicide &amp; Crisis Lifeline). You are deeply loved, and you do not have to walk through it alone.</p>
           </div>
         )}
         {activeTab === "salvation" && (
