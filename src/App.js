@@ -3400,7 +3400,7 @@ const startQuiz = (level) => {
               </div>
             ))}</div>); })}
             <p style={{ color: BROWN, fontSize: 11.5, textAlign: "center", margin: "16px 0 0", fontStyle: "italic" }}>{STILL_SESSIONS.length >= 29 ? "All 29 sessions ready — be still and know. 🙏" : STILL_SESSIONS.length + " of 29 ready — more coming. 🙏"}</p>
-            <p style={{ color: BROWN, fontSize: 11, textAlign: "center", lineHeight: 1.6, margin: "14px auto 0", maxWidth: 344, opacity: 0.7 }}>💛 If you are in real crisis or thinking of harming yourself, please reach out now — in the U.S., call or text <b>988</b> (Suicide &amp; Crisis Lifeline). You are deeply loved, and you do not have to walk through it alone.</p>
+            <p style={{ color: BROWN, fontSize: 11, textAlign: "center", lineHeight: 1.6, margin: "14px auto 0", maxWidth: 344, opacity: 0.7 }}>Carrying something too heavy to bear alone? You don't have to. In the U.S., you can call or text <b>988</b> anytime to talk with someone who cares. You are deeply loved, and you never have to walk through it alone. 💛</p>
           </div>
         )}
         {activeTab === "salvation" && (
