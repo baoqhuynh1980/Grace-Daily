@@ -1800,10 +1800,10 @@ function WordSearchGame() {
   const [showNotifBanner, setShowNotifBanner] = useState(typeof Notification !== 'undefined' ? Notification.permission !== 'granted' : true);
   const [isPremium, setIsPremium] = useState(false); const [userName, setUserName] = useState(""); const [portalLoading, setPortalLoading] = useState(false); const openUpgrade = () => { if (!user) { setShowAuth(true); return; } const params = new URLSearchParams(); params.set("client_reference_id", user.uid); if (user.email) params.set("prefilled_email", user.email); window.location.href = STRIPE_LINK + "?" + params.toString(); };
   const MUSIC_TRACKS = [
-    { name: "Morning", icon: "🌅", url: "https://d8j0ntlcm91z4.cloudfront.net/user_3BAmSP09keCCGfCf7ySW8NtxLky/hf_20260615_214837_86103ac9-2402-43fb-9182-52033fd8a9ab.m4a" },
-    { name: "Grace", icon: "✨", url: "https://d8j0ntlcm91z4.cloudfront.net/user_3BAmSP09keCCGfCf7ySW8NtxLky/hf_20260616_002759_330b835b-16cd-4b3c-b396-d367da0d4791.m4a" },
-    { name: "Sanctuary", icon: "🙏", url: "https://d8j0ntlcm91z4.cloudfront.net/user_3BAmSP09keCCGfCf7ySW8NtxLky/hf_20260615_215047_633f34d0-beaa-4f42-8fed-22d17ed6e1cf.m4a" },
-    { name: "Rest", icon: "🌙", url: "https://d8j0ntlcm91z4.cloudfront.net/user_3BAmSP09keCCGfCf7ySW8NtxLky/hf_20260615_215043_ef675fb4-79cc-4d4b-a629-8d216ba3ff02.m4a" },
+    { name: "Morning", icon: "🌅", url: `${process.env.PUBLIC_URL}/morning.m4a` },
+    { name: "Grace", icon: "✨", url: `${process.env.PUBLIC_URL}/grace.m4a` },
+    { name: "Sanctuary", icon: "🙏", url: `${process.env.PUBLIC_URL}/sanctuary.m4a` },
+    { name: "Rest", icon: "🌙", url: `${process.env.PUBLIC_URL}/rest.m4a` },
   ];
   const [musicOpen, setMusicOpen] = useState(false);
   const [musicOn, setMusicOn] = useState(() => { try { return localStorage.getItem("gd_music_off") !== "1"; } catch (e) { return true; } });
