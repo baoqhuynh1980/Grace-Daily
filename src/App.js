@@ -1799,6 +1799,22 @@ function WordSearchGame() {
   const [notifEnabled, setNotifEnabled] = useState(false);
   const [showNotifBanner, setShowNotifBanner] = useState(typeof Notification !== 'undefined' ? Notification.permission !== 'granted' : true);
   const [isPremium, setIsPremium] = useState(false); const [userName, setUserName] = useState(""); const [portalLoading, setPortalLoading] = useState(false); const openUpgrade = () => { if (!user) { setShowAuth(true); return; } const params = new URLSearchParams(); params.set("client_reference_id", user.uid); if (user.email) params.set("prefilled_email", user.email); window.location.href = STRIPE_LINK + "?" + params.toString(); };
+  const MUSIC_TRACKS = [
+    { name: "Morning", icon: "🌅", url: "https://d8j0ntlcm91z4.cloudfront.net/user_3BAmSP09keCCGfCf7ySW8NtxLky/hf_20260615_214837_86103ac9-2402-43fb-9182-52033fd8a9ab.m4a" },
+    { name: "Grace", icon: "✨", url: "https://d8j0ntlcm91z4.cloudfront.net/user_3BAmSP09keCCGfCf7ySW8NtxLky/hf_20260616_002759_330b835b-16cd-4b3c-b396-d367da0d4791.m4a" },
+    { name: "Sanctuary", icon: "🙏", url: "https://d8j0ntlcm91z4.cloudfront.net/user_3BAmSP09keCCGfCf7ySW8NtxLky/hf_20260615_215047_633f34d0-beaa-4f42-8fed-22d17ed6e1cf.m4a" },
+    { name: "Rest", icon: "🌙", url: "https://d8j0ntlcm91z4.cloudfront.net/user_3BAmSP09keCCGfCf7ySW8NtxLky/hf_20260615_215043_ef675fb4-79cc-4d4b-a629-8d216ba3ff02.m4a" },
+  ];
+  const [musicOpen, setMusicOpen] = useState(false);
+  const [musicOn, setMusicOn] = useState(() => { try { return localStorage.getItem("gd_music_off") !== "1"; } catch (e) { return true; } });
+  const [musicTrack, setMusicTrack] = useState(0);
+  const [musicVol, setMusicVol] = useState(0.55);
+  const musicRef = useRef(null);
+  const musicOnRef = useRef(musicOn);
+  useEffect(() => { const a = musicRef.current; if (!a) return; if (musicOn) { a.volume = musicVol; const pr = a.play(); if (pr && pr.catch) pr.catch(() => {}); } else { a.pause(); } }, [musicOn, musicTrack]);
+  useEffect(() => { const a = musicRef.current; if (a) a.volume = musicVol; }, [musicVol]);
+  useEffect(() => { musicOnRef.current = musicOn; try { localStorage.setItem("gd_music_off", musicOn ? "0" : "1"); } catch (e) {} }, [musicOn]);
+  useEffect(() => { const start = () => { const a = musicRef.current; if (a && musicOnRef.current && a.paused) { a.volume = musicVol; const pr = a.play(); if (pr && pr.catch) pr.catch(() => {}); } window.removeEventListener("pointerdown", start); window.removeEventListener("keydown", start); }; window.addEventListener("pointerdown", start); window.addEventListener("keydown", start); return () => { window.removeEventListener("pointerdown", start); window.removeEventListener("keydown", start); }; }, []);
 
   const [fastingTab, setFastingTab] = useState("foundation");
   const [fastingLog, setFastingLog] = useState([]);
@@ -2404,7 +2420,7 @@ const startQuiz = (level) => {
         <div style={s.header}>
         {["-16deg","-6deg","6deg","16deg"].map((r,i)=>(<div key={i} aria-hidden="true" style={{ position:"absolute", top:-40, left:"50%", width:2, height:230, transformOrigin:"top center", transform:`translateX(-50%) rotate(${r})`, background:"linear-gradient(to bottom, rgba(255,246,220,0.5), rgba(255,246,220,0))", opacity:0.5, pointerEvents:"none", zIndex:0 }} />))}
         <div style={s.headerTop}>
-          <div style={{ width: 60 }} />
+          <div style={{ width: 60, display: "flex", justifyContent: "flex-start", alignItems: "flex-start", paddingTop: 4 }}><button onClick={() => setMusicOpen(o => !o)} aria-label="Worship music" style={{ display: "flex", alignItems: "center", gap: 4, background: musicOn ? "rgba(201,151,42,0.92)" : "rgba(0,0,0,0.18)", border: `1px solid ${GOLD_LIGHT}88`, borderRadius: 20, padding: "5px 10px", cursor: "pointer", color: musicOn ? "#3A2E16" : GOLD_LIGHT, fontSize: 11, fontWeight: "bold", fontFamily: "sans-serif", zIndex: 3, position: "relative" }}><span style={{ fontSize: 13, lineHeight: 1 }}>♪</span>{musicOn ? "On" : ""}</button></div>
           <div style={s.headerCenter}>
             <div style={{ width: 46, height: 46, borderRadius: 14, margin: "0 auto 14px", background: `linear-gradient(150deg, ${GOLD_LIGHT}, ${GOLD})`, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 8px 22px rgba(201,151,42,0.45), inset 0 1px 2px rgba(255,255,255,0.6)", position: "relative", zIndex: 2 }}><span style={{ color: "#3A2E16", fontSize: 26, lineHeight: 1 }}>✝</span></div>
             <h1 style={s.headerTitle}>Grace Daily</h1>
@@ -2417,6 +2433,36 @@ const startQuiz = (level) => {
         {user && <p style={{ color: GOLD_LIGHT, fontSize: 12, textAlign: "center", margin: "12px 0 0", fontFamily: "sans-serif", opacity: 0.85, position: "relative", zIndex: 2 }}>{(new Date().getHours() < 12 ? "Good morning" : new Date().getHours() < 17 ? "Good afternoon" : "Good evening")}{userName ? ", " + userName : ""} 🙏</p>}
       </div>
 
+      {musicOpen && (
+        <div style={{ position: "fixed", top: 64, left: 12, right: 12, maxWidth: 412, margin: "0 auto", zIndex: 1500, background: WHITE, border: `1px solid ${GOLD_LIGHT}`, borderRadius: 18, boxShadow: "0 24px 50px -16px rgba(20,15,8,0.6)", padding: 16 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+            <span style={{ fontSize: 10, fontWeight: "bold", letterSpacing: 1.5, textTransform: "uppercase", color: BROWN_DARK, fontFamily: "sans-serif" }}>♪ Worship Music</span>
+            <button onClick={() => setMusicOpen(false)} style={{ background: "none", border: "none", fontSize: 16, color: BROWN, cursor: "pointer" }}>✕</button>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
+            <div style={{ width: 44, height: 44, borderRadius: 12, background: `linear-gradient(150deg, #1F3252, ${BROWN})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>{MUSIC_TRACKS[musicTrack].icon}</div>
+            <div style={{ flex: 1 }}>
+              <p style={{ fontSize: 9, letterSpacing: 1, textTransform: "uppercase", color: BROWN, fontWeight: "bold", margin: 0, fontFamily: "sans-serif" }}>Now Playing</p>
+              <p style={{ fontFamily: "Georgia, serif", fontSize: 17, color: BROWN_DARK, fontWeight: "bold", margin: 0 }}>{MUSIC_TRACKS[musicTrack].name}</p>
+            </div>
+            <button onClick={() => setMusicOn(o => !o)} style={{ width: 42, height: 42, borderRadius: "50%", background: `linear-gradient(135deg, ${GOLD}, ${BROWN})`, color: WHITE, border: "none", fontSize: 15, cursor: "pointer" }}>{musicOn ? "❚❚" : "►"}</button>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 2, marginBottom: 12 }}>
+            {MUSIC_TRACKS.map((t, i) => (
+              <button key={t.name} onClick={() => { setMusicTrack(i); setMusicOn(true); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 10px", borderRadius: 10, border: "none", cursor: "pointer", background: i === musicTrack ? GOLD_LIGHT : "transparent", color: BROWN_DARK, fontFamily: "sans-serif", fontSize: 13, fontWeight: i === musicTrack ? "bold" : "normal", textAlign: "left", width: "100%" }}>
+                <span style={{ fontSize: 15 }}>{t.icon}</span>
+                <span style={{ flex: 1 }}>{t.name}</span>
+                {i === musicTrack && musicOn && <span style={{ fontSize: 11, color: BROWN }}>playing</span>}
+              </button>
+            ))}
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
+            <span style={{ fontSize: 14 }}>🔉</span>
+            <input type="range" min="0" max="1" step="0.05" value={musicVol} onChange={(e) => setMusicVol(parseFloat(e.target.value))} style={{ flex: 1, accentColor: GOLD }} />
+          </div>
+          <button onClick={() => { setMusicOn(false); setMusicOpen(false); }} style={{ width: "100%", background: "transparent", border: `1px solid ${CREAM_DARK}`, color: BROWN, borderRadius: 10, padding: 10, fontSize: 13, fontWeight: "bold", fontFamily: "sans-serif", cursor: "pointer" }}>🔇 Silence the music</button>
+        </div>
+      )}
       <div style={s.content}>
 
         {activeTab === "home" && (
@@ -3103,6 +3149,15 @@ const startQuiz = (level) => {
 
       </div>
 
+      <audio ref={musicRef} src={MUSIC_TRACKS[musicTrack].url} autoPlay={musicOn} preload="auto" onEnded={() => setMusicTrack((t) => (t + 1) % MUSIC_TRACKS.length)} />
+      {musicOn && (
+        <div style={{ position: "fixed", left: 0, right: 0, bottom: "calc(62px + env(safe-area-inset-bottom))", zIndex: 90, margin: "0 12px", display: "flex", alignItems: "center", gap: 10, background: "rgba(74,53,16,0.96)", border: `1px solid ${GOLD}`, borderRadius: 14, padding: "8px 12px", boxShadow: "0 10px 24px -8px rgba(0,0,0,0.5)" }}>
+          <span style={{ fontSize: 15 }}>{MUSIC_TRACKS[musicTrack].icon}</span>
+          <span style={{ flex: 1, color: GOLD_LIGHT, fontSize: 12, fontWeight: "bold", fontFamily: "sans-serif" }}>{MUSIC_TRACKS[musicTrack].name} <span style={{ color: GOLD_MID, fontWeight: "normal" }}>· Worship</span></span>
+          <button onClick={() => setMusicOpen(true)} aria-label="Open player" style={{ width: 30, height: 30, borderRadius: "50%", background: "transparent", color: GOLD_LIGHT, border: `1px solid ${GOLD}`, fontSize: 13, cursor: "pointer" }}>♪</button>
+          <button onClick={() => setMusicOn(false)} aria-label="Silence" style={{ width: 30, height: 30, borderRadius: "50%", background: GOLD, color: "#3A2E16", border: "none", fontSize: 12, cursor: "pointer" }}>❚❚</button>
+        </div>
+      )}
       <nav style={s.nav}>
         {tabs.map(t => (
           <button key={t.id} className="gd-nav" style={s.navBtn} onClick={() => { setActiveTab(t.id); setSelectedTopic(null); setTopicContent(null); setSelectedCategory(null); setSelectedBook(null); setSelectedChapter(null); setChapterText(null); setTestingVerse(null); setTestResult(null); setMemoryTab("list"); setHighlightVerse(null); setViewingSavedVerse(null); }}>
