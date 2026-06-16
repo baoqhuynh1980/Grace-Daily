@@ -2014,6 +2014,78 @@ function WordSearchGame() {
       { label: "Stillness", icon: "✨", text: `Now be still, and let His courage rise in you. You do not go alone. He goes before you.` },
       { label: "Blessing", icon: "✝️", text: `Go now strong and courageous, for the Lord your God is with you wherever you go. Amen.` },
     ]},
+    { key: "morning", section: "Rhythms of the Day", name: "Morning", icon: "☀️", ref: "Lamentations 3:22-23", theme: "Begin", min: 7, grad: "linear-gradient(150deg, #6e5a3a, #b07a2e)", steps: [
+      { label: "Welcome", icon: "🕊️", text: `Good morning. Before the day pulls you in a hundred directions, come and be with your Father first. However yesterday went, this is a brand-new page. His mercy is fresh, and He is glad to meet you here at the start.` },
+      { label: "Breathe", icon: "🌬️", text: `Let's breathe slow. Breathe in… and let it out. Again — breathe in His mercy that is new this morning… and breathe out yesterday. One more, and let's begin this day with Him.` },
+      { label: "The Word", icon: "📖", text: `Hear the Word of God, from Lamentations 3: "It is of the Lord's mercies that we are not consumed, because his compassions fail not. They are new every morning: great is thy faithfulness."` },
+      { label: "Reflection", icon: "💭", text: `New every morning — that means whatever you carried yesterday, His mercy has already gone ahead of you into today. You don't have to earn this day; it's a gift He made. Even Jesus rose early to be with the Father before the crowds came. Set your eyes on Him first, and everything else will find its right place.` },
+      { label: "Guided Prayer", icon: "🙏", text: `Let's pray. Father, thank You for this new day and for mercy that meets me at sunrise. I give You everything ahead — my work, my people, the things I'm carrying. Go before me. Let me walk with You through every hour of it. This is the day You have made; I will rejoice in it.` },
+      { label: "Stillness", icon: "✨", text: `Now be still for a moment before the day begins. Receive His peace. You are not stepping into today alone.` },
+      { label: "Blessing", icon: "✝️", text: `Go now into your day in His strength, carried by mercies that are new every morning. Amen.` },
+    ]},
+    { key: "midday", section: "Rhythms of the Day", name: "Midday Reset", icon: "🌤️", ref: "Matthew 11:28", theme: "Reset", min: 7, grad: "linear-gradient(150deg, #3a6e6e, #2e8a8a)", steps: [
+      { label: "Welcome", icon: "🕊️", text: `Welcome. The day is half-spent, and maybe it's already worn on you. This is your reset — a small pause to lift your eyes off the noise and back onto the Lord. A few minutes here can change the rest of your day.` },
+      { label: "Breathe", icon: "🌬️", text: `Let's breathe slow. Breathe in… and let it out. Again — breathe in His rest… and breathe out the rush of the morning. One more, and let the noise fall quiet for a moment.` },
+      { label: "The Word", icon: "📖", text: `Hear the Word of God, from Matthew 11, verse 28: "Come unto me, all ye that labour and are heavy laden, and I will give you rest."` },
+      { label: "Reflection", icon: "💭", text: `You don't have to wait until evening to find rest. Right here, in the middle of it all, Jesus invites you to come. The psalmist prayed evening, morning, and at noon — a midday turning of the heart back to God. You can set the weight down for a moment, breathe, remember Who holds the day, and pick it back up lighter.` },
+      { label: "Guided Prayer", icon: "🙏", text: `Let's pray. Father, thank You for this pause. I bring You the morning that's been, and the afternoon ahead. Reset my heart. Steady me where I've gotten frazzled. Renew my strength as I wait on You. Help me finish this day in Your peace.` },
+      { label: "Stillness", icon: "✨", text: `Now be still, just for a moment. Let Him restore your soul before you step back in.` },
+      { label: "Blessing", icon: "✝️", text: `Go now back into your day renewed — those who wait on the Lord shall renew their strength. Amen.` },
+    ]},
+    { key: "evening", section: "Rhythms of the Day", name: "Evening Examen", icon: "🌇", ref: "Psalm 139:23-24", theme: "Reflect", min: 7, grad: "linear-gradient(150deg, #5a3a6e, #6e3a5a)", steps: [
+      { label: "Welcome", icon: "🕊️", text: `Welcome. As the day comes to a close, let's look back over it with God — not to keep score, but to notice where He was. He was with you in all of it. Let's lay the day down gently in His hands.` },
+      { label: "Breathe", icon: "🌬️", text: `Let's breathe slow. Breathe in… and let it out. Again — breathe in His peace… and breathe out the day behind you. One more, and let your heart grow quiet and reflective.` },
+      { label: "The Word", icon: "📖", text: `Hear the Word of God, from Psalm 139, verses 23 and 24: "Search me, O God, and know my heart: try me, and know my thoughts: and see if there be any wicked way in me, and lead me in the way everlasting."` },
+      { label: "Reflection", icon: "💭", text: `An evening examen is a gentle looking-back. Where did you see God's goodness today — a kindness, a provision, a moment of grace? Thank Him for it. And where did you fall short, or feel far from Him? Bring it honestly, and let Him forgive and lead you. This isn't about guilt; it's about walking closely, one day at a time.` },
+      { label: "Guided Prayer", icon: "🙏", text: `Let's pray. Father, thank You for being with me today… (recall a moment of His goodness)… Where I missed it, or fell short… (bring it to Him honestly)… search my heart, forgive me, and lead me on. I lay this whole day down in Your hands. Thank You for Your faithfulness.` },
+      { label: "Stillness", icon: "✨", text: `Now be still, and rest in His mercy over the day. It is finished, and you are held.` },
+      { label: "Blessing", icon: "✝️", text: `Go now in peace — the day is in His hands, and He who searches you also loves you completely. Amen.` },
+    ]},
+    { key: "waiting", section: "Seasons", name: "Waiting on God", icon: "⏳", ref: "Isaiah 40:31", theme: "Wait", min: 7, grad: "linear-gradient(150deg, #3a5a6e, #1b3340)", steps: [
+      { label: "Welcome", icon: "🕊️", text: `Welcome. Maybe you've been waiting a long time — for an answer, a change, a breakthrough — and the waiting has worn you thin. For these few minutes, let's wait differently: not anxiously watching the clock, but resting in the One who holds the timing.` },
+      { label: "Breathe", icon: "🌬️", text: `Let's breathe slow. Breathe in… and let it out. Again — breathe in His faithfulness… and breathe out the weariness of waiting. One more, and let your soul settle.` },
+      { label: "The Word", icon: "📖", text: `Hear the Word of God, from Isaiah 40, verse 31: "They that wait upon the Lord shall renew their strength; they shall mount up with wings as eagles; they shall run, and not be weary; and they shall walk, and not faint."` },
+      { label: "Reflection", icon: "💭", text: `Notice — waiting on the Lord isn't wasted time; it's where strength is renewed. God is never late, and His delays are not denials. The same God who kept every promise in Scripture is keeping His promises to you, even in the silence. The wait is doing something in you that the answer alone never could. Keep hoping in Him; He is good to those who wait.` },
+      { label: "Guided Prayer", icon: "🙏", text: `Let's pray. Father, I've been waiting, and I'm tired… You know what I'm longing for. I bring my impatience honestly to You. Renew my strength as I wait. Help me to trust Your timing over my own. I will hope in You, for You have never failed me.` },
+      { label: "Stillness", icon: "✨", text: `Now be still, and let go of the clock. Rest in His perfect timing. He has not forgotten you.` },
+      { label: "Blessing", icon: "✝️", text: `Go now renewed in your waiting — those who hope in the Lord will rise up on wings like eagles. Amen.` },
+    ]},
+    { key: "decisions", section: "Seasons", name: "Big Decisions", icon: "🧭", ref: "James 1:5", theme: "Wisdom", min: 7, grad: "linear-gradient(150deg, #3a6e5a, #1b4036)", steps: [
+      { label: "Welcome", icon: "🕊️", text: `Welcome. You're standing at a crossroads, and the way forward isn't clear. For these few minutes, set the pressure down. You don't have to figure it all out by yourself — you have a Father who gives wisdom freely to those who ask.` },
+      { label: "Breathe", icon: "🌬️", text: `Let's breathe slow. Breathe in… and let it out. Again — breathe in His peace… and breathe out the weight of the decision. One more, and let your mind grow quiet enough to hear Him.` },
+      { label: "The Word", icon: "📖", text: `Hear the Word of God, from James 1, verse 5: "If any of you lack wisdom, let him ask of God, that giveth to all men liberally, and upbraideth not; and it shall be given him."` },
+      { label: "Reflection", icon: "💭", text: `God doesn't roll His eyes at your questions — He gives wisdom generously, without finding fault. You don't have to see the whole road; you only have to take the next faithful step. Trust the Lord with all your heart, lean not on your own understanding, and He promises to direct your paths. He cares about this decision more than you do, and He will not let you wander when your heart is set on following Him.` },
+      { label: "Guided Prayer", icon: "🙏", text: `Let's pray. Father, here is the decision in front of me… (lay it out before Him)… I ask for Your wisdom, and I trust You to give it. Close the doors that aren't from You, and open the ones that are. I surrender the outcome to You. Direct my path, and I will follow.` },
+      { label: "Stillness", icon: "✨", text: `Now be still, and stop straining to see it all. Let Him lead. The next step will come.` },
+      { label: "Blessing", icon: "✝️", text: `Go now in peace — ask, and He will give wisdom; trust, and He will direct your steps. Amen.` },
+    ]},
+    { key: "healing", section: "Seasons", name: "Healing", icon: "🌿", ref: "Psalm 103:2-3", theme: "Healing", min: 7, grad: "linear-gradient(150deg, #3a6e6e, #1b4040)", steps: [
+      { label: "Welcome", icon: "🕊️", text: `Welcome. You've come carrying something that hurts — in your body, or your heart, or both. Bring it here, into the presence of the One who made you and loves you. He is a healer, and He is tender toward the suffering.` },
+      { label: "Breathe", icon: "🌬️", text: `Let's breathe slow. Breathe in… and let it out. Again — breathe in His comfort… and breathe out the fear and the pain. One more, and let your body rest in His care.` },
+      { label: "The Word", icon: "📖", text: `Hear the Word of God, from Psalm 103, verses 2 and 3: "Bless the Lord, O my soul, and forget not all his benefits: who forgiveth all thine iniquities; who healeth all thy diseases."` },
+      { label: "Reflection", icon: "💭", text: `God is the One who heals — body and soul. Sometimes He heals suddenly; sometimes slowly, through the hands of doctors and the care of others He has provided; and one day, in His presence, He will heal completely and forever, wiping away every tear. Healing in His timing is still healing. Whatever the answer, His nearness is certain, His comfort is real, and He will never waste your suffering or leave your side.` },
+      { label: "Guided Prayer", icon: "🙏", text: `Let's pray. Father, You see exactly where it hurts… I bring my body and my heart to You, and I ask for Your healing. I trust You with the how and the when. Give me Your peace in the waiting, wisdom for the next step, and strength for today. Thank You that You are near, and You are good.` },
+      { label: "Stillness", icon: "✨", text: `Now be still, and rest in the care of the Great Physician. You are held. You are loved.` },
+      { label: "Blessing", icon: "✝️", text: `Go now in His peace, trusting your body and your future to the God who heals. And lean on the doctors and people He has placed around you — they are part of His provision. Amen.` },
+    ]},
+    { key: "provision", section: "Seasons", name: "Provision", icon: "🌾", ref: "Philippians 4:19", theme: "Provision", min: 7, grad: "linear-gradient(150deg, #6e5a3a, #403218)", steps: [
+      { label: "Welcome", icon: "🕊️", text: `Welcome. Maybe you're worried about money, or a need that's pressing in, and the numbers don't seem to add up. For these few minutes, bring it to the One who owns it all and who has never once failed to provide for His children. Let your shoulders come down.` },
+      { label: "Breathe", icon: "🌬️", text: `Let's breathe slow. Breathe in… and let it out. Again — breathe in His provision… and breathe out the worry about tomorrow. One more, and let your heart steady.` },
+      { label: "The Word", icon: "📖", text: `Hear the Word of God, from Philippians 4, verse 19: "But my God shall supply all your need according to his riches in glory by Christ Jesus."` },
+      { label: "Reflection", icon: "💭", text: `Look at the birds, Jesus said — they don't store up barns, yet your Father feeds them, and you are worth far more to Him than they are. He knows exactly what you need before you ask. Seek first His kingdom, and trust Him with the rest. His provision may not always look the way you expect, but it has never run out, and it never will. He is a good Father.` },
+      { label: "Guided Prayer", icon: "🙏", text: `Let's pray. Father, You know the need I'm carrying… (name it to Him)… I bring it to You instead of letting it crush me. Thank You that You are my provider. Supply what I need, give me wisdom with what I have, and help me to trust You for tomorrow. I seek You first.` },
+      { label: "Stillness", icon: "✨", text: `Now be still, and rest in your Father's care. He knows. He provides. You can let the worry go.` },
+      { label: "Blessing", icon: "✝️", text: `Go now in peace — your Father knows your needs, and He will supply them according to His riches. Amen.` },
+    ]},
+    { key: "newbeliever", section: "Seasons", name: "New Believer's First Steps", icon: "🌱", ref: "2 Corinthians 5:17", theme: "New Life", min: 7, grad: "linear-gradient(150deg, #5a6e3a, #2e4018)", steps: [
+      { label: "Welcome", icon: "🕊️", text: `Welcome — and if you've recently given your life to Jesus, what a beautiful thing has happened. Heaven rejoiced over you. You may be wondering, "What now? Where do I begin?" Take a breath. These first steps are simpler than you think, and you are not walking them alone.` },
+      { label: "Breathe", icon: "🌬️", text: `Let's breathe slow. Breathe in… and let it out. Again — breathe in the new life He's given you… and breathe out any fear that you have to get it all right. One more, and rest in simply being His.` },
+      { label: "The Word", icon: "📖", text: `Hear the Word of God, from 2 Corinthians 5, verse 17: "Therefore if any man be in Christ, he is a new creature: old things are passed away; behold, all things are become new."` },
+      { label: "Reflection", icon: "💭", text: `Hear what is true of you now: in Christ, you are brand new. Not improved — new. The old is gone. You don't have to clean yourself up to be loved; you are already His. The walk ahead is simple at its heart: talk to God honestly — that is prayer; listen to Him in His Word — a good place to start is the Gospel of John; find other believers to walk with — a good church; and take it one day at a time. He who began this good work in you will be faithful to complete it.` },
+      { label: "Guided Prayer", icon: "🙏", text: `Let's pray. Father, thank You for making me new. Thank You for Jesus, and for loving me before I ever cleaned anything up. Teach me to walk with You. Help me to know You more each day. I give You my whole life — lead me, one step at a time. In Jesus' name.` },
+      { label: "Stillness", icon: "✨", text: `Now be still, and rest in this: you belong to Him now. You are loved, you are forgiven, you are His. Welcome to the family.` },
+      { label: "Blessing", icon: "✝️", text: `Go now as a new creation, dearly loved — He who began a good work in you will carry it on to completion. Welcome home. Amen.` },
+    ]},
   ];
   const musicRef = useRef(null);
   const musicOnRef = useRef(musicOn);
@@ -3327,7 +3399,7 @@ const startQuiz = (level) => {
                 <div style={{ width: 33, height: 33, borderRadius: "50%", background: `linear-gradient(135deg, ${GOLD}, ${BROWN})`, color: WHITE, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, flexShrink: 0 }}>►</div>
               </div>
             ))}</div>); })}
-            <p style={{ color: BROWN, fontSize: 11.5, textAlign: "center", margin: "16px 0 0", fontStyle: "italic" }}>{STILL_SESSIONS.length} of 29 ready — more coming. 🙏</p>
+            <p style={{ color: BROWN, fontSize: 11.5, textAlign: "center", margin: "16px 0 0", fontStyle: "italic" }}>{STILL_SESSIONS.length >= 29 ? "All 29 sessions ready — be still and know. 🙏" : STILL_SESSIONS.length + " of 29 ready — more coming. 🙏"}</p>
             <p style={{ color: BROWN, fontSize: 11, textAlign: "center", lineHeight: 1.6, margin: "14px auto 0", maxWidth: 344, opacity: 0.7 }}>💛 If you are in real crisis or thinking of harming yourself, please reach out now — in the U.S., call or text <b>988</b> (Suicide &amp; Crisis Lifeline). You are deeply loved, and you do not have to walk through it alone.</p>
           </div>
         )}
