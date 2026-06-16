@@ -1810,6 +1810,37 @@ function WordSearchGame() {
   const [musicTrack, setMusicTrack] = useState(0);
   const [musicVol, setMusicVol] = useState(0.55);
   const [musicWaiting, setMusicWaiting] = useState(false);
+  const [stillSession, setStillSession] = useState(null);
+  const [stillStep, setStillStep] = useState(0);
+  const STILL_SESSIONS = [
+    { key: "bestill", name: "Be Still & Know", icon: "🕊️", ref: "Psalm 46:10", theme: "Peace", min: 7, grad: "linear-gradient(150deg, #2E5A6E, #1F3252)", steps: [
+      { label: "Welcome", icon: "🕊️", text: `Welcome. For these few minutes, there's nothing you need to do and nothing you need to fix. Find a comfortable place. Let your shoulders drop. You've come to be with your Father — and He is glad you came.` },
+      { label: "Breathe", icon: "🌬️", text: `Let's breathe slow. Breathe in… and let it out. Again — breathe in His peace… breathe out all you've been carrying. One more, and let the noise of the day grow quiet.` },
+      { label: "The Word", icon: "📖", text: `Hear the Word of God, from Psalm 46, verse 10: "Be still, and know that I am God." Let it settle over you. Be still… and know.` },
+      { label: "Reflection", icon: "💭", text: `He doesn't say figure it out and know. He says be still. Before you do a single thing, He simply wants you to know that He is God — and you are not, and that is good news. He is holding what you cannot hold. He is awake while you rest. Whatever is stirring in you right now, He is greater than it.` },
+      { label: "Guided Prayer", icon: "🙏", text: `Let's pray. Father, I am here. I quiet myself before You… I give You the things I keep trying to carry… Take them, Lord — I trust You. Remind me that You are God, and that You are good.` },
+      { label: "Stillness", icon: "✨", text: `Now simply be still before Him. No words needed. Let the worship hold you. Let Him love you.` },
+      { label: "Blessing", icon: "✝️", text: `As you go, carry this: He is God, and He is with you. Go in His peace. Amen.` },
+    ]},
+    { key: "anxiety", name: "Anxiety & Worry", icon: "😟", ref: "Philippians 4:6-7", theme: "Calm", min: 7, grad: "linear-gradient(150deg, #6E5A8E, #3a2e56)", steps: [
+      { label: "Welcome", icon: "🕊️", text: `Welcome. Whatever you carried in here — the worries, the what-ifs, the racing thoughts — you can set them down for a few minutes. You're safe here, with your Father. He already knows, and He already cares.` },
+      { label: "Breathe", icon: "🌬️", text: `Let's breathe slow. Breathe in… and out. Again — breathe in His peace… and breathe out the worry you've been holding. One more slow breath, and let your body begin to rest.` },
+      { label: "The Word", icon: "📖", text: `Hear the Word of God, from Philippians 4: "Be careful for nothing; but in every thing by prayer and supplication with thanksgiving, let your requests be made known unto God. And the peace of God, which passeth all understanding, shall keep your hearts and minds through Christ Jesus."` },
+      { label: "Reflection", icon: "💭", text: `God doesn't say your worries are silly. He says — bring them to Me. Every one. And in their place He promises a peace that doesn't even make sense, a peace that stands guard over your heart and mind like a soldier at the gate. You don't have to manufacture calm. You just have to hand Him the worry.` },
+      { label: "Guided Prayer", icon: "🙏", text: `Let's pray. Father, here is what I've been carrying… (take a moment to name it to Him)… I give it to You now. Thank You that You hear me, and that You care. I trade my worry for Your peace. Guard my heart and my mind, in Jesus' name.` },
+      { label: "Stillness", icon: "✨", text: `Now rest for a moment. Nothing to solve. Let His peace settle over you like light.` },
+      { label: "Blessing", icon: "✝️", text: `Go now in the peace of God that passes all understanding. He's got you. Amen.` },
+    ]},
+    { key: "sleep", name: "Sleep in His Word", icon: "🌙", ref: "Psalm 4:8", theme: "Sleep", min: 7, grad: "linear-gradient(150deg, #3a4a6e, #1b2240)", steps: [
+      { label: "Welcome", icon: "🕊️", text: `Welcome. The day is done, and you don't have to carry it into the night. Let your body sink down. Let your breathing slow. You're not alone in the dark — your Father is here, and He never sleeps.` },
+      { label: "Breathe", icon: "🌬️", text: `Breathe in slowly… and let it go. Again — breathe in His peace… and breathe out the whole day. One more, slower still, and let every muscle begin to rest.` },
+      { label: "The Word", icon: "📖", text: `Hear the Word of God, from Psalm 4, verse 8: "I will both lay me down in peace, and sleep: for thou, Lord, only makest me dwell in safety."` },
+      { label: "Reflection", icon: "💭", text: `David doesn't say he'll sleep once everything is fixed. He lies down in peace because of who is watching over him. You can do the same. The same God who holds the stars in place is holding you tonight. You can close your eyes, because He won't close His.` },
+      { label: "Guided Prayer", icon: "🙏", text: `Let's pray. Father, I lay this day down — the good and the hard… I give You what's unfinished and what's unresolved. Watch over me as I sleep. Quiet my mind, and let me rest in Your safety. In Jesus' name.` },
+      { label: "Stillness", icon: "✨", text: `Now just rest. Let the worship carry you. Let your thoughts grow soft and still.` },
+      { label: "Blessing", icon: "✝️", text: `Sleep now in peace, for the Lord keeps you safe. Goodnight, beloved child of God. Amen.` },
+    ]},
+  ];
   const musicRef = useRef(null);
   const musicOnRef = useRef(musicOn);
   useEffect(() => { const a = musicRef.current; if (!a) return; if (musicOn) { a.volume = musicVol; const pr = a.play(); if (pr && pr.then) { pr.then(() => setMusicWaiting(false)).catch(() => setMusicWaiting(true)); } } else { a.pause(); setMusicWaiting(false); } }, [musicOn, musicTrack]);
@@ -2736,7 +2767,7 @@ const startQuiz = (level) => {
 
         {activeTab === "prayer" && (
           <div>
-            <p style={s.sectionTitle}>🙏 Prayer</p><div style={{ borderRadius: 16, overflow: "hidden", marginBottom: 14, position: "relative", boxShadow: "0 12px 30px -14px rgba(74,53,16,0.5)" }}><div style={{ position: "relative", minHeight: 132, padding: "18px 16px", display: "flex", flexDirection: "column", justifyContent: "flex-end", backgroundImage: `linear-gradient(180deg, rgba(40,28,12,0.1) 0%, rgba(40,28,12,0.78) 100%), url(${process.env.PUBLIC_URL}/prayer-sunrise.jpg)`, backgroundSize: "cover", backgroundPosition: "center" }}><p style={{ color: GOLD_LIGHT, fontSize: 10, fontWeight: "bold", letterSpacing: 1.5, textTransform: "uppercase", margin: "0 0 3px", fontFamily: "sans-serif", textShadow: "0 1px 6px rgba(0,0,0,0.6)" }}>Prayer</p><p style={{ color: WHITE, fontSize: 23, fontWeight: "bold", margin: 0, fontFamily: "Georgia, serif", lineHeight: 1.1, textShadow: "0 2px 12px rgba(0,0,0,0.6)" }}>Come to the Father</p></div></div>
+            <p style={s.sectionTitle}>🙏 Prayer</p><div style={{ borderRadius: 16, overflow: "hidden", marginBottom: 14, position: "relative", boxShadow: "0 12px 30px -14px rgba(74,53,16,0.5)" }}><div style={{ position: "relative", minHeight: 132, padding: "18px 16px", display: "flex", flexDirection: "column", justifyContent: "flex-end", backgroundImage: `linear-gradient(180deg, rgba(40,28,12,0.1) 0%, rgba(40,28,12,0.78) 100%), url(${process.env.PUBLIC_URL}/prayer-sunrise.jpg)`, backgroundSize: "cover", backgroundPosition: "center" }}><p style={{ color: GOLD_LIGHT, fontSize: 10, fontWeight: "bold", letterSpacing: 1.5, textTransform: "uppercase", margin: "0 0 3px", fontFamily: "sans-serif", textShadow: "0 1px 6px rgba(0,0,0,0.6)" }}>Prayer</p><p style={{ color: WHITE, fontSize: 23, fontWeight: "bold", margin: 0, fontFamily: "Georgia, serif", lineHeight: 1.1, textShadow: "0 2px 12px rgba(0,0,0,0.6)" }}>Come to the Father</p></div></div><div onClick={() => setActiveTab("stillness")} style={{ borderRadius: 16, overflow: "hidden", marginBottom: 14, position: "relative", cursor: "pointer", boxShadow: "0 12px 30px -14px rgba(16,29,51,0.55)" }}><div style={{ position: "relative", minHeight: 120, padding: 16, display: "flex", flexDirection: "column", justifyContent: "flex-end", backgroundImage: `linear-gradient(180deg, rgba(16,29,51,0.12) 0%, rgba(16,29,51,0.72) 100%), url(${process.env.PUBLIC_URL}/stillness-dove.jpg)`, backgroundSize: "cover", backgroundPosition: "center" }}><span style={{ position: "absolute", top: 12, right: 12, background: GOLD, color: "#3A2E16", fontSize: 9, fontWeight: "bold", letterSpacing: 0.5, borderRadius: 20, padding: "2px 9px" }}>NEW</span><p style={{ color: GOLD_LIGHT, fontSize: 10, fontWeight: "bold", letterSpacing: 1.5, textTransform: "uppercase", margin: "0 0 3px", fontFamily: "sans-serif", textShadow: "0 1px 6px rgba(0,0,0,0.7)" }}>Be Still · tap to enter</p><p style={{ color: WHITE, fontSize: 22, fontWeight: "bold", margin: 0, fontFamily: "Georgia, serif", lineHeight: 1.1, textShadow: "0 2px 12px rgba(0,0,0,0.7)" }}>Be Still Before Him</p><p style={{ color: GOLD_LIGHT, fontSize: 12, margin: "4px 0 0", textShadow: "0 1px 6px rgba(0,0,0,0.7)" }}>Scripture meditation & guided prayer ›</p></div></div>
             <div style={{ display: "flex", background: WHITE, borderRadius: 12, padding: 4, marginBottom: 16, border: `1px solid ${GOLD_LIGHT}`, overflowX: "auto" }}>
               {[["how","🙏 How"],["wall","👥 Wall"],["journal","📓 Journal"],["answered","✅ Answered"],["fasting","⚡ Fasting"]].map(([id, label]) => (
                 <button key={id} onClick={() => setPrayerTab(id)} style={{ flex: 1, minWidth: 60, padding: "8px 4px", border: "none", borderRadius: 10, background: prayerTab === id ? `linear-gradient(135deg, ${GOLD}, ${BROWN})` : "none", color: prayerTab === id ? WHITE : BROWN, fontSize: 10, fontFamily: "sans-serif", fontWeight: prayerTab === id ? "bold" : "normal", cursor: "pointer", lineHeight: 1.3, whiteSpace: "nowrap" }}>{label}</button>
@@ -3110,6 +3141,21 @@ const startQuiz = (level) => {
     )}
   </div>
 )}
+        {activeTab === "stillness" && (
+          <div>
+            <button onClick={() => setActiveTab("prayer")} style={{ background: "none", border: "none", color: BROWN, fontSize: 13, fontWeight: "bold", cursor: "pointer", padding: "0 0 8px", fontFamily: "sans-serif" }}>‹ Prayer</button>
+            <div style={{ borderRadius: 16, overflow: "hidden", marginBottom: 14, position: "relative" }}><div style={{ position: "relative", minHeight: 152, padding: "18px 16px", display: "flex", flexDirection: "column", justifyContent: "flex-end", backgroundImage: `linear-gradient(180deg, rgba(16,29,51,0.18) 0%, rgba(16,29,51,0.78) 100%), url(${process.env.PUBLIC_URL}/stillness-dove.jpg)`, backgroundSize: "cover", backgroundPosition: "center" }}><p style={{ color: WHITE, fontSize: 27, fontWeight: "bold", margin: 0, fontFamily: "Georgia, serif", textShadow: "0 2px 12px rgba(0,0,0,0.7)" }}>Be Still</p><p style={{ color: GOLD_LIGHT, fontSize: 12.5, fontStyle: "italic", margin: "4px 0 0", textShadow: "0 1px 6px rgba(0,0,0,0.7)" }}>"Be still, and know that I am God." — Psalm 46:10</p></div></div>
+            <p style={{ color: BROWN, fontSize: 13, lineHeight: 1.6, margin: "0 0 14px" }}>Quiet your heart and let His Word draw you near. Choose where you need Him today — each is a guided few minutes with worship underneath. 🕊️</p>
+            {STILL_SESSIONS.map((se) => (
+              <div key={se.key} onClick={() => { setStillSession(se); setStillStep(0); setMusicOn(true); }} style={{ display: "flex", alignItems: "center", gap: 13, background: WHITE, border: `1px solid ${GOLD_LIGHT}`, borderRadius: 16, padding: 11, marginBottom: 10, cursor: "pointer", boxShadow: "0 6px 16px -12px rgba(74,53,16,0.4)" }}>
+                <div style={{ width: 52, height: 52, borderRadius: 13, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 23, background: se.grad }}>{se.icon}</div>
+                <div style={{ flex: 1, minWidth: 0 }}><p style={{ fontFamily: "Georgia, serif", fontSize: 15, color: BROWN_DARK, fontWeight: "bold", margin: 0 }}>{se.name}</p><p style={{ color: GOLD, fontSize: 11, fontStyle: "italic", margin: "1px 0 4px" }}>{se.ref}</p><div style={{ display: "flex", gap: 6 }}><span style={{ background: GOLD_LIGHT, color: BROWN_DARK, fontSize: 9.5, fontWeight: "bold", borderRadius: 20, padding: "2px 8px" }}>{se.theme}</span><span style={{ background: GOLD_LIGHT, color: BROWN_DARK, fontSize: 9.5, fontWeight: "bold", borderRadius: 20, padding: "2px 8px" }}>{se.min} min</span></div></div>
+                <div style={{ width: 33, height: 33, borderRadius: "50%", background: `linear-gradient(135deg, ${GOLD}, ${BROWN})`, color: WHITE, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, flexShrink: 0 }}>►</div>
+              </div>
+            ))}
+            <p style={{ color: BROWN, fontSize: 11.5, textAlign: "center", margin: "10px 0 0", fontStyle: "italic" }}>More sessions coming — 29 in all. 🙏</p>
+          </div>
+        )}
         {activeTab === "salvation" && (
           <div>
             <div style={s.cardGold}><p style={{ color: GOLD_MID, fontSize: 11, fontFamily: "sans-serif", margin: "0 0 6px", letterSpacing: 1, textTransform: "uppercase" }}>The Greatest Decision</p><h2 style={{ color: WHITE, fontSize: 22, margin: "0 0 8px" }}>Who is Jesus Christ?</h2><p style={{ color: GOLD_LIGHT, fontSize: 14, lineHeight: 1.6, margin: 0 }}>Jesus is the Son of God, who came to earth to save humanity from sin and give us eternal life. He is the Way, the Truth, and the Life.</p></div>
@@ -3150,6 +3196,32 @@ const startQuiz = (level) => {
 
       </div>
 
+      {stillSession && (
+        <div style={{ position: "fixed", inset: 0, zIndex: 4000, background: "radial-gradient(420px 300px at 50% 16%, rgba(245,230,192,0.4) 0%, rgba(245,230,192,0) 60%), linear-gradient(170deg, #101d33 0%, #1F3252 34%, #4A3510 88%, #7A5C1E 120%)", display: "flex", flexDirection: "column", padding: "30px 26px calc(28px + env(safe-area-inset-bottom))", textAlign: "center" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <button onClick={() => setStillSession(null)} style={{ background: "none", border: "none", color: GOLD_LIGHT, fontSize: 20, cursor: "pointer" }}>✕</button>
+            <span style={{ color: GOLD_LIGHT, fontSize: 11, fontWeight: "bold", opacity: 0.85 }}>{musicOn ? "♪ Worship" : "♪ off"}</span>
+          </div>
+          <p style={{ color: GOLD_MID, fontSize: 11, fontWeight: "bold", letterSpacing: 2, textTransform: "uppercase", marginTop: 24 }}>{stillSession.name} · {stillSession.ref}</p>
+          <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
+            <div style={{ fontSize: 34, marginBottom: 14 }}>{stillSession.steps[stillStep].icon}</div>
+            <p style={{ color: GOLD_LIGHT, fontSize: 11, fontWeight: "bold", letterSpacing: 2, textTransform: "uppercase", marginBottom: 14, opacity: 0.8 }}>{stillSession.steps[stillStep].label}</p>
+            <p style={{ color: "#fff", fontFamily: "Georgia, serif", fontSize: 19, lineHeight: 1.6, fontWeight: 500, textShadow: "0 2px 16px rgba(0,0,0,0.4)", maxWidth: 340, margin: 0 }}>{stillSession.steps[stillStep].text}</p>
+          </div>
+          <div style={{ display: "flex", gap: 6, justifyContent: "center", marginBottom: 18 }}>
+            {stillSession.steps.map((_, i) => (<div key={i} style={{ width: i === stillStep ? 22 : 7, height: 7, borderRadius: 4, background: i === stillStep ? GOLD_MID : "rgba(245,230,192,0.3)", transition: "all 0.3s" }} />))}
+          </div>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 14 }}>
+            <button onClick={() => setStillStep((x) => Math.max(0, x - 1))} style={{ background: "none", border: "none", color: GOLD_LIGHT, fontSize: 14, cursor: "pointer", opacity: stillStep === 0 ? 0.3 : 0.8, padding: 8, width: 64 }}>‹ Back</button>
+            {stillStep < stillSession.steps.length - 1 ? (
+              <button onClick={() => setStillStep((x) => x + 1)} style={{ background: `linear-gradient(135deg, ${GOLD_LIGHT}, ${GOLD})`, color: "#3A2E16", border: "none", borderRadius: 30, padding: "13px 36px", fontSize: 15, fontWeight: "bold", fontFamily: "sans-serif", cursor: "pointer", boxShadow: "0 10px 26px rgba(201,151,42,0.4)" }}>Continue</button>
+            ) : (
+              <button onClick={() => setStillSession(null)} style={{ background: `linear-gradient(135deg, ${GOLD_LIGHT}, ${GOLD})`, color: "#3A2E16", border: "none", borderRadius: 30, padding: "13px 36px", fontSize: 15, fontWeight: "bold", fontFamily: "sans-serif", cursor: "pointer", boxShadow: "0 10px 26px rgba(201,151,42,0.4)" }}>Amen 🙏</button>
+            )}
+            <span style={{ width: 64 }} />
+          </div>
+        </div>
+      )}
       <style>{"@keyframes gdMusicPulse{0%,100%{opacity:0.5}50%{opacity:1}}"}</style>
       <audio ref={musicRef} src={MUSIC_TRACKS[musicTrack].url} autoPlay={musicOn} preload="auto" onPlaying={() => setMusicWaiting(false)} onEnded={() => setMusicTrack((t) => (t + 1) % MUSIC_TRACKS.length)} />
       {musicOn && (
