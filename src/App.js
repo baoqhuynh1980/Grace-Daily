@@ -1820,6 +1820,7 @@ function WordSearchGame() {
   const closeStillSession = () => { setStillSession(null); if (!musicBeforeSession.current) setMusicOn(false); if (window.__graceStillAudio) { window.__graceStillAudio.pause(); window.__graceStillAudio = null; } setStillAudioState("idle"); };
   const playStillAudio = async () => {
     if (!stillSession) return;
+    if (!isPremium) { openUpgrade(); return; }
     if (stillAudioState === "playing") { const a = window.__graceStillAudio; if (a) { a.pause(); window.__graceStillAudio = null; } setStillAudioState("idle"); return; }
     if (stillAudioState === "loading") return;
     setStillAudioErr(""); setStillAudioState("loading");
@@ -3408,6 +3409,27 @@ const startQuiz = (level) => {
           <div>
             <button onClick={() => setActiveTab("prayer")} style={{ background: "none", border: "none", color: BROWN, fontSize: 13, fontWeight: "bold", cursor: "pointer", padding: "0 0 8px", fontFamily: "sans-serif" }}>‹ Prayer</button>
             <div style={{ borderRadius: 16, overflow: "hidden", marginBottom: 14, position: "relative" }}><div style={{ position: "relative", minHeight: 152, padding: "18px 16px", display: "flex", flexDirection: "column", justifyContent: "flex-end", backgroundImage: `linear-gradient(180deg, rgba(16,29,51,0.18) 0%, rgba(16,29,51,0.78) 100%), url(${process.env.PUBLIC_URL}/stillness-dove.jpg)`, backgroundSize: "cover", backgroundPosition: "center" }}><p style={{ color: WHITE, fontSize: 27, fontWeight: "bold", margin: 0, fontFamily: "Georgia, serif", textShadow: "0 2px 12px rgba(0,0,0,0.7)" }}>Be Still</p><p style={{ color: GOLD_LIGHT, fontSize: 12.5, fontStyle: "italic", margin: "4px 0 0", textShadow: "0 1px 6px rgba(0,0,0,0.7)" }}>"Be still, and know that I am God." — Psalm 46:10</p></div></div>
+            {!isPremium && (
+              <div>
+                <p style={{ color: BROWN, fontSize: 13, lineHeight: 1.6, margin: "0 0 14px" }}>A quiet place to meet with God — guided Scripture meditation and prayer, with worship underneath and a gentle voice to lead you. 🕊️</p>
+                <div style={{ background: `linear-gradient(135deg, ${BROWN_DARK}, ${BROWN})`, borderRadius: 16, padding: 22, border: `2px solid ${GOLD}`, textAlign: "center" }}>
+                  <div style={{ fontSize: 38, marginBottom: 8 }}>🕊️</div>
+                  <h3 style={{ color: GOLD_MID, fontSize: 20, fontWeight: "bold", margin: "0 0 6px", fontFamily: "sans-serif" }}>Be Still — Premium</h3>
+                  <p style={{ color: GOLD_LIGHT, fontSize: 13.5, margin: "0 0 14px", lineHeight: 1.6 }}>Enter a sanctuary of stillness — meditation rooted in God's Word, with worship underneath and a calming voice to lead you into His presence.</p>
+                  <div style={{ background: "rgba(255,255,255,0.1)", borderRadius: 10, padding: "10px 14px", marginBottom: 14 }}>
+                    <p style={{ color: GOLD_MID, fontSize: 15, fontWeight: "bold", margin: 0, fontFamily: "sans-serif" }}>7 Days FREE — then $4.99/month</p>
+                    <p style={{ color: GOLD_LIGHT, fontSize: 11, margin: "2px 0 0", fontFamily: "sans-serif" }}>Cancel anytime. No commitment.</p>
+                  </div>
+                  {[["🕊️", "29 guided sessions — paced and breathing"], ["💛", "For anxiety, grief, sleep, doubt and more"], ["🎵", "Original worship music underneath"], ["🎙️", "A gentle voice to lead you in prayer"]].map(([icon, f]) => (
+                    <p key={f} style={{ color: GOLD_LIGHT, fontSize: 12.5, margin: "0 0 5px", fontFamily: "sans-serif", textAlign: "left" }}>✅ {icon} {f}</p>
+                  ))}
+                  <button onClick={() => openUpgrade()} style={{ background: `linear-gradient(135deg, ${GOLD}, #C9972A)`, color: "#FFFDF7", border: "none", borderRadius: 10, padding: "13px 20px", fontSize: 15, fontWeight: "bold", cursor: "pointer", width: "100%", marginTop: 12, fontFamily: "sans-serif" }}>✨ Begin Your 7-Day Free Trial</button>
+                  <p style={{ color: GOLD_LIGHT, fontSize: 10, textAlign: "center", margin: "8px 0 0", fontFamily: "sans-serif", opacity: 0.7 }}>Powered by Stripe — Secure Payment 🔒</p>
+                </div>
+                <p style={{ color: BROWN, fontSize: 11.5, textAlign: "center", margin: "14px 0 0", fontStyle: "italic" }}>The written Word is always free in Prayer, Bible & Study. 🙏</p>
+              </div>
+            )}
+            {isPremium && (<>
             <p style={{ color: BROWN, fontSize: 13, lineHeight: 1.6, margin: "0 0 14px" }}>Quiet your heart and let His Word draw you near. Choose where you need Him today — each is a guided few minutes with worship underneath. 🕊️</p>
             {STILL_SECTIONS.map((sec) => { const items = STILL_SESSIONS.filter((x) => x.section === sec); if (!items.length) return null; return (<div key={sec}><p style={{ color: BROWN, fontSize: 11, fontWeight: "bold", letterSpacing: 1.5, textTransform: "uppercase", margin: "18px 0 8px", fontFamily: "sans-serif", opacity: 0.65 }}>{sec}</p>{items.map((se) => (
               <div key={se.key} onClick={() => { if (window.__graceStillAudio) { window.__graceStillAudio.pause(); window.__graceStillAudio = null; } setStillAudioState("idle"); setStillAudioUrl(""); setStillAudioErr(""); musicBeforeSession.current = musicOn; setStillSession(se); setStillStep(0); setStillPaused(false); setMusicOn(true); }} style={{ display: "flex", alignItems: "center", gap: 13, background: WHITE, border: `1px solid ${GOLD_LIGHT}`, borderRadius: 16, padding: 11, marginBottom: 10, cursor: "pointer", boxShadow: "0 6px 16px -12px rgba(74,53,16,0.4)" }}>
@@ -3417,7 +3439,7 @@ const startQuiz = (level) => {
               </div>
             ))}</div>); })}
             <p style={{ color: BROWN, fontSize: 11.5, textAlign: "center", margin: "16px 0 0", fontStyle: "italic" }}>{STILL_SESSIONS.length >= 29 ? "All 29 sessions ready — be still and know. 🙏" : STILL_SESSIONS.length + " of 29 ready — more coming. 🙏"}</p>
-            <p style={{ color: BROWN, fontSize: 11, textAlign: "center", lineHeight: 1.6, margin: "14px auto 0", maxWidth: 344, opacity: 0.7 }}>Carrying something too heavy to bear alone? You don't have to. In the U.S., you can call or text <b>988</b> anytime to talk with someone who cares. You are deeply loved, and you never have to walk through it alone. 💛</p>
+            <p style={{ color: BROWN, fontSize: 11, textAlign: "center", lineHeight: 1.6, margin: "14px auto 0", maxWidth: 344, opacity: 0.7 }}>Carrying something too heavy to bear alone? You don't have to. In the U.S., you can call or text <b>988</b> anytime to talk with someone who cares. You are deeply loved, and you never have to walk through it alone. 💛</p></>)}
           </div>
         )}
         {activeTab === "salvation" && (
@@ -3467,7 +3489,7 @@ const startQuiz = (level) => {
             <span style={{ color: GOLD_LIGHT, fontSize: 11, fontWeight: "bold", opacity: 0.85 }}>{musicOn ? "♪ Worship" : "♪ off"}</span>
           </div>
           <p style={{ color: GOLD_MID, fontSize: 11, fontWeight: "bold", letterSpacing: 2, textTransform: "uppercase", marginTop: 24 }}>{stillSession.name} · {stillSession.ref}</p>
-          <div style={{ display: "flex", gap: 10, justifyContent: "center", marginTop: 12, flexWrap: "wrap" }}><button onClick={playStillAudio} disabled={stillAudioState === "loading"} style={{ background: "rgba(245,230,192,0.14)", border: `1px solid ${GOLD_MID}`, color: GOLD_LIGHT, borderRadius: 30, padding: "7px 16px", fontSize: 12.5, fontWeight: "bold", fontFamily: "sans-serif", cursor: "pointer" }}>{stillAudioState === "loading" ? "⏳ Preparing voice…" : stillAudioState === "playing" ? "⏸ Stop voice" : "🔊 Listen in voice"}</button>{stillAudioUrl && (<a href={stillAudioUrl} download style={{ background: "rgba(245,230,192,0.14)", border: `1px solid ${GOLD_MID}`, color: GOLD_LIGHT, borderRadius: 30, padding: "7px 16px", fontSize: 12.5, fontWeight: "bold", fontFamily: "sans-serif", cursor: "pointer", textDecoration: "none" }}>⬇ Save</a>)}</div>{stillAudioErr && (<p style={{ color: "#FFD9D9", fontSize: 11, marginTop: 8 }}>{stillAudioErr}</p>)}
+          <div style={{ display: "flex", gap: 10, justifyContent: "center", marginTop: 12, flexWrap: "wrap" }}><button onClick={playStillAudio} disabled={stillAudioState === "loading"} style={{ background: "rgba(245,230,192,0.14)", border: `1px solid ${GOLD_MID}`, color: GOLD_LIGHT, borderRadius: 30, padding: "7px 16px", fontSize: 12.5, fontWeight: "bold", fontFamily: "sans-serif", cursor: "pointer" }}>{stillAudioState === "loading" ? "⏳ Preparing voice…" : stillAudioState === "playing" ? "⏸ Stop voice" : "🔊 Listen in voice"}</button>{stillAudioUrl && user && user.uid === GD_ADMIN_UID && (<a href={stillAudioUrl} download style={{ background: "rgba(245,230,192,0.14)", border: `1px solid ${GOLD_MID}`, color: GOLD_LIGHT, borderRadius: 30, padding: "7px 16px", fontSize: 12.5, fontWeight: "bold", fontFamily: "sans-serif", cursor: "pointer", textDecoration: "none" }}>⬇ Save</a>)}</div>{stillAudioErr && (<p style={{ color: "#FFD9D9", fontSize: 11, marginTop: 8 }}>{stillAudioErr}</p>)}
           <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
             {(stillSession.steps[stillStep].label === "Breathe" || stillSession.steps[stillStep].label === "Stillness") ? (
               <div style={{ width: 132, height: 132, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 18, background: "radial-gradient(circle, rgba(245,230,192,0.5) 0%, rgba(245,230,192,0.04) 70%)", animation: "gdBreath 8s ease-in-out infinite", animationPlayState: stillPaused ? "paused" : "running" }}><span style={{ fontSize: 40 }}>{stillSession.steps[stillStep].icon}</span></div>
