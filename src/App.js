@@ -1812,8 +1812,17 @@ function WordSearchGame() {
   const [musicWaiting, setMusicWaiting] = useState(false);
   const [stillSession, setStillSession] = useState(null);
   const [stillStep, setStillStep] = useState(0);
+  const [stillPaused, setStillPaused] = useState(false);
   const musicBeforeSession = useRef(false);
   const closeStillSession = () => { setStillSession(null); if (!musicBeforeSession.current) setMusicOn(false); };
+  const STILL_PACE = { Welcome: 40, Breathe: 50, "The Word": 45, Reflection: 70, "Guided Prayer": 90, Stillness: 75, Blessing: 40 };
+  useEffect(() => {
+    if (!stillSession || stillPaused) return;
+    if (stillStep >= stillSession.steps.length - 1) return;
+    const ms = (STILL_PACE[stillSession.steps[stillStep].label] || 50) * 1000;
+    const t = setTimeout(() => setStillStep((x) => Math.min(stillSession.steps.length - 1, x + 1)), ms);
+    return () => clearTimeout(t);
+  }, [stillSession, stillStep, stillPaused]);
   const STILL_SESSIONS = [
     { key: "bestill", name: "Be Still & Know", icon: "🕊️", ref: "Psalm 46:10", theme: "Peace", min: 7, grad: "linear-gradient(150deg, #2E5A6E, #1F3252)", steps: [
       { label: "Welcome", icon: "🕊️", text: `Welcome. For these few minutes, there's nothing you need to do and nothing you need to fix. Find a comfortable place. Let your shoulders drop. You've come to be with your Father — and He is glad you came.` },
@@ -3149,7 +3158,7 @@ const startQuiz = (level) => {
             <div style={{ borderRadius: 16, overflow: "hidden", marginBottom: 14, position: "relative" }}><div style={{ position: "relative", minHeight: 152, padding: "18px 16px", display: "flex", flexDirection: "column", justifyContent: "flex-end", backgroundImage: `linear-gradient(180deg, rgba(16,29,51,0.18) 0%, rgba(16,29,51,0.78) 100%), url(${process.env.PUBLIC_URL}/stillness-dove.jpg)`, backgroundSize: "cover", backgroundPosition: "center" }}><p style={{ color: WHITE, fontSize: 27, fontWeight: "bold", margin: 0, fontFamily: "Georgia, serif", textShadow: "0 2px 12px rgba(0,0,0,0.7)" }}>Be Still</p><p style={{ color: GOLD_LIGHT, fontSize: 12.5, fontStyle: "italic", margin: "4px 0 0", textShadow: "0 1px 6px rgba(0,0,0,0.7)" }}>"Be still, and know that I am God." — Psalm 46:10</p></div></div>
             <p style={{ color: BROWN, fontSize: 13, lineHeight: 1.6, margin: "0 0 14px" }}>Quiet your heart and let His Word draw you near. Choose where you need Him today — each is a guided few minutes with worship underneath. 🕊️</p>
             {STILL_SESSIONS.map((se) => (
-              <div key={se.key} onClick={() => { musicBeforeSession.current = musicOn; setStillSession(se); setStillStep(0); setMusicOn(true); }} style={{ display: "flex", alignItems: "center", gap: 13, background: WHITE, border: `1px solid ${GOLD_LIGHT}`, borderRadius: 16, padding: 11, marginBottom: 10, cursor: "pointer", boxShadow: "0 6px 16px -12px rgba(74,53,16,0.4)" }}>
+              <div key={se.key} onClick={() => { musicBeforeSession.current = musicOn; setStillSession(se); setStillStep(0); setStillPaused(false); setMusicOn(true); }} style={{ display: "flex", alignItems: "center", gap: 13, background: WHITE, border: `1px solid ${GOLD_LIGHT}`, borderRadius: 16, padding: 11, marginBottom: 10, cursor: "pointer", boxShadow: "0 6px 16px -12px rgba(74,53,16,0.4)" }}>
                 <div style={{ width: 52, height: 52, borderRadius: 13, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 23, background: se.grad }}>{se.icon}</div>
                 <div style={{ flex: 1, minWidth: 0 }}><p style={{ fontFamily: "Georgia, serif", fontSize: 15, color: BROWN_DARK, fontWeight: "bold", margin: 0 }}>{se.name}</p><p style={{ color: GOLD, fontSize: 11, fontStyle: "italic", margin: "1px 0 4px" }}>{se.ref}</p><div style={{ display: "flex", gap: 6 }}><span style={{ background: GOLD_LIGHT, color: BROWN_DARK, fontSize: 9.5, fontWeight: "bold", borderRadius: 20, padding: "2px 8px" }}>{se.theme}</span><span style={{ background: GOLD_LIGHT, color: BROWN_DARK, fontSize: 9.5, fontWeight: "bold", borderRadius: 20, padding: "2px 8px" }}>{se.min} min</span></div></div>
                 <div style={{ width: 33, height: 33, borderRadius: "50%", background: `linear-gradient(135deg, ${GOLD}, ${BROWN})`, color: WHITE, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, flexShrink: 0 }}>►</div>
@@ -3206,10 +3215,15 @@ const startQuiz = (level) => {
           </div>
           <p style={{ color: GOLD_MID, fontSize: 11, fontWeight: "bold", letterSpacing: 2, textTransform: "uppercase", marginTop: 24 }}>{stillSession.name} · {stillSession.ref}</p>
           <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
-            <div style={{ fontSize: 34, marginBottom: 14 }}>{stillSession.steps[stillStep].icon}</div>
+            {(stillSession.steps[stillStep].label === "Breathe" || stillSession.steps[stillStep].label === "Stillness") ? (
+              <div style={{ width: 132, height: 132, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 18, background: "radial-gradient(circle, rgba(245,230,192,0.5) 0%, rgba(245,230,192,0.04) 70%)", animation: "gdBreath 8s ease-in-out infinite", animationPlayState: stillPaused ? "paused" : "running" }}><span style={{ fontSize: 40 }}>{stillSession.steps[stillStep].icon}</span></div>
+            ) : (
+              <div style={{ fontSize: 34, marginBottom: 14 }}>{stillSession.steps[stillStep].icon}</div>
+            )}
             <p style={{ color: GOLD_LIGHT, fontSize: 11, fontWeight: "bold", letterSpacing: 2, textTransform: "uppercase", marginBottom: 14, opacity: 0.8 }}>{stillSession.steps[stillStep].label}</p>
             <p style={{ color: "#fff", fontFamily: "Georgia, serif", fontSize: 19, lineHeight: 1.6, fontWeight: 500, textShadow: "0 2px 16px rgba(0,0,0,0.4)", maxWidth: 340, margin: 0 }}>{stillSession.steps[stillStep].text}</p>
           </div>
+          <div style={{ width: "70%", maxWidth: 280, height: 3, borderRadius: 3, background: "rgba(245,230,192,0.18)", overflow: "hidden", margin: "0 auto 14px" }}><div key={stillStep} style={{ height: "100%", background: GOLD_MID, animation: `gdFill ${(STILL_PACE[stillSession.steps[stillStep].label] || 50)}s linear forwards`, animationPlayState: stillPaused ? "paused" : "running" }} /></div>
           <div style={{ display: "flex", gap: 6, justifyContent: "center", marginBottom: 18 }}>
             {stillSession.steps.map((_, i) => (<div key={i} style={{ width: i === stillStep ? 22 : 7, height: 7, borderRadius: 4, background: i === stillStep ? GOLD_MID : "rgba(245,230,192,0.3)", transition: "all 0.3s" }} />))}
           </div>
@@ -3220,11 +3234,11 @@ const startQuiz = (level) => {
             ) : (
               <button onClick={closeStillSession} style={{ background: `linear-gradient(135deg, ${GOLD_LIGHT}, ${GOLD})`, color: "#3A2E16", border: "none", borderRadius: 30, padding: "13px 36px", fontSize: 15, fontWeight: "bold", fontFamily: "sans-serif", cursor: "pointer", boxShadow: "0 10px 26px rgba(201,151,42,0.4)" }}>Amen 🙏</button>
             )}
-            <span style={{ width: 64 }} />
+            <button onClick={() => setStillPaused((p) => !p)} style={{ background: "none", border: "none", color: GOLD_LIGHT, fontSize: 12.5, cursor: "pointer", opacity: 0.75, width: 64, fontFamily: "sans-serif" }}>{stillPaused ? "▶ Resume" : "⏸ Pause"}</button>
           </div>
         </div>
       )}
-      <style>{"@keyframes gdMusicPulse{0%,100%{opacity:0.5}50%{opacity:1}}"}</style>
+      <style>{"@keyframes gdMusicPulse{0%,100%{opacity:0.5}50%{opacity:1}}@keyframes gdFill{from{width:0%}to{width:100%}}@keyframes gdBreath{0%,100%{transform:scale(0.7);opacity:0.5}50%{transform:scale(1);opacity:1}}"}</style>
       <audio ref={musicRef} src={MUSIC_TRACKS[musicTrack].url} autoPlay={musicOn} preload="auto" onPlaying={() => setMusicWaiting(false)} onEnded={() => setMusicTrack((t) => (t + 1) % MUSIC_TRACKS.length)} />
       {musicOn && (
         <div style={{ position: "fixed", left: 0, right: 0, bottom: "calc(62px + env(safe-area-inset-bottom))", zIndex: 90, margin: "0 12px", display: "flex", alignItems: "center", gap: 10, background: "rgba(74,53,16,0.96)", border: `1px solid ${GOLD}`, borderRadius: 14, padding: "8px 12px", boxShadow: "0 10px 24px -8px rgba(0,0,0,0.5)" }}>
