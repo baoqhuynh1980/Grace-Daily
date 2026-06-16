@@ -1809,12 +1809,13 @@ function WordSearchGame() {
   const [musicOn, setMusicOn] = useState(() => { try { return localStorage.getItem("gd_music_off") !== "1"; } catch (e) { return true; } });
   const [musicTrack, setMusicTrack] = useState(0);
   const [musicVol, setMusicVol] = useState(0.55);
+  const [musicWaiting, setMusicWaiting] = useState(false);
   const musicRef = useRef(null);
   const musicOnRef = useRef(musicOn);
-  useEffect(() => { const a = musicRef.current; if (!a) return; if (musicOn) { a.volume = musicVol; const pr = a.play(); if (pr && pr.catch) pr.catch(() => {}); } else { a.pause(); } }, [musicOn, musicTrack]);
+  useEffect(() => { const a = musicRef.current; if (!a) return; if (musicOn) { a.volume = musicVol; const pr = a.play(); if (pr && pr.then) { pr.then(() => setMusicWaiting(false)).catch(() => setMusicWaiting(true)); } } else { a.pause(); setMusicWaiting(false); } }, [musicOn, musicTrack]);
   useEffect(() => { const a = musicRef.current; if (a) a.volume = musicVol; }, [musicVol]);
   useEffect(() => { musicOnRef.current = musicOn; try { localStorage.setItem("gd_music_off", musicOn ? "0" : "1"); } catch (e) {} }, [musicOn]);
-  useEffect(() => { const start = () => { const a = musicRef.current; if (a && musicOnRef.current && a.paused) { a.volume = musicVol; const pr = a.play(); if (pr && pr.catch) pr.catch(() => {}); } window.removeEventListener("pointerdown", start); window.removeEventListener("keydown", start); }; window.addEventListener("pointerdown", start); window.addEventListener("keydown", start); return () => { window.removeEventListener("pointerdown", start); window.removeEventListener("keydown", start); }; }, []);
+  useEffect(() => { const start = () => { const a = musicRef.current; if (a && musicOnRef.current && a.paused) { a.volume = musicVol; const pr = a.play(); if (pr && pr.then) pr.then(() => setMusicWaiting(false)).catch(() => {}); } window.removeEventListener("pointerdown", start); window.removeEventListener("keydown", start); }; window.addEventListener("pointerdown", start); window.addEventListener("keydown", start); return () => { window.removeEventListener("pointerdown", start); window.removeEventListener("keydown", start); }; }, []);
 
   const [fastingTab, setFastingTab] = useState("foundation");
   const [fastingLog, setFastingLog] = useState([]);
@@ -3149,11 +3150,12 @@ const startQuiz = (level) => {
 
       </div>
 
-      <audio ref={musicRef} src={MUSIC_TRACKS[musicTrack].url} autoPlay={musicOn} preload="auto" onEnded={() => setMusicTrack((t) => (t + 1) % MUSIC_TRACKS.length)} />
+      <style>{"@keyframes gdMusicPulse{0%,100%{opacity:0.5}50%{opacity:1}}"}</style>
+      <audio ref={musicRef} src={MUSIC_TRACKS[musicTrack].url} autoPlay={musicOn} preload="auto" onPlaying={() => setMusicWaiting(false)} onEnded={() => setMusicTrack((t) => (t + 1) % MUSIC_TRACKS.length)} />
       {musicOn && (
         <div style={{ position: "fixed", left: 0, right: 0, bottom: "calc(62px + env(safe-area-inset-bottom))", zIndex: 90, margin: "0 12px", display: "flex", alignItems: "center", gap: 10, background: "rgba(74,53,16,0.96)", border: `1px solid ${GOLD}`, borderRadius: 14, padding: "8px 12px", boxShadow: "0 10px 24px -8px rgba(0,0,0,0.5)" }}>
           <span style={{ fontSize: 15 }}>{MUSIC_TRACKS[musicTrack].icon}</span>
-          <span style={{ flex: 1, color: GOLD_LIGHT, fontSize: 12, fontWeight: "bold", fontFamily: "sans-serif" }}>{MUSIC_TRACKS[musicTrack].name} <span style={{ color: GOLD_MID, fontWeight: "normal" }}>· Worship</span></span>
+          <span style={{ flex: 1, color: GOLD_LIGHT, fontSize: 12, fontWeight: "bold", fontFamily: "sans-serif" }}>{musicWaiting ? <span style={{ animation: "gdMusicPulse 1.6s ease-in-out infinite" }}>🎵 Tap anywhere to begin worship</span> : <span>{MUSIC_TRACKS[musicTrack].name} <span style={{ color: GOLD_MID, fontWeight: "normal" }}>· Worship</span></span>}</span>
           <button onClick={() => setMusicOpen(true)} aria-label="Open player" style={{ width: 30, height: 30, borderRadius: "50%", background: "transparent", color: GOLD_LIGHT, border: `1px solid ${GOLD}`, fontSize: 13, cursor: "pointer" }}>♪</button>
           <button onClick={() => setMusicOn(false)} aria-label="Silence" style={{ width: 30, height: 30, borderRadius: "50%", background: GOLD, color: "#3A2E16", border: "none", fontSize: 12, cursor: "pointer" }}>❚❚</button>
         </div>
