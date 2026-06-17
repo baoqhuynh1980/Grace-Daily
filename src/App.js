@@ -1496,7 +1496,7 @@ function PremiumGate({ onUpgrade }) {
         <p style={{ color: GOLD_MID, fontSize: 15, fontWeight: "bold", margin: 0, fontFamily: "sans-serif" }}>7 Days FREE — then $4.99/month</p>
         <p style={{ color: GOLD_LIGHT, fontSize: 11, margin: "2px 0 0", fontFamily: "sans-serif" }}>Cancel anytime. No commitment.</p>
       </div>
-      {[["✍️","Scripture Memory + Badges"],["📓","Prayer Journal"],["📋","Faith Vision Board"],["⚡","Fasting Tracker"],["🎯","Pop Quiz System"]].map(([icon, f]) => (
+      {[["✍️","Scripture Memory + Badges"],["📓","Prayer Journal"],["📋","Faith Vision Board"],["⚡","Fasting Tracker"],["🎯","Pop Quiz System"],["📚","Deep Bible Study"],["🔍","Word Search"],["🕊️","Be Still & Know"]].map(([icon, f]) => (
         <p key={f} style={{ color: GOLD_LIGHT, fontSize: 12, margin: "0 0 4px", fontFamily: "sans-serif", textAlign: "left" }}>✅ {icon} {f}</p>
       ))}
       <button style={{ background: `linear-gradient(135deg, ${GOLD}, #C9972A)`, color: "#FFFDF7", border: "none", borderRadius: 10, padding: "13px 20px", fontSize: 15, fontWeight: "bold", cursor: "pointer", fontFamily: "sans-serif", width: "100%", marginTop: 14 }} onClick={onUpgrade}>Start 7-Day Free Trial 👑</button>
@@ -2864,12 +2864,12 @@ const startQuiz = (level) => {
               <div style={{ background: `linear-gradient(135deg, ${BROWN_DARK}, ${BROWN})`, borderRadius: 16, padding: 18, marginBottom: 14, border: `2px solid ${GOLD}` }}>
                 <p style={{ color: GOLD_MID, fontSize: 11, fontFamily: "sans-serif", margin: "0 0 4px", letterSpacing: 1, textTransform: "uppercase" }}>Unlock Everything 👑</p>
                 <h3 style={{ color: WHITE, fontSize: 18, fontWeight: "bold", margin: "0 0 8px" }}>Grace Daily Premium</h3>
-                <p style={{ color: GOLD_LIGHT, fontSize: 13, margin: "0 0 10px", lineHeight: 1.6 }}>Scripture Memory • Prayer Journal • Bible Progress • Vision Board • Fasting Tracker • Pop Quiz</p>
+                <p style={{ color: GOLD_LIGHT, fontSize: 13, margin: "0 0 10px", lineHeight: 1.6 }}>Scripture Memory • Prayer Journal • Bible Progress • Vision Board • Fasting Tracker • Pop Quiz • Deep Study • Word Search • Stillness</p>
                 <div style={{ background: "rgba(255,255,255,0.1)", borderRadius: 10, padding: "8px 12px", marginBottom: 12 }}>
                   <p style={{ color: GOLD_MID, fontSize: 15, fontWeight: "bold", margin: 0, fontFamily: "sans-serif" }}>7 Days FREE — then $4.99/month</p>
                   <p style={{ color: GOLD_LIGHT, fontSize: 11, margin: "2px 0 0", fontFamily: "sans-serif" }}>Cancel anytime. No commitment.</p>
                 </div>
-                {[["📖","Bible Reading Progress"],["✍️","Scripture Memory + Badges"],["📓","Prayer Journal"],["📋","Faith Vision Board"],["⚡","Fasting Tracker"],["🎯","Pop Quiz System"]].map(([icon, feature]) => (
+                {[["📖","Bible Reading Progress"],["✍️","Scripture Memory + Badges"],["📓","Prayer Journal"],["📋","Faith Vision Board"],["⚡","Fasting Tracker"],["🎯","Pop Quiz System"],["📚","Deep Bible Study"],["🔍","Word Search"],["🕊️","Be Still & Know"]].map(([icon, feature]) => (
                   <p key={feature} style={{ color: GOLD_LIGHT, fontSize: 12, margin: "0 0 4px", fontFamily: "sans-serif" }}>✅ {icon} {feature}</p>
                 ))}
                 <button style={{ background: `linear-gradient(135deg, ${GOLD}, #C9972A)`, color: WHITE, border: "none", borderRadius: 10, padding: "12px 20px", fontSize: 15, fontWeight: "bold", cursor: "pointer", fontFamily: "sans-serif", width: "100%", marginTop: 12 }} onClick={() => openUpgrade()}>Start 7-Day Free Trial 👑</button>
