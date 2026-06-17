@@ -1869,7 +1869,7 @@ function WordSearchGame() {
         if (cancelled) return;
         if (!resp.ok || !data.audioUrl) { throw new Error("no audio"); }
         const audio = new Audio(data.audioUrl); window.__graceStillAudio = audio; audio.volume = 1.0;
-        if (musicRef.current) musicRef.current.volume = 0.05;
+        if (musicRef.current) musicRef.current.volume = 0.08;
         audio.onended = () => { if (cancelled) return; if (step >= stillSession.steps.length - 1) { if (musicRef.current) musicRef.current.volume = musicVol; } else { advTimer = setTimeout(() => { if (!cancelled) setStillStep((x) => Math.min(stillSession.steps.length - 1, x + 1)); }, 2600); } };
         setStillVoiceLoading(false);
         if (!stillPausedRef.current) { const pr = audio.play(); if (pr && pr.catch) pr.catch(() => {}); }
@@ -2142,8 +2142,8 @@ function WordSearchGame() {
   ];
   const musicRef = useRef(null);
   const musicOnRef = useRef(musicOn);
-  useEffect(() => { const a = musicRef.current; if (!a) return; if (musicOn) { a.volume = stillVoiceOnRef.current ? 0.05 : musicVol; const pr = a.play(); if (pr && pr.then) { pr.then(() => setMusicWaiting(false)).catch(() => setMusicWaiting(true)); } } else { a.pause(); setMusicWaiting(false); } }, [musicOn, musicTrack]);
-  useEffect(() => { const a = musicRef.current; if (a) a.volume = stillVoiceOnRef.current ? 0.05 : musicVol; }, [musicVol]);
+  useEffect(() => { const a = musicRef.current; if (!a) return; if (musicOn) { a.volume = stillVoiceOnRef.current ? 0.08 : musicVol; const pr = a.play(); if (pr && pr.then) { pr.then(() => setMusicWaiting(false)).catch(() => setMusicWaiting(true)); } } else { a.pause(); setMusicWaiting(false); } }, [musicOn, musicTrack]);
+  useEffect(() => { const a = musicRef.current; if (a) a.volume = stillVoiceOnRef.current ? 0.08 : musicVol; }, [musicVol]);
   useEffect(() => { musicOnRef.current = musicOn; try { localStorage.setItem("gd_music_off", musicOn ? "0" : "1"); } catch (e) {} }, [musicOn]);
   useEffect(() => { const start = () => { const a = musicRef.current; if (a && musicOnRef.current && a.paused) { a.volume = musicVol; const pr = a.play(); if (pr && pr.then) pr.then(() => setMusicWaiting(false)).catch(() => {}); } window.removeEventListener("pointerdown", start); window.removeEventListener("keydown", start); }; window.addEventListener("pointerdown", start); window.addEventListener("keydown", start); return () => { window.removeEventListener("pointerdown", start); window.removeEventListener("keydown", start); }; }, []);
 
