@@ -1798,7 +1798,7 @@ function WordSearchGame() {
   const [streakCelebration, setStreakCelebration] = useState(false);
   const [notifEnabled, setNotifEnabled] = useState(false);
   const [showNotifBanner, setShowNotifBanner] = useState(typeof Notification !== 'undefined' ? Notification.permission !== 'granted' : true);
-  const [isPremium, setIsPremium] = useState(false); const [userName, setUserName] = useState(""); const [portalLoading, setPortalLoading] = useState(false); const openUpgrade = () => { if (!user) { setShowAuth(true); return; } const params = new URLSearchParams(); params.set("client_reference_id", user.uid); if (user.email) params.set("prefilled_email", user.email); window.location.href = STRIPE_LINK + "?" + params.toString(); };
+  const [isPremium, setIsPremium] = useState(false); const [userName, setUserName] = useState(""); const [portalLoading, setPortalLoading] = useState(false); const [deleteState, setDeleteState] = useState("idle"); const [deleteErr, setDeleteErr] = useState(""); const openUpgrade = () => { if (!user) { setShowAuth(true); return; } const params = new URLSearchParams(); params.set("client_reference_id", user.uid); if (user.email) params.set("prefilled_email", user.email); window.location.href = STRIPE_LINK + "?" + params.toString(); };
   const MUSIC_TRACKS = [
     { name: "Morning", icon: "🌅", url: `${process.env.PUBLIC_URL}/morning.m4a` },
     { name: "Grace", icon: "✨", url: `${process.env.PUBLIC_URL}/grace.m4a` },
@@ -2641,7 +2641,20 @@ const startQuiz = (level) => {
     const result = checkAnswers(words, blankIndices, quizAnswers);
     setQuizResult(result);
   };
-  const handleSignOut = async () => { await signOut(auth); };
+  const handleSignOut = async () => { await signOut(auth); }; const handleDeleteAccount = async () => {
+    if (!user) return;
+    setDeleteErr(""); setDeleteState("deleting");
+    try {
+      const resp = await fetch("https://us-central1-grace-daily-6f520.cloudfunctions.net/deleteAccount", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ uid: user.uid }) });
+      const data = await resp.json();
+      if (!resp.ok || !data.success) { throw new Error(data.error || "Could not delete account"); }
+      try { window.alert("Your account and all your data have been permanently deleted."); } catch (e) {}
+      try { await signOut(auth); } catch (e) {}
+      setDeleteState("idle");
+    } catch (err) {
+      setDeleteErr("Could not delete your account. Please try again."); setDeleteState("idle");
+    }
+  };
 
   const s = {
     app: { background: CREAM, minHeight: "100vh", fontFamily: "Georgia, serif", paddingBottom: 80 },
@@ -2853,7 +2866,7 @@ const startQuiz = (level) => {
                 </div>
               </div>
             )}
-            {user && isPremium && (<button style={{ ...s.btn, marginTop: 0, marginBottom: 14 }} disabled={portalLoading} onClick={async () => { setPortalLoading(true); try { const resp = await fetch("https://us-central1-grace-daily-6f520.cloudfunctions.net/createPortalSession", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ uid: user.uid }) }); const data = await resp.json(); if (!resp.ok || !data.url) { throw new Error(data.error || "Could not open"); } window.location.href = data.url; } catch (err) { alert("Could not open subscription management right now. Please try again."); setPortalLoading(false); } }}>{portalLoading ? "⏳ Opening..." : "💳 Manage Subscription"}</button>)}{!user && (<div style={{ ...s.card, border: `2px solid ${GOLD_MID}`, background: GOLD_LIGHT }}><p style={{ color: BROWN_DARK, fontSize: 14, fontWeight: "bold", margin: "0 0 6px" }}>✝️ Save Your Progress</p><p style={{ color: BROWN, fontSize: 13, margin: "0 0 10px", lineHeight: 1.5 }}>Create a free account to save your streak, Bible reading, memory verses, and more — forever!</p><button style={s.btn} onClick={() => setShowAuth(true)}>Create Free Account →</button></div>)}
+            {user && isPremium && (<button style={{ ...s.btn, marginTop: 0, marginBottom: 14 }} disabled={portalLoading} onClick={async () => { setPortalLoading(true); try { const resp = await fetch("https://us-central1-grace-daily-6f520.cloudfunctions.net/createPortalSession", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ uid: user.uid }) }); const data = await resp.json(); if (!resp.ok || !data.url) { throw new Error(data.error || "Could not open"); } window.location.href = data.url; } catch (err) { alert("Could not open subscription management right now. Please try again."); setPortalLoading(false); } }}>{portalLoading ? "⏳ Opening..." : "💳 Manage Subscription"}</button>)}{user && (<div style={{ marginTop: 4, marginBottom: 14 }}>{deleteState === "idle" && (<button onClick={() => { setDeleteErr(""); setDeleteState("confirm"); }} style={{ background: "none", border: "none", color: BROWN, opacity: 0.6, fontSize: 12, fontFamily: "sans-serif", cursor: "pointer", textDecoration: "underline", padding: "4px 0" }}>Delete my account</button>)}{(deleteState === "confirm" || deleteState === "deleting") && (<div style={{ background: "#FBEDED", border: "1px solid #E3B7B7", borderRadius: 12, padding: 16 }}><p style={{ color: "#8A2C2C", fontSize: 13.5, fontWeight: "bold", margin: "0 0 6px", fontFamily: "sans-serif" }}>⚠️ Delete your account?</p><p style={{ color: BROWN_DARK, fontSize: 12.5, margin: "0 0 12px", lineHeight: 1.55, fontFamily: "sans-serif" }}>This permanently deletes your account and all your private data — journals, memory verses, vision goals, streaks, and progress. This cannot be undone.</p>{deleteErr && (<p style={{ color: "#B23A3A", fontSize: 12, margin: "0 0 10px", fontFamily: "sans-serif" }}>{deleteErr}</p>)}<div style={{ display: "flex", gap: 10 }}><button onClick={handleDeleteAccount} disabled={deleteState === "deleting"} style={{ flex: 1, background: "#B23A3A", color: "#FFFFFF", border: "none", borderRadius: 10, padding: "11px 14px", fontSize: 13, fontWeight: "bold", fontFamily: "sans-serif", cursor: "pointer" }}>{deleteState === "deleting" ? "Deleting…" : "Yes, delete everything"}</button><button onClick={() => { setDeleteState("idle"); setDeleteErr(""); }} disabled={deleteState === "deleting"} style={{ flex: 1, background: "rgba(0,0,0,0.06)", color: BROWN_DARK, border: "none", borderRadius: 10, padding: "11px 14px", fontSize: 13, fontWeight: "bold", fontFamily: "sans-serif", cursor: "pointer" }}>Cancel</button></div></div>)}</div>)}{!user && (<div style={{ ...s.card, border: `2px solid ${GOLD_MID}`, background: GOLD_LIGHT }}><p style={{ color: BROWN_DARK, fontSize: 14, fontWeight: "bold", margin: "0 0 6px" }}>✝️ Save Your Progress</p><p style={{ color: BROWN, fontSize: 13, margin: "0 0 10px", lineHeight: 1.5 }}>Create a free account to save your streak, Bible reading, memory verses, and more — forever!</p><button style={s.btn} onClick={() => setShowAuth(true)}>Create Free Account →</button></div>)}
               <div style={s.card}>
               <p style={{ ...s.sectionTitle, fontSize: 15, marginBottom: 8 }}>Quick Actions</p>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
