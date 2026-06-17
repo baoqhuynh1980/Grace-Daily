@@ -1821,8 +1821,8 @@ function WordSearchGame() {
   const stillPausedRef = useRef(false);
   const stillVoiceOnRef = useRef(false);
   const musicBeforeSession = useRef(false);
-  const closeStillSession = () => { setStillSession(null); setStillVoiceOn(false); setStillMuted(false); if (window.__graceStillAudio) { window.__graceStillAudio.pause(); window.__graceStillAudio = null; } if (musicRef.current) musicRef.current.volume = musicVol; if (!musicBeforeSession.current) setMusicOn(false); setStillVoiceLoading(false); };
-  const stopStillVoice = () => { setStillVoiceOn(false); if (window.__graceStillAudio) { window.__graceStillAudio.pause(); window.__graceStillAudio = null; } if (musicRef.current) musicRef.current.volume = musicVol; setStillVoiceLoading(false); };
+  const closeStillSession = () => { setStillSession(null); setStillVoiceOn(false); setStillMuted(false); if (window.__graceStillAudio) { window.__graceStillAudio.pause(); window.__graceStillAudio = null; } if (musicRef.current) setMusicLevel(musicVol); if (!musicBeforeSession.current) setMusicOn(false); setStillVoiceLoading(false); };
+  const stopStillVoice = () => { setStillVoiceOn(false); if (window.__graceStillAudio) { window.__graceStillAudio.pause(); window.__graceStillAudio = null; } if (musicRef.current) setMusicLevel(musicVol); setStillVoiceLoading(false); };
   const toggleStillMute = () => {
     const willMute = !stillMuted; setStillMuted(willMute);
     if (willMute) {
@@ -1854,7 +1854,7 @@ function WordSearchGame() {
     return () => clearTimeout(t);
   }, [stillSession, stillStep, stillPaused, stillVoiceOn]);
   useEffect(() => { stillPausedRef.current = stillPaused; }, [stillPaused]);
-  useEffect(() => { stillVoiceOnRef.current = stillVoiceOn; if (!stillVoiceOn && musicRef.current) musicRef.current.volume = musicVol; }, [stillVoiceOn]);
+  useEffect(() => { stillVoiceOnRef.current = stillVoiceOn; if (!stillVoiceOn && musicRef.current) setMusicLevel(musicVol); }, [stillVoiceOn]);
   useEffect(() => {
     if (!stillSession || !stillVoiceOn) return;
     let cancelled = false; let advTimer = null;
@@ -1869,11 +1869,11 @@ function WordSearchGame() {
         if (cancelled) return;
         if (!resp.ok || !data.audioUrl) { throw new Error("no audio"); }
         const audio = new Audio(data.audioUrl); window.__graceStillAudio = audio; audio.volume = 1.0;
-        if (musicRef.current) musicRef.current.volume = 0.08;
-        audio.onended = () => { if (cancelled) return; if (step >= stillSession.steps.length - 1) { if (musicRef.current) musicRef.current.volume = musicVol; } else { advTimer = setTimeout(() => { if (!cancelled) setStillStep((x) => Math.min(stillSession.steps.length - 1, x + 1)); }, 2600); } };
+        if (musicRef.current) setMusicLevel(0.08);
+        audio.onended = () => { if (cancelled) return; if (step >= stillSession.steps.length - 1) { if (musicRef.current) setMusicLevel(musicVol); } else { advTimer = setTimeout(() => { if (!cancelled) setStillStep((x) => Math.min(stillSession.steps.length - 1, x + 1)); }, 2600); } };
         setStillVoiceLoading(false);
         if (!stillPausedRef.current) { const pr = audio.play(); if (pr && pr.catch) pr.catch(() => {}); }
-      } catch (e) { if (!cancelled) { setStillAudioErr("Voice unavailable right now. Please try again."); setStillVoiceOn(false); setStillVoiceLoading(false); if (musicRef.current) musicRef.current.volume = musicVol; } }
+      } catch (e) { if (!cancelled) { setStillAudioErr("Voice unavailable right now. Please try again."); setStillVoiceOn(false); setStillVoiceLoading(false); if (musicRef.current) setMusicLevel(musicVol); } }
     })();
     return () => { cancelled = true; if (advTimer) clearTimeout(advTimer); };
   }, [stillSession, stillStep, stillVoiceOn]);
@@ -2141,11 +2141,30 @@ function WordSearchGame() {
     ]},
   ];
   const musicRef = useRef(null);
+  const musicCtxRef = useRef(null); const musicSrcRef = useRef(null); const musicGainRef = useRef(null);
+  const ensureMusicGraph = () => {
+    try {
+      if (musicGainRef.current) { if (musicCtxRef.current && musicCtxRef.current.state === "suspended" && musicCtxRef.current.resume) musicCtxRef.current.resume(); return true; }
+      const el = musicRef.current; if (!el) return false;
+      const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return false;
+      const ctx = new AC();
+      const src = ctx.createMediaElementSource(el);
+      const gain = ctx.createGain(); gain.gain.value = musicVol;
+      src.connect(gain); gain.connect(ctx.destination);
+      if (ctx.resume) ctx.resume();
+      musicCtxRef.current = ctx; musicSrcRef.current = src; musicGainRef.current = gain; el.volume = 1.0;
+      return true;
+    } catch (e) { return false; }
+  };
+  const setMusicLevel = (x) => {
+    if (musicGainRef.current) { try { musicGainRef.current.gain.value = x; if (musicRef.current) musicRef.current.volume = 1.0; return; } catch (e) {} }
+    if (musicRef.current) musicRef.current.volume = x;
+  };
   const musicOnRef = useRef(musicOn);
-  useEffect(() => { const a = musicRef.current; if (!a) return; if (musicOn) { a.volume = stillVoiceOnRef.current ? 0.08 : musicVol; const pr = a.play(); if (pr && pr.then) { pr.then(() => setMusicWaiting(false)).catch(() => setMusicWaiting(true)); } } else { a.pause(); setMusicWaiting(false); } }, [musicOn, musicTrack]);
-  useEffect(() => { const a = musicRef.current; if (a) a.volume = stillVoiceOnRef.current ? 0.08 : musicVol; }, [musicVol]);
+  useEffect(() => { const a = musicRef.current; if (!a) return; if (musicOn) { setMusicLevel(stillVoiceOnRef.current ? 0.08 : musicVol); const pr = a.play(); if (pr && pr.then) { pr.then(() => setMusicWaiting(false)).catch(() => setMusicWaiting(true)); } } else { a.pause(); setMusicWaiting(false); } }, [musicOn, musicTrack]);
+  useEffect(() => { const a = musicRef.current; if (a) setMusicLevel(stillVoiceOnRef.current ? 0.08 : musicVol); }, [musicVol]);
   useEffect(() => { musicOnRef.current = musicOn; try { localStorage.setItem("gd_music_off", musicOn ? "0" : "1"); } catch (e) {} }, [musicOn]);
-  useEffect(() => { const start = () => { const a = musicRef.current; if (a && musicOnRef.current && a.paused) { a.volume = musicVol; const pr = a.play(); if (pr && pr.then) pr.then(() => setMusicWaiting(false)).catch(() => {}); } window.removeEventListener("pointerdown", start); window.removeEventListener("keydown", start); }; window.addEventListener("pointerdown", start); window.addEventListener("keydown", start); return () => { window.removeEventListener("pointerdown", start); window.removeEventListener("keydown", start); }; }, []);
+  useEffect(() => { const start = () => { const a = musicRef.current; if (a && musicOnRef.current && a.paused) { ensureMusicGraph(); setMusicLevel(musicVol); const pr = a.play(); if (pr && pr.then) pr.then(() => setMusicWaiting(false)).catch(() => {}); } window.removeEventListener("pointerdown", start); window.removeEventListener("keydown", start); }; window.addEventListener("pointerdown", start); window.addEventListener("keydown", start); return () => { window.removeEventListener("pointerdown", start); window.removeEventListener("keydown", start); }; }, []);
 
   const [fastingTab, setFastingTab] = useState("foundation");
   const [fastingLog, setFastingLog] = useState([]);
@@ -3480,7 +3499,7 @@ const startQuiz = (level) => {
             {isPremium && (<>
             <p style={{ color: BROWN, fontSize: 13, lineHeight: 1.6, margin: "0 0 14px" }}>Quiet your heart and let His Word draw you near. Choose where you need Him today — each is a guided few minutes with worship underneath. 🕊️</p>
             {STILL_SECTIONS.map((sec) => { const items = STILL_SESSIONS.filter((x) => x.section === sec); if (!items.length) return null; return (<div key={sec}><p style={{ color: BROWN, fontSize: 11, fontWeight: "bold", letterSpacing: 1.5, textTransform: "uppercase", margin: "18px 0 8px", fontFamily: "sans-serif", opacity: 0.65 }}>{sec}</p>{items.map((se) => (
-              <div key={se.key} onClick={() => { if (window.__graceStillAudio) { window.__graceStillAudio.pause(); window.__graceStillAudio = null; } setStillVoiceLoading(false); setStillAudioErr(""); musicBeforeSession.current = musicOn; setStillSession(se); setStillStep(0); setStillPaused(false); setStillMuted(false); setMusicOn(true); setStillVoiceOn(true); }} style={{ display: "flex", alignItems: "center", gap: 13, background: WHITE, border: `1px solid ${GOLD_LIGHT}`, borderRadius: 16, padding: 11, marginBottom: 10, cursor: "pointer", boxShadow: "0 6px 16px -12px rgba(74,53,16,0.4)" }}>
+              <div key={se.key} onClick={() => { if (window.__graceStillAudio) { window.__graceStillAudio.pause(); window.__graceStillAudio = null; } setStillVoiceLoading(false); setStillAudioErr(""); ensureMusicGraph(); musicBeforeSession.current = musicOn; setStillSession(se); setStillStep(0); setStillPaused(false); setStillMuted(false); setMusicOn(true); setStillVoiceOn(true); }} style={{ display: "flex", alignItems: "center", gap: 13, background: WHITE, border: `1px solid ${GOLD_LIGHT}`, borderRadius: 16, padding: 11, marginBottom: 10, cursor: "pointer", boxShadow: "0 6px 16px -12px rgba(74,53,16,0.4)" }}>
                 <div style={{ width: 52, height: 52, borderRadius: 13, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 23, background: se.grad }}>{se.icon}</div>
                 <div style={{ flex: 1, minWidth: 0 }}><p style={{ fontFamily: "Georgia, serif", fontSize: 15, color: BROWN_DARK, fontWeight: "bold", margin: 0 }}>{se.name}</p><p style={{ color: GOLD, fontSize: 11, fontStyle: "italic", margin: "1px 0 4px" }}>{se.ref}</p><div style={{ display: "flex", gap: 6 }}><span style={{ background: GOLD_LIGHT, color: BROWN_DARK, fontSize: 9.5, fontWeight: "bold", borderRadius: 20, padding: "2px 8px" }}>{se.theme}</span><span style={{ background: GOLD_LIGHT, color: BROWN_DARK, fontSize: 9.5, fontWeight: "bold", borderRadius: 20, padding: "2px 8px" }}>{se.min} min</span></div></div>
                 <div style={{ width: 33, height: 33, borderRadius: "50%", background: `linear-gradient(135deg, ${GOLD}, ${BROWN})`, color: WHITE, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, flexShrink: 0 }}>►</div>
