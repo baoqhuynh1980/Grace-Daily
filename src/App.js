@@ -1813,35 +1813,61 @@ function WordSearchGame() {
   const [stillSession, setStillSession] = useState(null);
   const [stillStep, setStillStep] = useState(0);
   const [stillPaused, setStillPaused] = useState(false);
-  const [stillAudioState, setStillAudioState] = useState("idle");
-  const [stillAudioUrl, setStillAudioUrl] = useState("");
   const [stillAudioErr, setStillAudioErr] = useState("");
+  const [stillVoiceOn, setStillVoiceOn] = useState(false);
+  const [stillVoiceLoading, setStillVoiceLoading] = useState(false);
+  const [stillDlState, setStillDlState] = useState("idle");
+  const stillPausedRef = useRef(false);
+  const stillVoiceOnRef = useRef(false);
   const musicBeforeSession = useRef(false);
-  const closeStillSession = () => { setStillSession(null); if (!musicBeforeSession.current) setMusicOn(false); if (window.__graceStillAudio) { window.__graceStillAudio.pause(); window.__graceStillAudio = null; } setStillAudioState("idle"); };
-  const playStillAudio = async () => {
+  const closeStillSession = () => { setStillSession(null); setStillVoiceOn(false); if (window.__graceStillAudio) { window.__graceStillAudio.pause(); window.__graceStillAudio = null; } if (musicRef.current) musicRef.current.volume = musicVol; if (!musicBeforeSession.current) setMusicOn(false); setStillVoiceLoading(false); };
+  const stopStillVoice = () => { setStillVoiceOn(false); if (window.__graceStillAudio) { window.__graceStillAudio.pause(); window.__graceStillAudio = null; } if (musicRef.current) musicRef.current.volume = musicVol; setStillVoiceLoading(false); };
+  const toggleStillVoice = () => { if (!stillSession) return; if (!isPremium) { openUpgrade(); return; } if (stillVoiceOn) { stopStillVoice(); } else { setStillAudioErr(""); setStillVoiceOn(true); } };
+  const downloadStillFull = async () => {
     if (!stillSession) return;
-    if (!isPremium) { openUpgrade(); return; }
-    if (stillAudioState === "playing") { const a = window.__graceStillAudio; if (a) { a.pause(); window.__graceStillAudio = null; } setStillAudioState("idle"); return; }
-    if (stillAudioState === "loading") return;
-    setStillAudioErr(""); setStillAudioState("loading");
+    setStillAudioErr(""); setStillDlState("loading");
     try {
       const text = stillSession.steps.map((st) => st.text).join("\n\n");
-      const resp = await fetch("https://us-central1-grace-daily-6f520.cloudfunctions.net/generateStillnessAudio", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: stillSession.key, text }) });
+      const resp = await fetch("https://us-central1-grace-daily-6f520.cloudfunctions.net/generateStillnessAudio", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: stillSession.key + "-full", text }) });
       const data = await resp.json();
-      if (!resp.ok || !data.audioUrl) { throw new Error(data.error || "Could not load audio"); }
-      setStillAudioUrl(data.audioUrl);
-      const audio = new Audio(data.audioUrl); window.__graceStillAudio = audio; audio.onended = () => setStillAudioState("idle"); audio.play(); setStillAudioState("playing");
-    } catch (err) { setStillAudioErr("Voice unavailable right now. Please try again."); setStillAudioState("idle"); }
+      if (!resp.ok || !data.audioUrl) { throw new Error("no audio"); }
+      const a = document.createElement("a"); a.href = data.audioUrl; a.download = stillSession.key + ".mp3"; a.target = "_blank"; a.rel = "noopener noreferrer"; document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      setStillDlState("idle");
+    } catch (e) { setStillDlState("idle"); setStillAudioErr("Download unavailable right now. Please try again."); }
   };
   const STILL_PACE = { Welcome: 40, Breathe: 50, "The Word": 45, Reflection: 70, "Guided Prayer": 90, Stillness: 75, Blessing: 40 };
   const STILL_SECTIONS = ["Hard Places", "Drawing Near", "Strength & Battle", "Rhythms of the Day", "Seasons"];
   useEffect(() => {
-    if (!stillSession || stillPaused) return;
+    if (!stillSession || stillPaused || stillVoiceOn) return;
     if (stillStep >= stillSession.steps.length - 1) return;
     const ms = (STILL_PACE[stillSession.steps[stillStep].label] || 50) * 1000;
     const t = setTimeout(() => setStillStep((x) => Math.min(stillSession.steps.length - 1, x + 1)), ms);
     return () => clearTimeout(t);
-  }, [stillSession, stillStep, stillPaused]);
+  }, [stillSession, stillStep, stillPaused, stillVoiceOn]);
+  useEffect(() => { stillPausedRef.current = stillPaused; }, [stillPaused]);
+  useEffect(() => { stillVoiceOnRef.current = stillVoiceOn; if (!stillVoiceOn && musicRef.current) musicRef.current.volume = musicVol; }, [stillVoiceOn]);
+  useEffect(() => {
+    if (!stillSession || !stillVoiceOn) return;
+    let cancelled = false; let advTimer = null;
+    const step = stillStep;
+    const stepObj = stillSession.steps[step];
+    if (window.__graceStillAudio) { window.__graceStillAudio.pause(); window.__graceStillAudio = null; }
+    setStillVoiceLoading(true);
+    (async () => {
+      try {
+        const resp = await fetch("https://us-central1-grace-daily-6f520.cloudfunctions.net/generateStillnessAudio", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: stillSession.key + "-" + step, text: stepObj.text }) });
+        const data = await resp.json();
+        if (cancelled) return;
+        if (!resp.ok || !data.audioUrl) { throw new Error("no audio"); }
+        const audio = new Audio(data.audioUrl); window.__graceStillAudio = audio;
+        if (musicRef.current) musicRef.current.volume = 0.12;
+        audio.onended = () => { if (cancelled) return; if (step >= stillSession.steps.length - 1) { if (musicRef.current) musicRef.current.volume = musicVol; } else { advTimer = setTimeout(() => { if (!cancelled) setStillStep((x) => Math.min(stillSession.steps.length - 1, x + 1)); }, 2600); } };
+        setStillVoiceLoading(false);
+        if (!stillPausedRef.current) { const pr = audio.play(); if (pr && pr.catch) pr.catch(() => {}); }
+      } catch (e) { if (!cancelled) { setStillAudioErr("Voice unavailable right now. Please try again."); setStillVoiceOn(false); setStillVoiceLoading(false); if (musicRef.current) musicRef.current.volume = musicVol; } }
+    })();
+    return () => { cancelled = true; if (advTimer) clearTimeout(advTimer); };
+  }, [stillSession, stillStep, stillVoiceOn]);
   const STILL_SESSIONS = [
     { key: "bestill", section: "Drawing Near", name: "Be Still & Know", icon: "🕊️", ref: "Psalm 46:10", theme: "Peace", min: 7, grad: "linear-gradient(150deg, #2E5A6E, #1F3252)", steps: [
       { label: "Welcome", icon: "🕊️", text: `Welcome. For these few minutes, there's nothing you need to do and nothing you need to fix. Find a comfortable place. Let your shoulders drop. You've come to be with your Father — and He is glad you came.` },
@@ -2107,8 +2133,8 @@ function WordSearchGame() {
   ];
   const musicRef = useRef(null);
   const musicOnRef = useRef(musicOn);
-  useEffect(() => { const a = musicRef.current; if (!a) return; if (musicOn) { a.volume = musicVol; const pr = a.play(); if (pr && pr.then) { pr.then(() => setMusicWaiting(false)).catch(() => setMusicWaiting(true)); } } else { a.pause(); setMusicWaiting(false); } }, [musicOn, musicTrack]);
-  useEffect(() => { const a = musicRef.current; if (a) a.volume = musicVol; }, [musicVol]);
+  useEffect(() => { const a = musicRef.current; if (!a) return; if (musicOn) { a.volume = stillVoiceOnRef.current ? 0.12 : musicVol; const pr = a.play(); if (pr && pr.then) { pr.then(() => setMusicWaiting(false)).catch(() => setMusicWaiting(true)); } } else { a.pause(); setMusicWaiting(false); } }, [musicOn, musicTrack]);
+  useEffect(() => { const a = musicRef.current; if (a) a.volume = stillVoiceOnRef.current ? 0.12 : musicVol; }, [musicVol]);
   useEffect(() => { musicOnRef.current = musicOn; try { localStorage.setItem("gd_music_off", musicOn ? "0" : "1"); } catch (e) {} }, [musicOn]);
   useEffect(() => { const start = () => { const a = musicRef.current; if (a && musicOnRef.current && a.paused) { a.volume = musicVol; const pr = a.play(); if (pr && pr.then) pr.then(() => setMusicWaiting(false)).catch(() => {}); } window.removeEventListener("pointerdown", start); window.removeEventListener("keydown", start); }; window.addEventListener("pointerdown", start); window.addEventListener("keydown", start); return () => { window.removeEventListener("pointerdown", start); window.removeEventListener("keydown", start); }; }, []);
 
@@ -3432,7 +3458,7 @@ const startQuiz = (level) => {
             {isPremium && (<>
             <p style={{ color: BROWN, fontSize: 13, lineHeight: 1.6, margin: "0 0 14px" }}>Quiet your heart and let His Word draw you near. Choose where you need Him today — each is a guided few minutes with worship underneath. 🕊️</p>
             {STILL_SECTIONS.map((sec) => { const items = STILL_SESSIONS.filter((x) => x.section === sec); if (!items.length) return null; return (<div key={sec}><p style={{ color: BROWN, fontSize: 11, fontWeight: "bold", letterSpacing: 1.5, textTransform: "uppercase", margin: "18px 0 8px", fontFamily: "sans-serif", opacity: 0.65 }}>{sec}</p>{items.map((se) => (
-              <div key={se.key} onClick={() => { if (window.__graceStillAudio) { window.__graceStillAudio.pause(); window.__graceStillAudio = null; } setStillAudioState("idle"); setStillAudioUrl(""); setStillAudioErr(""); musicBeforeSession.current = musicOn; setStillSession(se); setStillStep(0); setStillPaused(false); setMusicOn(true); }} style={{ display: "flex", alignItems: "center", gap: 13, background: WHITE, border: `1px solid ${GOLD_LIGHT}`, borderRadius: 16, padding: 11, marginBottom: 10, cursor: "pointer", boxShadow: "0 6px 16px -12px rgba(74,53,16,0.4)" }}>
+              <div key={se.key} onClick={() => { if (window.__graceStillAudio) { window.__graceStillAudio.pause(); window.__graceStillAudio = null; } setStillVoiceOn(false); setStillVoiceLoading(false); setStillAudioErr(""); musicBeforeSession.current = musicOn; setStillSession(se); setStillStep(0); setStillPaused(false); setMusicOn(true); }} style={{ display: "flex", alignItems: "center", gap: 13, background: WHITE, border: `1px solid ${GOLD_LIGHT}`, borderRadius: 16, padding: 11, marginBottom: 10, cursor: "pointer", boxShadow: "0 6px 16px -12px rgba(74,53,16,0.4)" }}>
                 <div style={{ width: 52, height: 52, borderRadius: 13, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 23, background: se.grad }}>{se.icon}</div>
                 <div style={{ flex: 1, minWidth: 0 }}><p style={{ fontFamily: "Georgia, serif", fontSize: 15, color: BROWN_DARK, fontWeight: "bold", margin: 0 }}>{se.name}</p><p style={{ color: GOLD, fontSize: 11, fontStyle: "italic", margin: "1px 0 4px" }}>{se.ref}</p><div style={{ display: "flex", gap: 6 }}><span style={{ background: GOLD_LIGHT, color: BROWN_DARK, fontSize: 9.5, fontWeight: "bold", borderRadius: 20, padding: "2px 8px" }}>{se.theme}</span><span style={{ background: GOLD_LIGHT, color: BROWN_DARK, fontSize: 9.5, fontWeight: "bold", borderRadius: 20, padding: "2px 8px" }}>{se.min} min</span></div></div>
                 <div style={{ width: 33, height: 33, borderRadius: "50%", background: `linear-gradient(135deg, ${GOLD}, ${BROWN})`, color: WHITE, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, flexShrink: 0 }}>►</div>
@@ -3489,7 +3515,7 @@ const startQuiz = (level) => {
             <span style={{ color: GOLD_LIGHT, fontSize: 11, fontWeight: "bold", opacity: 0.85 }}>{musicOn ? "♪ Worship" : "♪ off"}</span>
           </div>
           <p style={{ color: GOLD_MID, fontSize: 11, fontWeight: "bold", letterSpacing: 2, textTransform: "uppercase", marginTop: 24 }}>{stillSession.name} · {stillSession.ref}</p>
-          <div style={{ display: "flex", gap: 10, justifyContent: "center", marginTop: 12, flexWrap: "wrap" }}><button onClick={playStillAudio} disabled={stillAudioState === "loading"} style={{ background: "rgba(245,230,192,0.14)", border: `1px solid ${GOLD_MID}`, color: GOLD_LIGHT, borderRadius: 30, padding: "7px 16px", fontSize: 12.5, fontWeight: "bold", fontFamily: "sans-serif", cursor: "pointer" }}>{stillAudioState === "loading" ? "⏳ Preparing voice…" : stillAudioState === "playing" ? "⏸ Stop voice" : "🔊 Listen in voice"}</button>{stillAudioUrl && user && user.uid === GD_ADMIN_UID && (<a href={stillAudioUrl} download style={{ background: "rgba(245,230,192,0.14)", border: `1px solid ${GOLD_MID}`, color: GOLD_LIGHT, borderRadius: 30, padding: "7px 16px", fontSize: 12.5, fontWeight: "bold", fontFamily: "sans-serif", cursor: "pointer", textDecoration: "none" }}>⬇ Save</a>)}</div>{stillAudioErr && (<p style={{ color: "#FFD9D9", fontSize: 11, marginTop: 8 }}>{stillAudioErr}</p>)}
+          <div style={{ display: "flex", gap: 10, justifyContent: "center", marginTop: 12, flexWrap: "wrap" }}><button onClick={toggleStillVoice} disabled={stillVoiceLoading} style={{ background: "rgba(245,230,192,0.14)", border: `1px solid ${GOLD_MID}`, color: GOLD_LIGHT, borderRadius: 30, padding: "7px 16px", fontSize: 12.5, fontWeight: "bold", fontFamily: "sans-serif", cursor: "pointer" }}>{stillVoiceLoading ? "⏳ Preparing voice…" : stillVoiceOn ? "⏸ Stop voice" : "🔊 Listen in voice"}</button>{user && user.uid === GD_ADMIN_UID && (<button onClick={downloadStillFull} disabled={stillDlState === "loading"} style={{ background: "rgba(245,230,192,0.14)", border: `1px solid ${GOLD_MID}`, color: GOLD_LIGHT, borderRadius: 30, padding: "7px 16px", fontSize: 12.5, fontWeight: "bold", fontFamily: "sans-serif", cursor: "pointer" }}>{stillDlState === "loading" ? "⏳ Preparing…" : "⬇ Save"}</button>)}</div>{stillAudioErr && (<p style={{ color: "#FFD9D9", fontSize: 11, marginTop: 8 }}>{stillAudioErr}</p>)}
           <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
             {(stillSession.steps[stillStep].label === "Breathe" || stillSession.steps[stillStep].label === "Stillness") ? (
               <div style={{ width: 132, height: 132, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 18, background: "radial-gradient(circle, rgba(245,230,192,0.5) 0%, rgba(245,230,192,0.04) 70%)", animation: "gdBreath 8s ease-in-out infinite", animationPlayState: stillPaused ? "paused" : "running" }}><span style={{ fontSize: 40 }}>{stillSession.steps[stillStep].icon}</span></div>
