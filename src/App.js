@@ -1847,12 +1847,12 @@ function WordSearchGame() {
   const STILL_PACE = { Welcome: 40, Breathe: 50, "The Word": 45, Reflection: 70, "Guided Prayer": 90, Stillness: 75, Blessing: 40 };
   const STILL_SECTIONS = ["Hard Places", "Drawing Near", "Strength & Battle", "Rhythms of the Day", "Seasons"];
   useEffect(() => {
-    if (!stillSession || stillPaused || stillVoiceOn) return;
+    if (!stillSession || stillPaused) return;
     if (stillStep >= stillSession.steps.length - 1) return;
     const ms = (STILL_PACE[stillSession.steps[stillStep].label] || 50) * 1000;
     const t = setTimeout(() => setStillStep((x) => Math.min(stillSession.steps.length - 1, x + 1)), ms);
     return () => clearTimeout(t);
-  }, [stillSession, stillStep, stillPaused, stillVoiceOn]);
+  }, [stillSession, stillStep, stillPaused]);
   useEffect(() => { stillPausedRef.current = stillPaused; }, [stillPaused]);
   useEffect(() => { stillVoiceOnRef.current = stillVoiceOn; if (!stillVoiceOn && musicRef.current) setMusicLevel(musicVol); }, [stillVoiceOn]);
   useEffect(() => {
@@ -1870,7 +1870,7 @@ function WordSearchGame() {
         if (!resp.ok || !data.audioUrl) { throw new Error("no audio"); }
         let audio = window.__graceStillAudio; if (!audio) { audio = new Audio(); window.__graceStillAudio = audio; } audio.src = data.audioUrl; audio.volume = 1.0;
         if (musicRef.current) setMusicLevel(0.08);
-        audio.onended = () => { if (cancelled) return; if (step >= stillSession.steps.length - 1) { if (musicRef.current) setMusicLevel(musicVol); } else { advTimer = setTimeout(() => { if (!cancelled) setStillStep((x) => Math.min(stillSession.steps.length - 1, x + 1)); }, 2600); } };
+        audio.onended = () => { if (cancelled) return; if (musicRef.current) setMusicLevel(0.22); };
         setStillVoiceLoading(false);
         if (!stillPausedRef.current) { const pr = audio.play(); if (pr && pr.catch) pr.catch(() => {}); }
       } catch (e) { if (!cancelled) { setStillAudioErr("Voice unavailable right now. Please try again."); setStillVoiceOn(false); setStillVoiceLoading(false); if (musicRef.current) setMusicLevel(musicVol); } }
