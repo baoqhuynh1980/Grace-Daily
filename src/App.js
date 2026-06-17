@@ -1860,7 +1860,7 @@ function WordSearchGame() {
     let cancelled = false; let advTimer = null;
     const step = stillStep;
     const stepObj = stillSession.steps[step];
-    if (window.__graceStillAudio) { window.__graceStillAudio.pause(); window.__graceStillAudio = null; }
+    if (window.__graceStillAudio) { try { window.__graceStillAudio.pause(); } catch (e) {} }
     setStillVoiceLoading(true);
     (async () => {
       try {
@@ -1868,7 +1868,7 @@ function WordSearchGame() {
         const data = await resp.json();
         if (cancelled) return;
         if (!resp.ok || !data.audioUrl) { throw new Error("no audio"); }
-        const audio = new Audio(data.audioUrl); window.__graceStillAudio = audio; audio.volume = 1.0;
+        let audio = window.__graceStillAudio; if (!audio) { audio = new Audio(); window.__graceStillAudio = audio; } audio.src = data.audioUrl; audio.volume = 1.0;
         if (musicRef.current) setMusicLevel(0.08);
         audio.onended = () => { if (cancelled) return; if (step >= stillSession.steps.length - 1) { if (musicRef.current) setMusicLevel(musicVol); } else { advTimer = setTimeout(() => { if (!cancelled) setStillStep((x) => Math.min(stillSession.steps.length - 1, x + 1)); }, 2600); } };
         setStillVoiceLoading(false);
@@ -3499,7 +3499,7 @@ const startQuiz = (level) => {
             {isPremium && (<>
             <p style={{ color: BROWN, fontSize: 13, lineHeight: 1.6, margin: "0 0 14px" }}>Quiet your heart and let His Word draw you near. Choose where you need Him today — each is a guided few minutes with worship underneath. 🕊️</p>
             {STILL_SECTIONS.map((sec) => { const items = STILL_SESSIONS.filter((x) => x.section === sec); if (!items.length) return null; return (<div key={sec}><p style={{ color: BROWN, fontSize: 11, fontWeight: "bold", letterSpacing: 1.5, textTransform: "uppercase", margin: "18px 0 8px", fontFamily: "sans-serif", opacity: 0.65 }}>{sec}</p>{items.map((se) => (
-              <div key={se.key} onClick={() => { if (window.__graceStillAudio) { window.__graceStillAudio.pause(); window.__graceStillAudio = null; } setStillVoiceLoading(false); setStillAudioErr(""); ensureMusicGraph(); musicBeforeSession.current = musicOn; setStillSession(se); setStillStep(0); setStillPaused(false); setStillMuted(false); setMusicOn(true); setStillVoiceOn(true); }} style={{ display: "flex", alignItems: "center", gap: 13, background: WHITE, border: `1px solid ${GOLD_LIGHT}`, borderRadius: 16, padding: 11, marginBottom: 10, cursor: "pointer", boxShadow: "0 6px 16px -12px rgba(74,53,16,0.4)" }}>
+              <div key={se.key} onClick={() => { if (window.__graceStillAudio) { try { window.__graceStillAudio.pause(); } catch (e) {} } setStillVoiceLoading(false); setStillAudioErr(""); ensureMusicGraph(); musicBeforeSession.current = musicOn; setStillSession(se); setStillStep(0); setStillPaused(false); setStillMuted(false); setMusicOn(true); setStillVoiceOn(true); }} style={{ display: "flex", alignItems: "center", gap: 13, background: WHITE, border: `1px solid ${GOLD_LIGHT}`, borderRadius: 16, padding: 11, marginBottom: 10, cursor: "pointer", boxShadow: "0 6px 16px -12px rgba(74,53,16,0.4)" }}>
                 <div style={{ width: 52, height: 52, borderRadius: 13, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 23, background: se.grad }}>{se.icon}</div>
                 <div style={{ flex: 1, minWidth: 0 }}><p style={{ fontFamily: "Georgia, serif", fontSize: 15, color: BROWN_DARK, fontWeight: "bold", margin: 0 }}>{se.name}</p><p style={{ color: GOLD, fontSize: 11, fontStyle: "italic", margin: "1px 0 4px" }}>{se.ref}</p><div style={{ display: "flex", gap: 6 }}><span style={{ background: GOLD_LIGHT, color: BROWN_DARK, fontSize: 9.5, fontWeight: "bold", borderRadius: 20, padding: "2px 8px" }}>{se.theme}</span><span style={{ background: GOLD_LIGHT, color: BROWN_DARK, fontSize: 9.5, fontWeight: "bold", borderRadius: 20, padding: "2px 8px" }}>{se.min} min</span></div></div>
                 <div style={{ width: 33, height: 33, borderRadius: "50%", background: `linear-gradient(135deg, ${GOLD}, ${BROWN})`, color: WHITE, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, flexShrink: 0 }}>►</div>
