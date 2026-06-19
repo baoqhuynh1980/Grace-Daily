@@ -34,6 +34,7 @@ const MEMORY_GOAL = 10;
 const STRIPE_LINK = "https://buy.stripe.com/bJe6oG0Pw2Wg1wf9sq8k800";
 const PRIVACY_URL = "https://faithdailywalk.com/grace-daily-privacy-policy/";
 const TERMS_URL = "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/";
+const snippet = (txt, n) => { const v = (txt || "").trim(); return v.length > n ? v.slice(0, n).trim() + "…" : v; };
 const openExternal = (u) => { const isNativeApp = typeof window !== "undefined" && window.Capacitor && typeof window.Capacitor.isNativePlatform === "function" && window.Capacitor.isNativePlatform(); if (isNativeApp) { window.open(u, "_system"); } else { window.open(u, "_blank", "noopener,noreferrer"); } };
 function LegalLinks({ light }) {
   const c = light ? GOLD_LIGHT : BROWN;
@@ -2916,6 +2917,46 @@ const startQuiz = (level) => {
                 ))}
               </div>
             </div>
+            {(testimonies.length > 0 || prayerList.length > 0) && (
+              <div style={{ marginTop: 4, marginBottom: 6 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 3 }}>
+                  <div style={{ flex: 1, height: 1, background: `linear-gradient(90deg, transparent, ${GOLD_MID})` }} />
+                  <p style={{ color: GOLD, fontSize: 12, fontWeight: "bold", letterSpacing: 2, textTransform: "uppercase", margin: 0, fontFamily: "sans-serif" }}>From the Community</p>
+                  <div style={{ flex: 1, height: 1, background: `linear-gradient(90deg, ${GOLD_MID}, transparent)` }} />
+                </div>
+                <p style={{ color: BROWN, fontSize: 12.5, fontStyle: "italic", textAlign: "center", margin: "0 0 12px" }}>See how God is moving among us 🙏</p>
+                {testimonies.length > 0 && (
+                  <div onClick={() => { setActiveTab("prayer"); setPrayerTab("answered"); }} style={{ position: "relative", overflow: "hidden", borderRadius: 18, marginBottom: 12, cursor: "pointer", background: "linear-gradient(135deg, #FFFDF7 0%, #FBF1D9 100%)", border: `1.5px solid ${GOLD_MID}`, boxShadow: "0 12px 30px -16px rgba(201,151,42,0.6)", padding: "16px 18px" }}>
+                    <span style={{ position: "absolute", top: -16, right: 8, fontSize: 92, fontFamily: "Georgia, serif", color: GOLD, opacity: 0.13, lineHeight: 1, pointerEvents: "none" }}>”</span>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10, position: "relative" }}>
+                      <span style={{ display: "inline-flex", alignItems: "center", gap: 5, background: `linear-gradient(135deg, ${GOLD}, #B8841F)`, color: WHITE, fontSize: 10, fontWeight: "bold", letterSpacing: 1, textTransform: "uppercase", padding: "4px 11px", borderRadius: 20, fontFamily: "sans-serif" }}>✅ God Answered</span>
+                      <span style={{ color: BROWN + "99", fontSize: 11, fontFamily: "sans-serif" }}>{testimonies[0].time}</span>
+                    </div>
+                    <p style={{ color: BROWN_DARK, fontSize: 15, lineHeight: 1.7, fontStyle: "italic", fontFamily: "Georgia, serif", margin: "0 0 12px", position: "relative" }}>{snippet(testimonies[0].text, 150)}</p>
+                    <div style={{ height: 1, background: GOLD_LIGHT, margin: "0 0 10px" }} />
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                      <span style={{ color: GOLD, fontSize: 12, fontWeight: "bold", fontFamily: "sans-serif" }}>— {testimonies[0].name}</span>
+                      <span style={{ color: GOLD, fontSize: 12, fontWeight: "bold", fontFamily: "sans-serif" }}>Read all testimonies ›</span>
+                    </div>
+                  </div>
+                )}
+                {prayerList.length > 0 && (
+                  <div onClick={() => { setActiveTab("prayer"); setPrayerTab("wall"); }} style={{ position: "relative", overflow: "hidden", borderRadius: 18, marginBottom: 4, cursor: "pointer", background: "linear-gradient(135deg, #FFFDF7 0%, #F1E7CE 100%)", border: `1.5px solid ${GOLD_LIGHT}`, boxShadow: "0 12px 30px -16px rgba(74,53,16,0.45)", padding: "16px 18px" }}>
+                    <span style={{ position: "absolute", top: 8, right: 12, fontSize: 58, opacity: 0.10, lineHeight: 1, pointerEvents: "none" }}>🙏</span>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10, position: "relative" }}>
+                      <span style={{ display: "inline-flex", alignItems: "center", gap: 5, background: WHITE, color: BROWN_DARK, fontSize: 10, fontWeight: "bold", letterSpacing: 1, textTransform: "uppercase", padding: "4px 11px", borderRadius: 20, fontFamily: "sans-serif", border: `1px solid ${GOLD_MID}` }}>🙏 Prayer Request</span>
+                      <span style={{ color: BROWN + "99", fontSize: 11, fontFamily: "sans-serif" }}>{prayerList[0].time}</span>
+                    </div>
+                    <p style={{ color: BROWN_DARK, fontSize: 15, lineHeight: 1.7, fontStyle: "italic", fontFamily: "Georgia, serif", margin: "0 0 12px", position: "relative" }}>{snippet(prayerList[0].request, 150)}</p>
+                    <div style={{ height: 1, background: GOLD_LIGHT, margin: "0 0 10px" }} />
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                      <span style={{ color: BROWN, fontSize: 12, fontFamily: "sans-serif" }}>🙏 {prayerList[0].prayed} have prayed</span>
+                      <span style={{ color: GOLD, fontSize: 12, fontWeight: "bold", fontFamily: "sans-serif" }}>Pray for them ›</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
             {user && isPremium && (<div style={s.card}><p style={{ ...s.sectionTitle, fontSize: 15, marginBottom: 8 }}>📖 Bible Reading Progress</p><div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}><p style={{ color: BROWN, fontSize: 13, margin: 0 }}>{totalRead} of {TOTAL_CHAPTERS} chapters read</p><span style={{ color: GOLD, fontSize: 14, fontWeight: "bold", fontFamily: "sans-serif" }}>{bibleProgress}%</span></div><div style={s.progressBg}><div style={{ height: 10, borderRadius: 6, background: `linear-gradient(90deg, ${GOLD}, ${BROWN})`, width: `${bibleProgress}%`, transition: "width 0.3s ease" }} /></div><button style={{ ...s.btn, marginTop: 10 }} onClick={() => setActiveTab("bible")}>Continue Reading →</button></div>)}
             {user && isPremium && (<div style={s.card}><p style={{ ...s.sectionTitle, fontSize: 15, marginBottom: 8 }}>✍️ Scripture Memory</p><div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}><p style={{ color: BROWN, fontSize: 13, margin: 0 }}>{totalMemorized} of {MEMORY_GOAL} verses memorized</p><span style={{ color: GOLD, fontSize: 14, fontWeight: "bold", fontFamily: "sans-serif" }}>{Math.round((totalMemorized / MEMORY_GOAL) * 100)}%</span></div><div style={s.progressBg}><div style={{ height: 10, borderRadius: 6, background: `linear-gradient(90deg, ${GOLD}, ${BROWN})`, width: `${Math.min(100, Math.round((totalMemorized / MEMORY_GOAL) * 100))}%`, transition: "width 0.3s ease" }} /></div>{getMemoryMilestone(totalMemorized) && <p style={{ color: GOLD, fontSize: 12, fontFamily: "sans-serif", margin: "6px 0 0", fontWeight: "bold" }}>{getMemoryMilestone(totalMemorized).label}</p>}<button style={{ ...s.btn, marginTop: 10 }} onClick={() => setActiveTab("memory")}>Go to Memory →</button></div>)}
             {user && isPremium && totalFasts > 0 && (<div style={s.card}><p style={{ ...s.sectionTitle, fontSize: 15, marginBottom: 8 }}>⚡ Fasting Journey</p><div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}><p style={{ color: BROWN, fontSize: 13, margin: 0 }}>{totalFasts} fast{totalFasts !== 1 ? "s" : ""} completed</p>{getFastingMilestone(totalFasts) && <span style={{ color: GOLD, fontSize: 13, fontWeight: "bold", fontFamily: "sans-serif" }}>{getFastingMilestone(totalFasts).label}</span>}</div><button style={{ ...s.btn, marginTop: 6 }} onClick={() => { setActiveTab("prayer"); setPrayerTab("fasting"); }}>Go to Fasting →</button></div>)}
@@ -3574,6 +3615,7 @@ const startQuiz = (level) => {
 
         {activeTab === "about" && (
           <div>
+            <button style={s.backBtn} onClick={() => setActiveTab("home")}>‹ Back to Home</button>
             <div style={{ borderRadius: 16, overflow: "hidden", marginBottom: 14, position: "relative", boxShadow: "0 12px 30px -14px rgba(74,53,16,0.5)" }}><div style={{ position: "relative", minHeight: 150, padding: "18px 16px", display: "flex", flexDirection: "column", justifyContent: "flex-end", backgroundImage: `linear-gradient(180deg, rgba(45,32,14,0.1) 0%, rgba(45,32,14,0.8) 100%), url(${process.env.PUBLIC_URL}/story-shepherd.jpg)`, backgroundSize: "cover", backgroundPosition: "center" }}><p style={{ color: GOLD_MID, fontSize: 10, fontWeight: "bold", letterSpacing: 1.5, textTransform: "uppercase", margin: "0 0 3px", fontFamily: "sans-serif", textShadow: "0 1px 6px rgba(0,0,0,0.6)" }}>Our Story</p><h2 style={{ color: WHITE, fontSize: 22, fontWeight: "bold", margin: 0, fontFamily: "Georgia, serif", lineHeight: 1.12, textShadow: "0 2px 12px rgba(0,0,0,0.6)" }}>About Grace Daily ✝️</h2><p style={{ color: GOLD_LIGHT, fontSize: 12, lineHeight: 1.5, margin: "5px 0 0", textShadow: "0 1px 6px rgba(0,0,0,0.6)" }}>Built with one purpose — to bring lost sheep back to the Shepherd, Jesus Christ.</p></div></div>
             <div style={s.card}><p style={{ color: GOLD, fontSize: 14, fontWeight: "bold", margin: "0 0 10px", fontFamily: "sans-serif" }}>🎯 Our Mission</p><p style={{ color: BROWN_DARK, fontSize: 14, lineHeight: 1.8, margin: 0 }}>Grace Daily was built with one purpose — to bring lost sheep back to the Shepherd, Jesus Christ. We believe that every person on earth deserves to encounter the living God in a personal, beautiful and life-changing way. This app is our offering to Him.</p></div>
             <div style={s.card}><p style={{ color: GOLD, fontSize: 14, fontWeight: "bold", margin: "0 0 10px", fontFamily: "sans-serif" }}>👨‍👩‍👧 Who We Are</p><p style={{ color: BROWN_DARK, fontSize: 14, lineHeight: 1.8, margin: 0 }}>Hi — I am Bao, the founder of Grace Daily and The Bible Story Project. Alongside my beloved wife Tiffany, we have dedicated our lives to spreading the Gospel and making God's Word accessible to everyone. I am not a perfect person. I am simply someone who has been radically transformed by the grace of Jesus Christ and cannot keep that grace to myself. Everything you see in this app was built out of a deep love for God and a burning desire to see lives changed by His Word.</p></div>
