@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import { initializeAuth, indexedDBLocalPersistence, browserLocalPersistence } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getMessaging, getToken, onMessage } from "firebase/messaging";
 
@@ -14,12 +14,34 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
+
+// Set up sign-in the lean way. initializeAuth (instead of getAuth) skips the
+// hidden popup/redirect connection that hangs inside the native app and was
+// freezing the app on "Loading...". Email/password sign-in needs none of that,
+// and this works the same in the web browser too.
+export const auth = initializeAuth(app, {
+  persistence: [indexedDBLocalPersistence, browserLocalPersistence]
+});
+
 export const db = getFirestore(app);
-export const messaging = getMessaging(app);
+
+// Firebase Cloud Messaging uses service workers, which only exist in a real
+// web browser (your Safari / PWA version). The native iOS app has no service
+// worker, so we only set messaging up when it's actually available. On native
+// it stays null and push notifications are simply skipped.
+let messaging = null;
+try {
+  if (typeof navigator !== "undefined" && "serviceWorker" in navigator) {
+    messaging = getMessaging(app);
+  }
+} catch (err) {
+  messaging = null;
+}
+export { messaging };
 
 export const requestNotificationPermission = async () => {
   try {
+    if (!messaging) return null;
     const permission = await Notification.requestPermission();
     if (permission === "granted") {
       const token = await getToken(messaging, {

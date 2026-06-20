@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { auth, db, messaging, requestNotificationPermission, onMessage } from "./firebase";
+import { initRevenueCat, loginRevenueCat, checkPremium, purchasePremium, restorePremium, addPremiumListener, isNativeApp, openManageSubscriptions } from "./revenuecat";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword, sendPasswordResetEmail,
@@ -1517,7 +1518,7 @@ function PremiumGate({ onUpgrade }) {
         <p key={f} style={{ color: GOLD_LIGHT, fontSize: 12, margin: "0 0 4px", fontFamily: "sans-serif", textAlign: "left" }}>✅ {icon} {f}</p>
       ))}
       <button style={{ background: `linear-gradient(135deg, ${GOLD}, #C9972A)`, color: "#FFFDF7", border: "none", borderRadius: 10, padding: "13px 20px", fontSize: 15, fontWeight: "bold", cursor: "pointer", fontFamily: "sans-serif", width: "100%", marginTop: 14 }} onClick={onUpgrade}>Start 7-Day Free Trial 👑</button>
-      <p style={{ color: GOLD_LIGHT, fontSize: 10, textAlign: "center", margin: "8px 0 0", fontFamily: "sans-serif", opacity: 0.7 }}>Powered by Stripe — Secure Payment 🔒</p>
+      <p style={{ color: GOLD_LIGHT, fontSize: 10, textAlign: "center", margin: "8px 0 0", fontFamily: "sans-serif", opacity: 0.7 }}>{isNativeApp() ? "🔒 Secure Payment" : "Powered by Stripe — Secure Payment 🔒"}</p>
       <LegalLinks light />
     </div>
   );
@@ -1817,7 +1818,7 @@ function WordSearchGame() {
   const [streakCelebration, setStreakCelebration] = useState(false);
   const [notifEnabled, setNotifEnabled] = useState(false);
   const [showNotifBanner, setShowNotifBanner] = useState(typeof Notification !== 'undefined' ? Notification.permission !== 'granted' : true);
-  const [isPremium, setIsPremium] = useState(false); const [userName, setUserName] = useState(""); const [portalLoading, setPortalLoading] = useState(false); const [deleteState, setDeleteState] = useState("idle"); const [deleteErr, setDeleteErr] = useState(""); const openUpgrade = () => { if (!user) { setShowAuth(true); return; } const params = new URLSearchParams(); params.set("client_reference_id", user.uid); if (user.email) params.set("prefilled_email", user.email); const upgradeUrl = STRIPE_LINK + "?" + params.toString(); const isNativeApp = typeof window !== "undefined" && window.Capacitor && typeof window.Capacitor.isNativePlatform === "function" && window.Capacitor.isNativePlatform(); if (isNativeApp) { window.open(upgradeUrl, "_system"); } else { window.location.href = upgradeUrl; } };
+  const [isPremium, setIsPremium] = useState(false); const [userName, setUserName] = useState(""); const [portalLoading, setPortalLoading] = useState(false); const [deleteState, setDeleteState] = useState("idle"); const [deleteErr, setDeleteErr] = useState(""); const openUpgrade = async () => { if (!user) { setShowAuth(true); return; } if (isNativeApp()) { const res = await purchasePremium(); if (res.premium) { setIsPremium(true); } else if (res.error) { alert("Sorry, the purchase could not be completed. Please try again."); } return; } const params = new URLSearchParams(); params.set("client_reference_id", user.uid); if (user.email) params.set("prefilled_email", user.email); const upgradeUrl = STRIPE_LINK + "?" + params.toString(); window.location.href = upgradeUrl; };
   const MUSIC_TRACKS = [
     { name: "Morning", icon: "🌅", url: `${process.env.PUBLIC_URL}/morning.m4a` },
     { name: "Grace", icon: "✨", url: `${process.env.PUBLIC_URL}/grace.m4a` },
@@ -2324,15 +2325,15 @@ function WordSearchGame() {
   };
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => { setUser(firebaseUser); });
+    initRevenueCat(); addPremiumListener((p) => setIsPremium(p)); const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => { setUser(firebaseUser); });
     return () => unsubscribe();
   }, []);
 
   useEffect(() => {
-    if (!user) { setIsPremium(false); return; }
+    if (!user) { setIsPremium(false); return; } if (isNativeApp()) { loginRevenueCat(user.uid).then(() => checkPremium()).then((p) => { if (p) setIsPremium(true); }); }
     const unsubscribe = onSnapshot(doc(db, "users", user.uid), (snap) => {
-      if (snap.exists()) { setIsPremium(snap.data().isPremium === true); setUserName((snap.data().name || "").trim().split(" ")[0]); }
-      else { setIsPremium(false); setUserName(""); }
+      if (snap.exists()) { if (!isNativeApp()) setIsPremium(snap.data().isPremium === true); setUserName((snap.data().name || "").trim().split(" ")[0]); }
+      else { if (!isNativeApp()) setIsPremium(false); setUserName(""); }
     });
     return () => unsubscribe();
   }, [user]);
@@ -2696,7 +2697,7 @@ const startQuiz = (level) => {
 
   const s = {
     app: { background: CREAM, minHeight: "100vh", fontFamily: "Georgia, serif", paddingBottom: 80 },
-    header: { background: `radial-gradient(420px 240px at 50% 6%, rgba(245,230,192,0.55) 0%, rgba(245,230,192,0) 62%), linear-gradient(168deg, #14233F 0%, #1F3252 28%, ${BROWN} 86%, ${GOLD} 116%)`, padding: "30px 20px 20px", position: "relative", overflow: "hidden" },
+    header: { background: `radial-gradient(420px 240px at 50% 6%, rgba(245,230,192,0.55) 0%, rgba(245,230,192,0) 62%), linear-gradient(168deg, #14233F 0%, #1F3252 28%, ${BROWN} 86%, ${GOLD} 116%)`, padding: "max(30px, env(safe-area-inset-top)) 20px 20px", position: "relative", overflow: "hidden" },
     headerTop: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", position: "relative", zIndex: 2 },
     headerCenter: { textAlign: "center", flex: 1 },
     headerTitle: { color: GOLD_MID, fontSize: 26, fontWeight: "bold", margin: 0, letterSpacing: 1 },
@@ -2892,7 +2893,7 @@ const startQuiz = (level) => {
                   <p key={feature} style={{ color: GOLD_LIGHT, fontSize: 12, margin: "0 0 4px", fontFamily: "sans-serif" }}>✅ {icon} {feature}</p>
                 ))}
                 <button style={{ background: `linear-gradient(135deg, ${GOLD}, #C9972A)`, color: WHITE, border: "none", borderRadius: 10, padding: "12px 20px", fontSize: 15, fontWeight: "bold", cursor: "pointer", fontFamily: "sans-serif", width: "100%", marginTop: 12 }} onClick={() => openUpgrade()}>Start 7-Day Free Trial 👑</button>
-                <p style={{ color: GOLD_LIGHT, fontSize: 10, textAlign: "center", margin: "8px 0 0", fontFamily: "sans-serif", opacity: 0.7 }}>Powered by Stripe — Secure Payment 🔒</p>
+                <p style={{ color: GOLD_LIGHT, fontSize: 10, textAlign: "center", margin: "8px 0 0", fontFamily: "sans-serif", opacity: 0.7 }}>{isNativeApp() ? "🔒 Secure Payment" : "Powered by Stripe — Secure Payment 🔒"}</p>
               </div>
             )}
             {isPremium && (
@@ -2904,7 +2905,7 @@ const startQuiz = (level) => {
                 </div>
               </div>
             )}
-            {user && isPremium && (<button style={{ ...s.btn, marginTop: 0, marginBottom: 14 }} disabled={portalLoading} onClick={async () => { setPortalLoading(true); try { const resp = await fetch("https://us-central1-grace-daily-6f520.cloudfunctions.net/createPortalSession", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ uid: user.uid }) }); const data = await resp.json(); if (!resp.ok || !data.url) { throw new Error(data.error || "Could not open"); } window.location.href = data.url; } catch (err) { alert("Could not open subscription management right now. Please try again."); setPortalLoading(false); } }}>{portalLoading ? "⏳ Opening..." : "💳 Manage Subscription"}</button>)}{user && (<div style={{ marginTop: 4, marginBottom: 14 }}>{deleteState === "idle" && (<button onClick={() => { setDeleteErr(""); setDeleteState("confirm"); }} style={{ background: "none", border: "none", color: BROWN, opacity: 0.6, fontSize: 12, fontFamily: "sans-serif", cursor: "pointer", textDecoration: "underline", padding: "4px 0" }}>Delete my account</button>)}{(deleteState === "confirm" || deleteState === "deleting") && (<div style={{ background: "#FBEDED", border: "1px solid #E3B7B7", borderRadius: 12, padding: 16 }}><p style={{ color: "#8A2C2C", fontSize: 13.5, fontWeight: "bold", margin: "0 0 6px", fontFamily: "sans-serif" }}>⚠️ Delete your account?</p><p style={{ color: BROWN_DARK, fontSize: 12.5, margin: "0 0 12px", lineHeight: 1.55, fontFamily: "sans-serif" }}>This permanently deletes your account and all your private data — journals, memory verses, vision goals, streaks, and progress. This cannot be undone.</p>{deleteErr && (<p style={{ color: "#B23A3A", fontSize: 12, margin: "0 0 10px", fontFamily: "sans-serif" }}>{deleteErr}</p>)}<div style={{ display: "flex", gap: 10 }}><button onClick={handleDeleteAccount} disabled={deleteState === "deleting"} style={{ flex: 1, background: "#B23A3A", color: "#FFFFFF", border: "none", borderRadius: 10, padding: "11px 14px", fontSize: 13, fontWeight: "bold", fontFamily: "sans-serif", cursor: "pointer" }}>{deleteState === "deleting" ? "Deleting…" : "Yes, delete everything"}</button><button onClick={() => { setDeleteState("idle"); setDeleteErr(""); }} disabled={deleteState === "deleting"} style={{ flex: 1, background: "rgba(0,0,0,0.06)", color: BROWN_DARK, border: "none", borderRadius: 10, padding: "11px 14px", fontSize: 13, fontWeight: "bold", fontFamily: "sans-serif", cursor: "pointer" }}>Cancel</button></div></div>)}</div>)}{!user && (<div style={{ ...s.card, border: `2px solid ${GOLD_MID}`, background: GOLD_LIGHT }}><p style={{ color: BROWN_DARK, fontSize: 14, fontWeight: "bold", margin: "0 0 6px" }}>✝️ Save Your Progress</p><p style={{ color: BROWN, fontSize: 13, margin: "0 0 10px", lineHeight: 1.5 }}>Create a free account to save your streak, Bible reading, memory verses, and more — forever!</p><button style={s.btn} onClick={() => setShowAuth(true)}>Create Free Account →</button></div>)}<LegalLinks />
+            {user && isPremium && (<button style={{ ...s.btn, marginTop: 0, marginBottom: 14 }} disabled={portalLoading} onClick={async () => { if (isNativeApp()) { openManageSubscriptions(); return; } setPortalLoading(true); try { const resp = await fetch("https://us-central1-grace-daily-6f520.cloudfunctions.net/createPortalSession", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ uid: user.uid }) }); const data = await resp.json(); if (!resp.ok || !data.url) { throw new Error(data.error || "Could not open"); } window.location.href = data.url; } catch (err) { alert("Could not open subscription management right now. Please try again."); setPortalLoading(false); } }}>{portalLoading ? "⏳ Opening..." : "💳 Manage Subscription"}</button>)}{user && (<div style={{ marginTop: 4, marginBottom: 14 }}>{deleteState === "idle" && (<button onClick={() => { setDeleteErr(""); setDeleteState("confirm"); }} style={{ background: "none", border: "none", color: BROWN, opacity: 0.6, fontSize: 12, fontFamily: "sans-serif", cursor: "pointer", textDecoration: "underline", padding: "4px 0" }}>Delete my account</button>)}{(deleteState === "confirm" || deleteState === "deleting") && (<div style={{ background: "#FBEDED", border: "1px solid #E3B7B7", borderRadius: 12, padding: 16 }}><p style={{ color: "#8A2C2C", fontSize: 13.5, fontWeight: "bold", margin: "0 0 6px", fontFamily: "sans-serif" }}>⚠️ Delete your account?</p><p style={{ color: BROWN_DARK, fontSize: 12.5, margin: "0 0 12px", lineHeight: 1.55, fontFamily: "sans-serif" }}>This permanently deletes your account and all your private data — journals, memory verses, vision goals, streaks, and progress. This cannot be undone.</p>{deleteErr && (<p style={{ color: "#B23A3A", fontSize: 12, margin: "0 0 10px", fontFamily: "sans-serif" }}>{deleteErr}</p>)}<div style={{ display: "flex", gap: 10 }}><button onClick={handleDeleteAccount} disabled={deleteState === "deleting"} style={{ flex: 1, background: "#B23A3A", color: "#FFFFFF", border: "none", borderRadius: 10, padding: "11px 14px", fontSize: 13, fontWeight: "bold", fontFamily: "sans-serif", cursor: "pointer" }}>{deleteState === "deleting" ? "Deleting…" : "Yes, delete everything"}</button><button onClick={() => { setDeleteState("idle"); setDeleteErr(""); }} disabled={deleteState === "deleting"} style={{ flex: 1, background: "rgba(0,0,0,0.06)", color: BROWN_DARK, border: "none", borderRadius: 10, padding: "11px 14px", fontSize: 13, fontWeight: "bold", fontFamily: "sans-serif", cursor: "pointer" }}>Cancel</button></div></div>)}</div>)}{!user && (<div style={{ ...s.card, border: `2px solid ${GOLD_MID}`, background: GOLD_LIGHT }}><p style={{ color: BROWN_DARK, fontSize: 14, fontWeight: "bold", margin: "0 0 6px" }}>✝️ Save Your Progress</p><p style={{ color: BROWN, fontSize: 13, margin: "0 0 10px", lineHeight: 1.5 }}>Create a free account to save your streak, Bible reading, memory verses, and more — forever!</p><button style={s.btn} onClick={() => setShowAuth(true)}>Create Free Account →</button></div>)}<LegalLinks />
             <div onClick={() => { setActiveTab("trinity"); setTrinityView("hub"); }} style={{ borderRadius: 16, overflow: "hidden", marginBottom: 14, position: "relative", cursor: "pointer", boxShadow: "0 12px 30px -14px rgba(74,53,16,0.55)" }}><div style={{ position: "relative", minHeight: 128, padding: "18px 16px", display: "flex", flexDirection: "column", justifyContent: "flex-end", backgroundImage: `linear-gradient(180deg, rgba(40,28,12,0.12) 0%, rgba(40,28,12,0.74) 100%), url(${process.env.PUBLIC_URL}/holy-trinity.jpg)`, backgroundSize: "cover", backgroundPosition: "center" }}><p style={{ color: GOLD_LIGHT, fontSize: 10, fontWeight: "bold", letterSpacing: 1.5, textTransform: "uppercase", margin: "0 0 3px", fontFamily: "sans-serif", textShadow: "0 1px 6px rgba(0,0,0,0.7)" }}>Father · Son · Holy Spirit</p><p style={{ color: WHITE, fontSize: 23, fontWeight: "bold", margin: 0, fontFamily: "Georgia, serif", lineHeight: 1.1, textShadow: "0 2px 12px rgba(0,0,0,0.7)" }}>The Holy Trinity</p><p style={{ color: GOLD_LIGHT, fontSize: 12, margin: "4px 0 0", textShadow: "0 1px 6px rgba(0,0,0,0.7)" }}>Meet the One who made you & loves you ›</p></div></div>
               <div style={s.card}>
               <p style={{ ...s.sectionTitle, fontSize: 15, marginBottom: 8 }}>Quick Actions</p>
@@ -3553,8 +3554,8 @@ const startQuiz = (level) => {
                   {[["🕊️", "29 guided sessions — paced and breathing"], ["💛", "For anxiety, grief, sleep, doubt and more"], ["🎵", "Original worship music underneath"], ["🎙️", "A gentle voice to lead you in prayer"]].map(([icon, f]) => (
                     <p key={f} style={{ color: GOLD_LIGHT, fontSize: 12.5, margin: "0 0 5px", fontFamily: "sans-serif", textAlign: "left" }}>✅ {icon} {f}</p>
                   ))}
-                  <button onClick={() => openUpgrade()} style={{ background: `linear-gradient(135deg, ${GOLD}, #C9972A)`, color: "#FFFDF7", border: "none", borderRadius: 10, padding: "13px 20px", fontSize: 15, fontWeight: "bold", cursor: "pointer", width: "100%", marginTop: 12, fontFamily: "sans-serif" }}>✨ Begin Your 7-Day Free Trial</button>
-                  <p style={{ color: GOLD_LIGHT, fontSize: 10, textAlign: "center", margin: "8px 0 0", fontFamily: "sans-serif", opacity: 0.7 }}>Powered by Stripe — Secure Payment 🔒</p>
+                  <button onClick={() => openUpgrade()} style={{ background: `linear-gradient(135deg, ${GOLD}, #C9972A)`, color: "#FFFDF7", border: "none", borderRadius: 10, padding: "13px 20px", fontSize: 15, fontWeight: "bold", cursor: "pointer", width: "100%", marginTop: 12, fontFamily: "sans-serif" }}>✨ Begin Your 7-Day Free Trial</button>{isNativeApp() && (<button onClick={async () => { const ok = await restorePremium(); if (ok) { setIsPremium(true); } else { alert("No previous purchase found to restore."); } }} style={{ background: "none", border: "none", color: GOLD, fontSize: 13, fontFamily: "sans-serif", cursor: "pointer", textDecoration: "underline", display: "block", margin: "12px auto 0", padding: 4 }}>Restore Purchases</button>)}
+                  <p style={{ color: GOLD_LIGHT, fontSize: 10, textAlign: "center", margin: "8px 0 0", fontFamily: "sans-serif", opacity: 0.7 }}>{isNativeApp() ? "🔒 Secure Payment" : "Powered by Stripe — Secure Payment 🔒"}</p>
                 </div>
                 <p style={{ color: BROWN, fontSize: 11.5, textAlign: "center", margin: "14px 0 0", fontStyle: "italic" }}>The written Word is always free in Prayer, Bible & Study. 🙏</p>
               </div>
