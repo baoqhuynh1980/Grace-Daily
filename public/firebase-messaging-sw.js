@@ -13,15 +13,7 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
-messaging.onBackgroundMessage(payload => {
-  const { title, body } = payload.notification;
-  self.registration.showNotification(title, {
-    body,
-    icon: '/favicon.ico',
-    badge: '/favicon.ico',
-    vibrate: [200, 100, 200],
-  });
-});
+
 
 self.addEventListener('notificationclick', event => {
   event.notification.close();
