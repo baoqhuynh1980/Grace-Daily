@@ -2696,7 +2696,7 @@ const startQuiz = (level) => {
   };
 
   const s = {
-    app: { background: CREAM, minHeight: "100vh", fontFamily: "Georgia, serif", paddingBottom: 80 },
+    app: { background: CREAM, minHeight: "100vh", fontFamily: "Georgia, serif", paddingBottom: "calc(96px + env(safe-area-inset-bottom))" },
     header: { background: `radial-gradient(420px 240px at 50% 6%, rgba(245,230,192,0.55) 0%, rgba(245,230,192,0) 62%), linear-gradient(168deg, #14233F 0%, #1F3252 28%, ${BROWN} 86%, ${GOLD} 116%)`, padding: "max(30px, env(safe-area-inset-top)) 20px 20px", position: "relative", overflow: "hidden" },
     headerTop: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", position: "relative", zIndex: 2 },
     headerCenter: { textAlign: "center", flex: 1 },
@@ -2767,7 +2767,7 @@ const startQuiz = (level) => {
     <div style={s.app}>
 
       {user && showNotifBanner && !notifEnabled && (
-        <div style={{ background: `linear-gradient(135deg, ${BROWN_DARK}, ${BROWN})`, padding: "12px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
+        <div style={{ background: `linear-gradient(135deg, ${BROWN_DARK}, ${BROWN})`, padding: "calc(12px + env(safe-area-inset-top)) 16px 12px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
           <div>
             <p style={{ color: GOLD_MID, fontSize: 13, fontWeight: "bold", margin: "0 0 2px", fontFamily: "sans-serif" }}>🔔 Enable Daily Reminders</p>
             <p style={{ color: GOLD_LIGHT, fontSize: 11, margin: 0, fontFamily: "sans-serif" }}>Get daily prayer, streak and verse reminders!</p>
