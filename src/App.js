@@ -1788,6 +1788,20 @@ function WordSearchGame() {
   const [activeTab, setActiveTab] = useState("home");
   const [activePlanDay, setActivePlanDay] = useState(1);
   const [firePlanDone, setFirePlanDone] = useState(0);
+  const [planReflections, setPlanReflections] = useState({});
+  const [savingReflect, setSavingReflect] = useState(false);
+  const [savedReflectDay, setSavedReflectDay] = useState(null);
+  useEffect(() => {
+    if (!user) { setFirePlanDone(0); setPlanReflections({}); return; }
+    (async () => {
+      try {
+        const snap = await getDoc(doc(db, "users", user.uid));
+        const pf = (snap.exists() && snap.data().planFire) || {};
+        setFirePlanDone(typeof pf.done === "number" ? pf.done : 0);
+        setPlanReflections(pf.reflections || {});
+      } catch (e) { console.error("planFire load error:", e); }
+    })();
+  }, [user]);
   const [studyInput, setStudyInput] = useState(""); const [studyLength, setStudyLength] = useState("deep"); const [studyLoading, setStudyLoading] = useState(false); const [studyResult, setStudyResult] = useState(null); const [studyError, setStudyError] = useState(""); const [studyReflection, setStudyReflection] = useState(""); const [reflectionSaved, setReflectionSaved] = useState(false); const [deepGate, setDeepGate] = useState(false); const [studyAudioState, setStudyAudioState] = useState("idle"); const [studyAudioError, setStudyAudioError] = useState(""); const [librarySaving, setLibrarySaving] = useState(false); const [librarySaved, setLibrarySaved] = useState(false); const [showLibrary, setShowLibrary] = useState(false); const [libraryItems, setLibraryItems] = useState([]); const [expandedLibId, setExpandedLibId] = useState(null); const [deletingLibId, setDeletingLibId] = useState(null); const [libAudioId, setLibAudioId] = useState(null); const [copiedLibId, setCopiedLibId] = useState(null); const [editingLibId, setEditingLibId] = useState(null); const [editLibFields, setEditLibFields] = useState({ title: "", setting: "", meaning: "", forYourHeart: "", prayer: "" });
   const [prayedIds, setPrayedIds] = useState([]);
   const [newPrayer, setNewPrayer] = useState("");
@@ -3655,10 +3669,13 @@ const startQuiz = (level) => {
               <div style={{ marginBottom: 16 }}>
                 <p style={{ color: GOLD, fontSize: 11, fontWeight: "bold", fontFamily: "sans-serif", letterSpacing: 1.4, textTransform: "uppercase", margin: "0 0 10px" }}>Reflection · Your Journal</p>
                 <p style={{ color: NAVY_TRINITY, fontSize: 15, fontStyle: "italic", lineHeight: 1.6, margin: "0 0 10px" }}>{fd.reflect}</p>
-                <textarea key={activePlanDay} placeholder="Write what's on your heart…" style={{ width: "100%", boxSizing: "border-box", minHeight: 92, background: WHITE, border: `1px solid ${GOLD_MID}`, borderRadius: 12, padding: "12px 14px", fontSize: 16, color: BROWN_DARK, fontFamily: "Georgia, serif", lineHeight: 1.6, resize: "vertical", outline: "none" }} />
-                <p style={{ color: BROWN, fontSize: 11, fontStyle: "italic", margin: "8px 0 0", lineHeight: 1.5 }}>Your private journal — saving turns on soon, so you can read these back on Day 30.</p>
+                <textarea value={planReflections[activePlanDay] || ""} onChange={(e) => { const v = e.target.value; setPlanReflections(prev => ({ ...prev, [activePlanDay]: v })); if (savedReflectDay === activePlanDay) setSavedReflectDay(null); }} placeholder="Write what's on your heart…" style={{ width: "100%", boxSizing: "border-box", minHeight: 92, background: WHITE, border: `1px solid ${GOLD_MID}`, borderRadius: 12, padding: "12px 14px", fontSize: 16, color: BROWN_DARK, fontFamily: "Georgia, serif", lineHeight: 1.6, resize: "vertical", outline: "none" }} />
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, margin: "10px 0 0" }}>
+                  <span style={{ color: BROWN, fontSize: 11, fontStyle: "italic", lineHeight: 1.4, flex: 1 }}>Only you can see this. You'll read it back on Day 30.</span>
+                  <button onClick={async () => { if (!user) { setShowAuth(true); return; } setSavingReflect(true); try { await setDoc(doc(db, "users", user.uid), { planFire: { reflections: { [activePlanDay]: planReflections[activePlanDay] || "" } } }, { merge: true }); setSavedReflectDay(activePlanDay); } catch (e) { console.error("planFire reflection save error:", e); } setSavingReflect(false); }} style={{ background: BROWN, color: WHITE, border: "none", borderRadius: 20, padding: "8px 18px", fontSize: 13, fontWeight: "bold", fontFamily: "sans-serif", cursor: "pointer", flexShrink: 0 }}>{savingReflect ? "Saving…" : (savedReflectDay === activePlanDay ? "Saved ✓" : "Save reflection")}</button>
+                </div>
               </div>
-              <button style={{ ...s.btn, marginTop: 0 }} onClick={() => { setFirePlanDone(x => Math.max(x, activePlanDay)); setActiveTab("planFire"); }}>✓ Mark Day {fd.day} complete</button>
+              <button style={{ ...s.btn, marginTop: 0 }} onClick={async () => { const newDone = Math.max(firePlanDone, activePlanDay); setFirePlanDone(newDone); if (user) { try { await setDoc(doc(db, "users", user.uid), { planFire: { done: newDone } }, { merge: true }); } catch (e) { console.error("planFire progress save error:", e); } } setActiveTab("planFire"); }}>✓ Mark Day {fd.day} complete</button>
               <p style={{ color: BROWN, fontSize: 11, fontStyle: "italic", lineHeight: 1.6, textAlign: "center", margin: "16px 4px 0" }}>This walks alongside professional help — it isn't a substitute for it.</p>
             </div>
           );
