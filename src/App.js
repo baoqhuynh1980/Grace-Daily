@@ -3675,7 +3675,7 @@ const startQuiz = (level) => {
           </div>
         </div>
       )}
-      <style>{"@keyframes gdMusicPulse{0%,100%{opacity:0.5}50%{opacity:1}}@keyframes gdFill{from{width:0%}to{width:100%}}@keyframes gdBreath{0%,100%{transform:scale(0.7);opacity:0.5}50%{transform:scale(1);opacity:1}}"}</style>
+      <style>{"@keyframes gdMusicPulse{0%,100%{opacity:0.5}50%{opacity:1}}@keyframes gdFill{from{width:0%}to{width:100%}}@keyframes gdBreath{0%,100%{transform:scale(0.7);opacity:0.5}50%{transform:scale(1);opacity:1}}@media (orientation:landscape) and (min-width:1000px){div[style*='cover']{min-height:220px !important;height:220px !important;max-height:220px !important;}}"}</style>
       <audio ref={musicRef} src={MUSIC_TRACKS[musicTrack].url} autoPlay={musicOn} preload="auto" onPlaying={() => setMusicWaiting(false)} onEnded={() => setMusicTrack((t) => (t + 1) % MUSIC_TRACKS.length)} />
       {musicOn && (
         <div style={{ position: "fixed", left: 12, right: 12, bottom: "calc(62px + env(safe-area-inset-bottom))", zIndex: 90, display: "flex", alignItems: "center", gap: 10, background: "rgba(74,53,16,0.96)", border: `1px solid ${GOLD}`, borderRadius: 14, padding: "8px 12px", boxShadow: "0 10px 24px -8px rgba(0,0,0,0.5)" }}>
