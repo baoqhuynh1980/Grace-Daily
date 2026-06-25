@@ -2447,6 +2447,19 @@ function WordSearchGame() {
   }, [user]);
 
   useEffect(() => {
+    if (!user || !isNativeApp()) return;
+    (async () => {
+      try {
+        const { FirebaseMessaging } = await import("@capacitor-firebase/messaging");
+        const perm = await FirebaseMessaging.requestPermissions();
+        if (perm.receive !== "granted") return;
+        const { token } = await FirebaseMessaging.getToken();
+        if (token) { setDoc(doc(db, "users", user.uid), { fcmToken: token }, { merge: true }).catch(e => console.error("Native FCM save error:", e)); }
+      } catch (err) { console.error("Native push registration error:", err); }
+    })();
+  }, [user]);
+
+  useEffect(() => {
     if (!user) { setStreak(0); setStreakLogged(false); setStreakLoading(false); return; }
     setStreakLoading(true);
     const loadStreak = async () => {
