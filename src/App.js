@@ -4255,9 +4255,9 @@ const startQuiz = (level) => {
       </div>
 
       {stillSession && (
-        <div style={{ position: "fixed", inset: 0, zIndex: 4000, background: "radial-gradient(420px 300px at 50% 16%, rgba(245,230,192,0.4) 0%, rgba(245,230,192,0) 60%), linear-gradient(170deg, #101d33 0%, #1F3252 34%, #4A3510 88%, #7A5C1E 120%)", display: "flex", flexDirection: "column", padding: "30px 26px calc(28px + env(safe-area-inset-bottom))", textAlign: "center" }}>
+        <div style={{ position: "fixed", inset: 0, zIndex: 4000, background: "radial-gradient(420px 300px at 50% 16%, rgba(245,230,192,0.4) 0%, rgba(245,230,192,0) 60%), linear-gradient(170deg, #101d33 0%, #1F3252 34%, #4A3510 88%, #7A5C1E 120%)", display: "flex", flexDirection: "column", padding: "calc(20px + env(safe-area-inset-top)) 26px calc(28px + env(safe-area-inset-bottom))", textAlign: "center" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <button onClick={closeStillSession} style={{ background: "none", border: "none", color: GOLD_LIGHT, fontSize: 20, cursor: "pointer" }}>✕</button>
+            <button onClick={closeStillSession} aria-label="Close meditation" style={{ background: "none", border: "none", color: GOLD_LIGHT, fontSize: 24, lineHeight: 1, cursor: "pointer", padding: "12px 16px", margin: "-12px -16px", WebkitTapHighlightColor: "transparent" }}>✕</button>
             <span style={{ color: GOLD_LIGHT, fontSize: 11, fontWeight: "bold", opacity: 0.85 }}>{musicOn ? "♪ Worship" : "♪ off"}</span>
           </div>
           <p style={{ color: GOLD_MID, fontSize: 11, fontWeight: "bold", letterSpacing: 2, textTransform: "uppercase", marginTop: 24 }}>{stillSession.name} · {stillSession.ref}</p>
