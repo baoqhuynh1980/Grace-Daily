@@ -25,6 +25,37 @@ import {
   getDocs
 , where } from "firebase/firestore";
 
+// --- Native daily reminder scheduling (iOS local notifications) ---
+async function schedulePlanReminder(planKey, r) {
+  if (!isNativeApp()) return; // web firing handled separately (later phase)
+  try {
+    const { LocalNotifications } = await import("@capacitor/local-notifications");
+    const idMap = { fire: 4001, beginning: 4002, psalms: 4003 };
+    const id = idMap[planKey];
+    if (!id) return;
+    await LocalNotifications.cancel({ notifications: [{ id }] });
+    if (!r || !r.enabled) return;
+    let perm = await LocalNotifications.checkPermissions();
+    if (perm.display !== "granted") perm = await LocalNotifications.requestPermissions();
+    if (perm.display !== "granted") return;
+    let hour = (r.hour12 % 12);
+    if (r.ampm === "PM") hour += 12;
+    const titleMap = { fire: "30 Days Through the Fire", beginning: "Beginning Your Walk", psalms: "21 Days in the Psalms" };
+    await LocalNotifications.schedule({
+      notifications: [{
+        id,
+        title: titleMap[planKey] || "Grace Daily",
+        body: "Your daily walk is waiting. Open Grace Daily \uD83D\uDE4F",
+        schedule: { on: { hour, minute: (r.minute || 0) }, repeats: true },
+      }],
+    });
+    const pending = await LocalNotifications.getPending();
+    console.log("Grace reminder scheduled:", planKey, hour + ":" + (r.minute || 0), pending);
+  } catch (e) {
+    console.error("schedulePlanReminder error:", e);
+  }
+}
+
 const GOLD = "#C9972A";
 const GOLD_LIGHT = "#F5E6C0";
 const GOLD_MID = "#E8C87A";
@@ -1827,6 +1858,7 @@ function WordSearchGame() {
         try { await setDoc(doc(db, "users", user.uid), { planReminders: { [planKey]: merged } }, { merge: true }); }
         catch (e) { console.error("planReminders save error:", e); }
       }
+      schedulePlanReminder(planKey, merged);
     };
     return (
       <div style={{ background: WHITE, border: `1px solid ${GOLD_MID}`, borderRadius: 14, padding: "16px", marginTop: 12 }}>
