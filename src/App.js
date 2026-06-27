@@ -2904,10 +2904,14 @@ function WordSearchGame() {
   }, []);
 
   useEffect(() => {
-    if (!user) { setIsPremium(false); return; } if (isNativeApp()) { loginRevenueCat(user.uid).then(() => checkPremium()).then((p) => { if (p) setIsPremium(true); }); }
+    if (!user) { setIsPremium(false); return; }
+    let revenueCatPremium = false;
+    let firebasePremium = false;
+    const applyPremium = () => setIsPremium(revenueCatPremium || firebasePremium);
+    if (isNativeApp()) { loginRevenueCat(user.uid).then(() => checkPremium()).then((p) => { revenueCatPremium = !!p; applyPremium(); }); }
     const unsubscribe = onSnapshot(doc(db, "users", user.uid), (snap) => {
-      if (snap.exists()) { if (!isNativeApp()) setIsPremium(snap.data().isPremium === true); setUserName((snap.data().name || "").trim().split(" ")[0]); }
-      else { if (!isNativeApp()) setIsPremium(false); setUserName(""); }
+      if (snap.exists()) { firebasePremium = snap.data().isPremium === true; applyPremium(); setUserName((snap.data().name || "").trim().split(" ")[0]); }
+      else { firebasePremium = false; applyPremium(); setUserName(""); }
     });
     return () => unsubscribe();
   }, [user]);
