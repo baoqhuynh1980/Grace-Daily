@@ -2959,6 +2959,18 @@ function WordSearchGame() {
     loadStreak();
   }, [user]);
 
+  const streakBlessing = (n) => {
+    const map = {
+      3: { emoji: "🌱", title: "3 Days — A Habit Is Forming!", verse: "Let us not be weary in well doing: for in due season we shall reap, if we faint not.", ref: "Galatians 6:9, KJV" },
+      7: { emoji: "🔥", title: "7 Days — One Faithful Week!", verse: "And the LORD shall guide thee continually, and satisfy thy soul.", ref: "Isaiah 58:11, KJV" },
+      14: { emoji: "✝️", title: "14 Days — Rooted and Growing!", verse: "And he shall be like a tree planted by the rivers of water, that bringeth forth his fruit in his season.", ref: "Psalm 1:3, KJV" },
+      21: { emoji: "🕊️", title: "21 Days — Walking in Step!", verse: "They go from strength to strength, every one of them in Zion appeareth before God.", ref: "Psalm 84:7, KJV" },
+      30: { emoji: "👑", title: "30 Days — A Full Month with God!", verse: "Be thou faithful unto death, and I will give thee a crown of life.", ref: "Revelation 2:10, KJV" },
+      50: { emoji: "⭐", title: "50 Days — Steadfast and Faithful!", verse: "Therefore, my beloved brethren, be ye stedfast, unmoveable, always abounding in the work of the Lord.", ref: "1 Corinthians 15:58, KJV" },
+      100: { emoji: "🏆", title: "100 Days — What God Has Done!", verse: "Being confident of this very thing, that he which hath begun a good work in you will perform it.", ref: "Philippians 1:6, KJV" },
+    };
+    return map[n] || { emoji: "🔥", title: n + " Day Streak!", verse: "Those who wait upon the LORD shall renew their strength.", ref: "Isaiah 40:31, KJV" };
+  };
   const logPrayer = async () => {
     if (streakLogged) return;
     if (!user) { setShowAuth(true); return; }
@@ -2974,7 +2986,7 @@ function WordSearchGame() {
       const newLongest = Math.max(newCount, data.longestStreak || 0);
       await setDoc(doc(db, "streaks", user.uid), { count: newCount, lastLogged: today, longestStreak: newLongest });
       setStreak(newCount); setStreakLogged(true);
-      if ([7, 14, 21, 30, 50, 100].includes(newCount)) { setStreakCelebration(true); setTimeout(() => setStreakCelebration(false), 4000); }
+      if ([3, 7, 14, 21, 30, 50, 100].includes(newCount)) { setStreakCelebration(true); setTimeout(() => setStreakCelebration(false), 6000); }
     } catch (err) { console.error(err); }
   };
 
@@ -3371,7 +3383,7 @@ const startQuiz = (level) => {
       )}
 
       {newSticker && (<div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.7)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center" }}><div style={{ background: WHITE, borderRadius: 20, padding: 32, textAlign: "center", margin: 24 }}><div style={{ fontSize: 48, marginBottom: 12 }}>🌟</div><p style={{ color: GOLD, fontSize: 20, fontWeight: "bold", margin: "0 0 8px", fontFamily: "sans-serif" }}>New Badge Earned!</p><p style={{ color: newSticker.color, fontSize: 22, fontWeight: "bold", margin: "0 0 12px", fontFamily: "sans-serif" }}>{newSticker.label}</p><p style={{ color: BROWN, fontSize: 14, margin: "0 0 16px", lineHeight: 1.5 }}>Your word is a lamp to my feet and a light to my path. — Psalm 119:105 🙏</p><button style={s.btn} onClick={() => setNewSticker(null)}>Praise God! 🙌</button></div></div>)}
-      {streakCelebration && (<div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.7)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center" }}><div style={{ background: WHITE, borderRadius: 20, padding: 32, textAlign: "center", margin: 24 }}><div style={{ fontSize: 48, marginBottom: 12 }}>🔥</div><p style={{ color: GOLD, fontSize: 20, fontWeight: "bold", margin: "0 0 8px", fontFamily: "sans-serif" }}>🎉 {streak} Day Streak!</p><p style={{ color: BROWN_DARK, fontSize: 15, fontWeight: "bold", margin: "0 0 8px" }}>You are on fire for God! 🔥</p><p style={{ color: BROWN, fontSize: 13, margin: "0 0 16px", lineHeight: 1.5 }}>Those who wait on the Lord shall renew their strength. — Isaiah 40:31</p><button style={s.btn} onClick={() => setStreakCelebration(false)}>Keep Going! ✝️</button></div></div>)}
+      {streakCelebration && (() => { const b = streakBlessing(streak); return (<div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.75)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}><div style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, pointerEvents: "none", overflow: "hidden" }}>{[...Array(50)].map((_, i) => { const colors = [GOLD, GOLD_LIGHT, GOLD_MID, "#FFFFFF", CREAM]; const left = (i * 2.04 + (i % 7) * 3) % 100; const delay = (i % 10) * 0.25; const dur = 2.8 + (i % 5) * 0.5; const size = 7 + (i % 4) * 3; const sq = i % 3 === 0; return (<div key={i} style={{ position: "absolute", top: "-20px", left: left + "%", width: size, height: size, background: colors[i % colors.length], borderRadius: sq ? 2 : "50%", opacity: 0.9, animation: `gdConfettiFall ${dur}s linear ${delay}s infinite` }} />); })}</div><div style={{ position: "relative", background: WHITE, borderRadius: 20, padding: 32, textAlign: "center", margin: 24, maxWidth: 360, boxShadow: "0 20px 60px -10px rgba(0,0,0,0.5)" }}><div style={{ fontSize: 56, marginBottom: 12 }}>{b.emoji}</div><p style={{ color: GOLD, fontSize: 22, fontWeight: "bold", margin: "0 0 10px", fontFamily: "sans-serif", lineHeight: 1.25 }}>{b.title}</p><p style={{ color: BROWN_DARK, fontSize: 14, fontWeight: "bold", margin: "0 0 12px" }}>God sees your faithfulness. 🙏</p><p style={{ color: BROWN, fontSize: 13.5, margin: "0 0 6px", lineHeight: 1.6, fontStyle: "italic", fontFamily: "Georgia, serif" }}>“{b.verse}”</p><p style={{ color: GOLD, fontSize: 12, fontWeight: "bold", margin: "0 0 18px", fontFamily: "sans-serif" }}>— {b.ref}</p><button style={s.btn} onClick={() => setStreakCelebration(false)}>Keep Going! ✝️</button></div></div>); })()}<style>{`@keyframes gdConfettiFall { 0% { transform: translateY(-20px) rotate(0deg); opacity: 1; } 100% { transform: translateY(105vh) rotate(540deg); opacity: 0.7; } }`}</style>
       {fastCelebration && (<div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.7)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center" }}><div style={{ background: WHITE, borderRadius: 20, padding: 32, textAlign: "center", margin: 24 }}><div style={{ fontSize: 48, marginBottom: 12 }}>⚡</div><p style={{ color: GOLD, fontSize: 20, fontWeight: "bold", margin: "0 0 8px", fontFamily: "sans-serif" }}>Fasting Badge Earned!</p><p style={{ color: fastCelebration.color, fontSize: 22, fontWeight: "bold", margin: "0 0 12px", fontFamily: "sans-serif" }}>{fastCelebration.label}</p><p style={{ color: BROWN, fontSize: 14, margin: "0 0 6px", lineHeight: 1.5 }}>Is not this the kind of fasting I have chosen:</p><p style={{ color: BROWN, fontSize: 13, fontStyle: "italic", margin: "0 0 16px" }}>to loose the chains of injustice — Isaiah 58:6 🙏</p><button style={s.btn} onClick={() => setFastCelebration(null)}>To God Be the Glory! 🙌</button></div></div>)}
       
 {quizBadgeCelebration && (
