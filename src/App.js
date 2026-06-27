@@ -1955,9 +1955,11 @@ function WordSearchGame() {
   ]);
 
   const [streak, setStreak] = useState(0);
+  const [longestStreakValue, setLongestStreakValue] = useState(0);
   const [streakLogged, setStreakLogged] = useState(false);
   const [streakLoading, setStreakLoading] = useState(true);
   const [streakCelebration, setStreakCelebration] = useState(false);
+  const [badgeView, setBadgeView] = useState(null);
   const [notifEnabled, setNotifEnabled] = useState(false);
   const [showNotifBanner, setShowNotifBanner] = useState(typeof Notification !== 'undefined' ? Notification.permission !== 'granted' : true);
   const [isPremium, setIsPremium] = useState(false); const [userName, setUserName] = useState(""); const [portalLoading, setPortalLoading] = useState(false); const [deleteState, setDeleteState] = useState("idle"); const [deleteErr, setDeleteErr] = useState(""); const openUpgrade = async () => { if (!user) { setShowAuth(true); return; } if (isNativeApp()) { const res = await purchasePremium(); if (res.premium) { setIsPremium(true); } else if (res.error) { alert("Sorry, the purchase could not be completed. Please try again."); } return; } const params = new URLSearchParams(); params.set("client_reference_id", user.uid); if (user.email) params.set("prefilled_email", user.email); const upgradeUrl = STRIPE_LINK + "?" + params.toString(); window.location.href = upgradeUrl; };
@@ -2938,7 +2940,7 @@ function WordSearchGame() {
   }, [user]);
 
   useEffect(() => {
-    if (!user) { setStreak(0); setStreakLogged(false); setStreakLoading(false); return; }
+    if (!user) { setStreak(0); setLongestStreakValue(0); setStreakLogged(false); setStreakLoading(false); return; }
     setStreakLoading(true);
     const loadStreak = async () => {
       try {
@@ -2948,7 +2950,7 @@ function WordSearchGame() {
           const today = getTodayString();
           const yesterday = getYesterdayString();
           const lastLogged = data.lastLogged || "";
-          if (lastLogged === today) { setStreak(data.count || 0); setStreakLogged(true); }
+          setLongestStreakValue(data.longestStreak || 0); if (lastLogged === today) { setStreak(data.count || 0); setStreakLogged(true); }
           else if (lastLogged === yesterday) { setStreak(data.count || 0); setStreakLogged(false); }
           else if (lastLogged === "") { setStreak(0); setStreakLogged(false); }
           else { setStreak(0); setStreakLogged(false); await setDoc(doc(db, "streaks", user.uid), { count: 0, lastLogged: "", longestStreak: data.longestStreak || 0 }, { merge: true }); }
@@ -2985,7 +2987,7 @@ function WordSearchGame() {
       else { newCount = 1; }
       const newLongest = Math.max(newCount, data.longestStreak || 0);
       await setDoc(doc(db, "streaks", user.uid), { count: newCount, lastLogged: today, longestStreak: newLongest });
-      setStreak(newCount); setStreakLogged(true);
+      setStreak(newCount); setStreakLogged(true); setLongestStreakValue(newLongest);
       if ([3, 7, 14, 21, 30, 50, 100].includes(newCount)) { setStreakCelebration(true); setTimeout(() => setStreakCelebration(false), 6000); }
     } catch (err) { console.error(err); }
   };
@@ -3383,7 +3385,7 @@ const startQuiz = (level) => {
       )}
 
       {newSticker && (<div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.7)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center" }}><div style={{ background: WHITE, borderRadius: 20, padding: 32, textAlign: "center", margin: 24 }}><div style={{ fontSize: 48, marginBottom: 12 }}>🌟</div><p style={{ color: GOLD, fontSize: 20, fontWeight: "bold", margin: "0 0 8px", fontFamily: "sans-serif" }}>New Badge Earned!</p><p style={{ color: newSticker.color, fontSize: 22, fontWeight: "bold", margin: "0 0 12px", fontFamily: "sans-serif" }}>{newSticker.label}</p><p style={{ color: BROWN, fontSize: 14, margin: "0 0 16px", lineHeight: 1.5 }}>Your word is a lamp to my feet and a light to my path. — Psalm 119:105 🙏</p><button style={s.btn} onClick={() => setNewSticker(null)}>Praise God! 🙌</button></div></div>)}
-      {streakCelebration && (() => { const b = streakBlessing(streak); return (<div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.75)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}><div style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, pointerEvents: "none", overflow: "hidden" }}>{[...Array(50)].map((_, i) => { const colors = [GOLD, GOLD_LIGHT, GOLD_MID, "#FFFFFF", CREAM]; const left = (i * 2.04 + (i % 7) * 3) % 100; const delay = (i % 10) * 0.25; const dur = 2.8 + (i % 5) * 0.5; const size = 7 + (i % 4) * 3; const sq = i % 3 === 0; return (<div key={i} style={{ position: "absolute", top: "-20px", left: left + "%", width: size, height: size, background: colors[i % colors.length], borderRadius: sq ? 2 : "50%", opacity: 0.9, animation: `gdConfettiFall ${dur}s linear ${delay}s infinite` }} />); })}</div><div style={{ position: "relative", background: WHITE, borderRadius: 20, padding: 32, textAlign: "center", margin: 24, maxWidth: 360, boxShadow: "0 20px 60px -10px rgba(0,0,0,0.5)" }}><div style={{ fontSize: 56, marginBottom: 12 }}>{b.emoji}</div><p style={{ color: GOLD, fontSize: 22, fontWeight: "bold", margin: "0 0 10px", fontFamily: "sans-serif", lineHeight: 1.25 }}>{b.title}</p><p style={{ color: BROWN_DARK, fontSize: 14, fontWeight: "bold", margin: "0 0 12px" }}>God sees your faithfulness. 🙏</p><p style={{ color: BROWN, fontSize: 13.5, margin: "0 0 6px", lineHeight: 1.6, fontStyle: "italic", fontFamily: "Georgia, serif" }}>“{b.verse}”</p><p style={{ color: GOLD, fontSize: 12, fontWeight: "bold", margin: "0 0 18px", fontFamily: "sans-serif" }}>— {b.ref}</p><button style={s.btn} onClick={() => setStreakCelebration(false)}>Keep Going! ✝️</button></div></div>); })()}<style>{`@keyframes gdConfettiFall { 0% { transform: translateY(-20px) rotate(0deg); opacity: 1; } 100% { transform: translateY(105vh) rotate(540deg); opacity: 0.7; } }`}</style>
+      {streakCelebration && (() => { const b = streakBlessing(streak); return (<div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.75)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}><div style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, pointerEvents: "none", overflow: "hidden" }}>{[...Array(50)].map((_, i) => { const colors = [GOLD, GOLD_LIGHT, GOLD_MID, "#FFFFFF", CREAM]; const left = (i * 2.04 + (i % 7) * 3) % 100; const delay = (i % 10) * 0.25; const dur = 2.8 + (i % 5) * 0.5; const size = 7 + (i % 4) * 3; const sq = i % 3 === 0; return (<div key={i} style={{ position: "absolute", top: "-20px", left: left + "%", width: size, height: size, background: colors[i % colors.length], borderRadius: sq ? 2 : "50%", opacity: 0.9, animation: `gdConfettiFall ${dur}s linear ${delay}s infinite` }} />); })}</div><div style={{ position: "relative", background: WHITE, borderRadius: 20, padding: 32, textAlign: "center", margin: 24, maxWidth: 360, boxShadow: "0 20px 60px -10px rgba(0,0,0,0.5)" }}><div style={{ fontSize: 56, marginBottom: 12 }}>{b.emoji}</div><p style={{ color: GOLD, fontSize: 22, fontWeight: "bold", margin: "0 0 10px", fontFamily: "sans-serif", lineHeight: 1.25 }}>{b.title}</p><p style={{ color: BROWN_DARK, fontSize: 14, fontWeight: "bold", margin: "0 0 12px" }}>God sees your faithfulness. 🙏</p><p style={{ color: BROWN, fontSize: 13.5, margin: "0 0 6px", lineHeight: 1.6, fontStyle: "italic", fontFamily: "Georgia, serif" }}>“{b.verse}”</p><p style={{ color: GOLD, fontSize: 12, fontWeight: "bold", margin: "0 0 18px", fontFamily: "sans-serif" }}>— {b.ref}</p><button style={s.btn} onClick={() => setStreakCelebration(false)}>Keep Going! ✝️</button></div></div>); })()}<style>{`@keyframes gdConfettiFall { 0% { transform: translateY(-20px) rotate(0deg); opacity: 1; } 100% { transform: translateY(105vh) rotate(540deg); opacity: 0.7; } }`}</style>{badgeView && (<div onClick={() => setBadgeView(null)} style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.7)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center" }}><div onClick={(e) => e.stopPropagation()} style={{ position: "relative", background: WHITE, borderRadius: 20, padding: 32, textAlign: "center", margin: 24, maxWidth: 340, boxShadow: "0 20px 60px -10px rgba(0,0,0,0.5)" }}><div style={{ fontSize: 56, marginBottom: 10 }}>{badgeView.emoji}</div><p style={{ color: GOLD, fontSize: 12, fontWeight: "bold", margin: "0 0 4px", fontFamily: "sans-serif", letterSpacing: 1, textTransform: "uppercase" }}>Badge Earned</p><p style={{ color: BROWN_DARK, fontSize: 20, fontWeight: "bold", margin: "0 0 14px", fontFamily: "Georgia, serif" }}>{badgeView.name}</p><p style={{ color: BROWN, fontSize: 13.5, margin: "0 0 18px", lineHeight: 1.6, fontStyle: "italic", fontFamily: "Georgia, serif" }}>{badgeView.verse}</p><button style={s.btn} onClick={() => setBadgeView(null)}>To God be the glory! ✨</button></div></div>)}
       {fastCelebration && (<div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.7)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center" }}><div style={{ background: WHITE, borderRadius: 20, padding: 32, textAlign: "center", margin: 24 }}><div style={{ fontSize: 48, marginBottom: 12 }}>⚡</div><p style={{ color: GOLD, fontSize: 20, fontWeight: "bold", margin: "0 0 8px", fontFamily: "sans-serif" }}>Fasting Badge Earned!</p><p style={{ color: fastCelebration.color, fontSize: 22, fontWeight: "bold", margin: "0 0 12px", fontFamily: "sans-serif" }}>{fastCelebration.label}</p><p style={{ color: BROWN, fontSize: 14, margin: "0 0 6px", lineHeight: 1.5 }}>Is not this the kind of fasting I have chosen:</p><p style={{ color: BROWN, fontSize: 13, fontStyle: "italic", margin: "0 0 16px" }}>to loose the chains of injustice — Isaiah 58:6 🙏</p><button style={s.btn} onClick={() => setFastCelebration(null)}>To God Be the Glory! 🙌</button></div></div>)}
       
 {quizBadgeCelebration && (
@@ -3835,6 +3837,46 @@ const startQuiz = (level) => {
               );
             })}
             {!showAddGoal ? (<button style={{ ...s.card, textAlign: "center", border: `2px dashed ${GOLD_MID}`, background: "none", cursor: "pointer", width: "100%", padding: 16 }} onClick={() => setShowAddGoal(true)}><p style={{ color: GOLD, fontSize: 15, fontWeight: "bold", margin: 0, fontFamily: "sans-serif" }}>+ Add a New Faith Goal</p></button>) : (<div style={s.card}><p style={{ color: GOLD, fontSize: 14, fontWeight: "bold", marginBottom: 12, fontFamily: "sans-serif" }}>New Faith Goal</p><input style={{ ...s.input, marginBottom: 10 }} placeholder="e.g. Read the entire Bible" value={newGoalTitle} onChange={e => setNewGoalTitle(e.target.value)} /><p style={{ color: BROWN, fontSize: 12, fontFamily: "sans-serif", marginBottom: 8 }}>Choose an icon:</p><div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 12 }}>{goalIcons.map(icon => (<button key={icon} onClick={() => setNewGoalIcon(icon)} style={{ fontSize: 22, background: newGoalIcon === icon ? GOLD_LIGHT : "none", border: newGoalIcon === icon ? `2px solid ${GOLD}` : `1px solid ${GOLD_LIGHT}`, borderRadius: 10, padding: "6px 8px", cursor: "pointer" }}>{icon}</button>))}</div><div style={{ display: "flex", gap: 8 }}><button style={{ ...s.btn, flex: 1, marginTop: 0 }} onClick={addGoal}>Add Goal</button><button style={{ ...s.btnOutline, flex: 1 }} onClick={() => setShowAddGoal(false)}>Cancel</button></div></div>)}
+            {(() => {
+              const plansComplete = [
+                firePlanDone >= 30, beginningPlanDone >= 30, psalmsPlanDone >= 21, faithPlanDone >= 21,
+                abidePlanDone >= 30, followingPlanDone >= 30, morningsPlanDone >= 30, prayerPlanDone >= 30,
+                armorPlanDone >= 30, hopePlanDone >= 30
+              ].filter(Boolean).length;
+              const anyPlanStarted = (firePlanDone + beginningPlanDone + psalmsPlanDone + faithPlanDone + abidePlanDone + followingPlanDone + morningsPlanDone + prayerPlanDone + armorPlanDone + hopePlanDone) > 0;
+              const verseCount = (memoryVerses && memoryVerses.length) || 0;
+              const best = Math.max(streak || 0, longestStreakValue || 0);
+              const badges = [
+                { id: "firstday", emoji: "🌱", name: "First Step", earned: anyPlanStarted, req: "Begin any devotional day", verse: "“The path of the just is as the shining light.” — Proverbs 4:18" },
+                { id: "firstverse", emoji: "📖", name: "First Verse", earned: verseCount >= 1, req: "Save your first memory verse", verse: "“Thy word have I hid in mine heart.” — Psalm 119:11" },
+                { id: "week", emoji: "🔥", name: "Week of Faith", earned: best >= 7, req: "Reach a 7-day streak", verse: "“Let us hold fast the profession of our faith.” — Hebrews 10:23" },
+                { id: "crowned", emoji: "👑", name: "Crowned", earned: best >= 30, req: "Reach a 30-day streak", verse: "“Be thou faithful unto death, and I will give thee a crown of life.” — Revelation 2:10" },
+                { id: "hundred", emoji: "🏆", name: "Hundredfold", earned: best >= 100, req: "Reach a 100-day streak", verse: "“Well done, thou good and faithful servant.” — Matthew 25:21" },
+                { id: "journey1", emoji: "🕊️", name: "First Journey", earned: plansComplete >= 1, req: "Finish any devotional plan", verse: "“He which hath begun a good work in you will perform it.” — Philippians 1:6" },
+                { id: "pilgrim", emoji: "🧭", name: "Pilgrim", earned: plansComplete >= 3, req: "Finish 3 devotional plans", verse: "“They go from strength to strength.” — Psalm 84:7" },
+                { id: "disciple", emoji: "✨", name: "Faithful Disciple", earned: plansComplete >= 5, req: "Finish 5 devotional plans", verse: "“Well done, good and faithful servant.” — Matthew 25:23" },
+                { id: "hidden", emoji: "💡", name: "Hidden in the Heart", earned: verseCount >= 5, req: "Save 5 memory verses", verse: "“Thy word is a lamp unto my feet.” — Psalm 119:105" },
+                { id: "lover", emoji: "❤️", name: "Scripture Lover", earned: verseCount >= 10, req: "Save 10 memory verses", verse: "“O how love I thy law!” — Psalm 119:97" },
+              ];
+              const earnedCount = badges.filter(b => b.earned).length;
+              return (<div style={{ marginTop: 18 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 12 }}>
+                  <span style={{ color: GOLD, fontSize: 13, fontWeight: "bold", fontFamily: "sans-serif", letterSpacing: 1, textTransform: "uppercase" }}>🏅 Milestones of Faith</span>
+                  <span style={{ color: BROWN, fontSize: 12, fontFamily: "sans-serif" }}>{earnedCount} of {badges.length}</span>
+                </div>
+                <p style={{ color: BROWN, fontSize: 12.5, lineHeight: 1.6, margin: "0 0 14px", fontStyle: "italic" }}>Every step of faith is seen by God. Tap a badge you have earned to read its blessing. 🙏</p>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10 }}>
+                  {badges.map(b => (
+                    <div key={b.id} onClick={() => { if (b.earned) { setBadgeView(b); } }} style={{ background: b.earned ? GOLD_LIGHT : "#F3EEE3", border: b.earned ? ("2px solid " + GOLD) : "1px solid " + CREAM_DARK, borderRadius: 14, padding: "14px 8px", textAlign: "center", cursor: b.earned ? "pointer" : "default", opacity: b.earned ? 1 : 0.55 }}>
+                      <div style={{ fontSize: 30, marginBottom: 6, filter: b.earned ? "none" : "grayscale(100%)" }}>{b.earned ? b.emoji : "🔒"}</div>
+                      <p style={{ color: b.earned ? BROWN_DARK : BROWN, fontSize: 11, fontWeight: "bold", margin: 0, fontFamily: "sans-serif", lineHeight: 1.25 }}>{b.name}</p>
+                      {!b.earned && (<p style={{ color: BROWN, fontSize: 9.5, margin: "4px 0 0", fontFamily: "sans-serif", lineHeight: 1.3, opacity: 0.85 }}>{b.req}</p>)}
+                    </div>
+                  ))}
+                </div>
+              </div>);
+            })()}
+
             <div style={{ ...s.card, background: GOLD_LIGHT, marginTop: 4 }}><p style={{ color: BROWN_DARK, fontSize: 13, fontWeight: "bold", margin: "0 0 6px" }}>🏆 Milestone Badges</p><div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>{[["25%","Bronze 🥉","#CD7F32"],["50%","Silver 🥈","#7A7A7A"],["75%","Gold 🥇","#C9972A"],["100%","Champion 🏆","#FFD700"]].map(([pct, label, color]) => (<div key={pct} style={{ background: WHITE, borderRadius: 10, padding: "6px 12px", border: `1px solid ${GOLD_LIGHT}` }}><p style={{ color, fontSize: 12, fontWeight: "bold", margin: 0, fontFamily: "sans-serif" }}>{pct} — {label}</p></div>))}</div></div>
             </div>)}
           </div>
@@ -4253,12 +4295,12 @@ const startQuiz = (level) => {
                 <div style={{ width: 38, height: 38, borderRadius: "50%", background: GOLD, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 15, color: CREAM }}>{planAudioState === "loading" ? "\u23F3" : planAudioState === "playing" ? "\u23F8" : "\u25B6"}</div>
                 <div style={{ flex: 1 }}>
                   <p style={{ color: NAVY_TRINITY, fontSize: 14, fontWeight: "bold", margin: 0 }}>Listen to today's reading</p>
-                  <p style={{ color: BROWN, fontSize: 12, fontStyle: "italic", margin: "2px 0 0" }}>{planAudioState === "loading" ? "Preparing audio\u2026" : planAudioState === "playing" ? "Now playing \u2014 tap to stop" : "Today's devotional, read aloud"}</p>
+                  <p style={{ color: BROWN, fontSize: 12, fontStyle: "italic", margin: "2px 0 0" }}>{planAudioState === "loading" ? "Preparing audio\u2026" : planAudioState === "playing" ? "Now playing — tap to stop" : "Today's devotional, read aloud"}</p>
                 </div>
               </div>
               {planAudioError && (<p style={{ color: "#B00020", fontSize: 12, fontFamily: "sans-serif", margin: "0 0 14px" }}>{planAudioError}</p>)}
               <div style={{ background: WHITE, border: `1px solid ${GOLD_MID}`, borderRadius: 14, padding: "16px", marginBottom: 16 }}>
-                <p style={{ color: NAVY_TRINITY, fontSize: 16, fontStyle: "italic", lineHeight: 1.6, margin: "0 0 10px" }}>{"\u201C" + fd.scripture + "\u201D"}</p>
+                <p style={{ color: NAVY_TRINITY, fontSize: 16, fontStyle: "italic", lineHeight: 1.6, margin: "0 0 10px" }}>{"“" + fd.scripture + "”"}</p>
                 <p style={{ color: GOLD, fontSize: 12, fontWeight: "bold", fontFamily: "sans-serif", letterSpacing: 0.5, textTransform: "uppercase", margin: 0 }}>{fd.ref} · KJV</p>
               </div>
               <div style={{ marginBottom: 16 }}>
@@ -4322,12 +4364,12 @@ const startQuiz = (level) => {
                 <div style={{ width: 38, height: 38, borderRadius: "50%", background: GOLD, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 15, color: CREAM }}>{planAudioState === "loading" ? "\u23F3" : planAudioState === "playing" ? "\u23F8" : "\u25B6"}</div>
                 <div style={{ flex: 1 }}>
                   <p style={{ color: NAVY_TRINITY, fontSize: 14, fontWeight: "bold", margin: 0 }}>Listen to today's reading</p>
-                  <p style={{ color: BROWN, fontSize: 12, fontStyle: "italic", margin: "2px 0 0" }}>{planAudioState === "loading" ? "Preparing audio\u2026" : planAudioState === "playing" ? "Now playing \u2014 tap to stop" : "Today's devotional, read aloud"}</p>
+                  <p style={{ color: BROWN, fontSize: 12, fontStyle: "italic", margin: "2px 0 0" }}>{planAudioState === "loading" ? "Preparing audio\u2026" : planAudioState === "playing" ? "Now playing — tap to stop" : "Today's devotional, read aloud"}</p>
                 </div>
               </div>
               {planAudioError && (<p style={{ color: "#B00020", fontSize: 12, fontFamily: "sans-serif", margin: "0 0 14px" }}>{planAudioError}</p>)}
               <div style={{ background: WHITE, border: `1px solid ${GOLD_MID}`, borderRadius: 14, padding: "16px", marginBottom: 16 }}>
-                <p style={{ color: NAVY_TRINITY, fontSize: 16, fontStyle: "italic", lineHeight: 1.6, margin: "0 0 10px" }}>{"\u201C" + fd.scripture + "\u201D"}</p>
+                <p style={{ color: NAVY_TRINITY, fontSize: 16, fontStyle: "italic", lineHeight: 1.6, margin: "0 0 10px" }}>{"“" + fd.scripture + "”"}</p>
                 <p style={{ color: GOLD, fontSize: 12, fontWeight: "bold", fontFamily: "sans-serif", letterSpacing: 0.5, textTransform: "uppercase", margin: 0 }}>{fd.ref} · KJV</p>
               </div>
               <div style={{ marginBottom: 16 }}>
@@ -4391,12 +4433,12 @@ const startQuiz = (level) => {
                 <div style={{ width: 38, height: 38, borderRadius: "50%", background: GOLD, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 15, color: CREAM }}>{planAudioState === "loading" ? "\u23F3" : planAudioState === "playing" ? "\u23F8" : "\u25B6"}</div>
                 <div style={{ flex: 1 }}>
                   <p style={{ color: NAVY_TRINITY, fontSize: 14, fontWeight: "bold", margin: 0 }}>Listen to today's reading</p>
-                  <p style={{ color: BROWN, fontSize: 12, fontStyle: "italic", margin: "2px 0 0" }}>{planAudioState === "loading" ? "Preparing audio\u2026" : planAudioState === "playing" ? "Now playing \u2014 tap to stop" : "Today's devotional, read aloud"}</p>
+                  <p style={{ color: BROWN, fontSize: 12, fontStyle: "italic", margin: "2px 0 0" }}>{planAudioState === "loading" ? "Preparing audio\u2026" : planAudioState === "playing" ? "Now playing — tap to stop" : "Today's devotional, read aloud"}</p>
                 </div>
               </div>
               {planAudioError && (<p style={{ color: "#B00020", fontSize: 12, fontFamily: "sans-serif", margin: "0 0 14px" }}>{planAudioError}</p>)}
               <div style={{ background: WHITE, border: `1px solid ${GOLD_MID}`, borderRadius: 14, padding: "16px", marginBottom: 16 }}>
-                <p style={{ color: NAVY_TRINITY, fontSize: 16, fontStyle: "italic", lineHeight: 1.6, margin: "0 0 10px" }}>{"\u201C" + fd.scripture + "\u201D"}</p>
+                <p style={{ color: NAVY_TRINITY, fontSize: 16, fontStyle: "italic", lineHeight: 1.6, margin: "0 0 10px" }}>{"“" + fd.scripture + "”"}</p>
                 <p style={{ color: GOLD, fontSize: 12, fontWeight: "bold", fontFamily: "sans-serif", letterSpacing: 0.5, textTransform: "uppercase", margin: 0 }}>{fd.ref} · KJV</p>
               </div>
               <div style={{ marginBottom: 16 }}>
@@ -4460,12 +4502,12 @@ const startQuiz = (level) => {
                 <div style={{ width: 38, height: 38, borderRadius: "50%", background: GOLD, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 15, color: CREAM }}>{planAudioState === "loading" ? "\u23F3" : planAudioState === "playing" ? "\u23F8" : "\u25B6"}</div>
                 <div style={{ flex: 1 }}>
                   <p style={{ color: NAVY_TRINITY, fontSize: 14, fontWeight: "bold", margin: 0 }}>Listen to today's reading</p>
-                  <p style={{ color: BROWN, fontSize: 12, fontStyle: "italic", margin: "2px 0 0" }}>{planAudioState === "loading" ? "Preparing audio\u2026" : planAudioState === "playing" ? "Now playing \u2014 tap to stop" : "Today's devotional, read aloud"}</p>
+                  <p style={{ color: BROWN, fontSize: 12, fontStyle: "italic", margin: "2px 0 0" }}>{planAudioState === "loading" ? "Preparing audio\u2026" : planAudioState === "playing" ? "Now playing — tap to stop" : "Today's devotional, read aloud"}</p>
                 </div>
               </div>
               {planAudioError && (<p style={{ color: "#B00020", fontSize: 12, fontFamily: "sans-serif", margin: "0 0 14px" }}>{planAudioError}</p>)}
               <div style={{ background: WHITE, border: `1px solid ${GOLD_MID}`, borderRadius: 14, padding: "16px", marginBottom: 16 }}>
-                <p style={{ color: NAVY_TRINITY, fontSize: 16, fontStyle: "italic", lineHeight: 1.6, margin: "0 0 10px" }}>{"\u201C" + fd.scripture + "\u201D"}</p>
+                <p style={{ color: NAVY_TRINITY, fontSize: 16, fontStyle: "italic", lineHeight: 1.6, margin: "0 0 10px" }}>{"“" + fd.scripture + "”"}</p>
                 <p style={{ color: GOLD, fontSize: 12, fontWeight: "bold", fontFamily: "sans-serif", letterSpacing: 0.5, textTransform: "uppercase", margin: 0 }}>{fd.ref} · KJV</p>
               </div>
               <div style={{ marginBottom: 16 }}>
@@ -4529,12 +4571,12 @@ const startQuiz = (level) => {
                 <div style={{ width: 38, height: 38, borderRadius: "50%", background: GOLD, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 15, color: CREAM }}>{planAudioState === "loading" ? "\u23F3" : planAudioState === "playing" ? "\u23F8" : "\u25B6"}</div>
                 <div style={{ flex: 1 }}>
                   <p style={{ color: NAVY_TRINITY, fontSize: 14, fontWeight: "bold", margin: 0 }}>Listen to today's reading</p>
-                  <p style={{ color: BROWN, fontSize: 12, fontStyle: "italic", margin: "2px 0 0" }}>{planAudioState === "loading" ? "Preparing audio\u2026" : planAudioState === "playing" ? "Now playing \u2014 tap to stop" : "Today's devotional, read aloud"}</p>
+                  <p style={{ color: BROWN, fontSize: 12, fontStyle: "italic", margin: "2px 0 0" }}>{planAudioState === "loading" ? "Preparing audio\u2026" : planAudioState === "playing" ? "Now playing — tap to stop" : "Today's devotional, read aloud"}</p>
                 </div>
               </div>
               {planAudioError && (<p style={{ color: "#B00020", fontSize: 12, fontFamily: "sans-serif", margin: "0 0 14px" }}>{planAudioError}</p>)}
               <div style={{ background: WHITE, border: `1px solid ${GOLD_MID}`, borderRadius: 14, padding: "16px", marginBottom: 16 }}>
-                <p style={{ color: NAVY_TRINITY, fontSize: 16, fontStyle: "italic", lineHeight: 1.6, margin: "0 0 10px" }}>{"\u201C" + fd.scripture + "\u201D"}</p>
+                <p style={{ color: NAVY_TRINITY, fontSize: 16, fontStyle: "italic", lineHeight: 1.6, margin: "0 0 10px" }}>{"“" + fd.scripture + "”"}</p>
                 <p style={{ color: GOLD, fontSize: 12, fontWeight: "bold", fontFamily: "sans-serif", letterSpacing: 0.5, textTransform: "uppercase", margin: 0 }}>{fd.ref} · KJV</p>
               </div>
               <div style={{ marginBottom: 16 }}>
@@ -4598,12 +4640,12 @@ const startQuiz = (level) => {
                 <div style={{ width: 38, height: 38, borderRadius: "50%", background: GOLD, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 15, color: CREAM }}>{planAudioState === "loading" ? "\u23F3" : planAudioState === "playing" ? "\u23F8" : "\u25B6"}</div>
                 <div style={{ flex: 1 }}>
                   <p style={{ color: NAVY_TRINITY, fontSize: 14, fontWeight: "bold", margin: 0 }}>Listen to today's reading</p>
-                  <p style={{ color: BROWN, fontSize: 12, fontStyle: "italic", margin: "2px 0 0" }}>{planAudioState === "loading" ? "Preparing audio\u2026" : planAudioState === "playing" ? "Now playing \u2014 tap to stop" : "Today's devotional, read aloud"}</p>
+                  <p style={{ color: BROWN, fontSize: 12, fontStyle: "italic", margin: "2px 0 0" }}>{planAudioState === "loading" ? "Preparing audio\u2026" : planAudioState === "playing" ? "Now playing — tap to stop" : "Today's devotional, read aloud"}</p>
                 </div>
               </div>
               {planAudioError && (<p style={{ color: "#B00020", fontSize: 12, fontFamily: "sans-serif", margin: "0 0 14px" }}>{planAudioError}</p>)}
               <div style={{ background: WHITE, border: `1px solid ${GOLD_MID}`, borderRadius: 14, padding: "16px", marginBottom: 16 }}>
-                <p style={{ color: NAVY_TRINITY, fontSize: 16, fontStyle: "italic", lineHeight: 1.6, margin: "0 0 10px" }}>{"\u201C" + fd.scripture + "\u201D"}</p>
+                <p style={{ color: NAVY_TRINITY, fontSize: 16, fontStyle: "italic", lineHeight: 1.6, margin: "0 0 10px" }}>{"“" + fd.scripture + "”"}</p>
                 <p style={{ color: GOLD, fontSize: 12, fontWeight: "bold", fontFamily: "sans-serif", letterSpacing: 0.5, textTransform: "uppercase", margin: 0 }}>{fd.ref} · KJV</p>
               </div>
               <div style={{ marginBottom: 16 }}>
@@ -4667,12 +4709,12 @@ const startQuiz = (level) => {
                 <div style={{ width: 38, height: 38, borderRadius: "50%", background: GOLD, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 15, color: CREAM }}>{planAudioState === "loading" ? "\u23F3" : planAudioState === "playing" ? "\u23F8" : "\u25B6"}</div>
                 <div style={{ flex: 1 }}>
                   <p style={{ color: NAVY_TRINITY, fontSize: 14, fontWeight: "bold", margin: 0 }}>Listen to today's reading</p>
-                  <p style={{ color: BROWN, fontSize: 12, fontStyle: "italic", margin: "2px 0 0" }}>{planAudioState === "loading" ? "Preparing audio\u2026" : planAudioState === "playing" ? "Now playing \u2014 tap to stop" : "Today's devotional, read aloud"}</p>
+                  <p style={{ color: BROWN, fontSize: 12, fontStyle: "italic", margin: "2px 0 0" }}>{planAudioState === "loading" ? "Preparing audio\u2026" : planAudioState === "playing" ? "Now playing — tap to stop" : "Today's devotional, read aloud"}</p>
                 </div>
               </div>
               {planAudioError && (<p style={{ color: "#B00020", fontSize: 12, fontFamily: "sans-serif", margin: "0 0 14px" }}>{planAudioError}</p>)}
               <div style={{ background: WHITE, border: `1px solid ${GOLD_MID}`, borderRadius: 14, padding: "16px", marginBottom: 16 }}>
-                <p style={{ color: NAVY_TRINITY, fontSize: 16, fontStyle: "italic", lineHeight: 1.6, margin: "0 0 10px" }}>{"\u201C" + fd.scripture + "\u201D"}</p>
+                <p style={{ color: NAVY_TRINITY, fontSize: 16, fontStyle: "italic", lineHeight: 1.6, margin: "0 0 10px" }}>{"“" + fd.scripture + "”"}</p>
                 <p style={{ color: GOLD, fontSize: 12, fontWeight: "bold", fontFamily: "sans-serif", letterSpacing: 0.5, textTransform: "uppercase", margin: 0 }}>{fd.ref} · KJV</p>
               </div>
               <div style={{ marginBottom: 16 }}>
@@ -4736,12 +4778,12 @@ const startQuiz = (level) => {
                 <div style={{ width: 38, height: 38, borderRadius: "50%", background: GOLD, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 15, color: CREAM }}>{planAudioState === "loading" ? "\u23F3" : planAudioState === "playing" ? "\u23F8" : "\u25B6"}</div>
                 <div style={{ flex: 1 }}>
                   <p style={{ color: NAVY_TRINITY, fontSize: 14, fontWeight: "bold", margin: 0 }}>Listen to today's reading</p>
-                  <p style={{ color: BROWN, fontSize: 12, fontStyle: "italic", margin: "2px 0 0" }}>{planAudioState === "loading" ? "Preparing audio\u2026" : planAudioState === "playing" ? "Now playing \u2014 tap to stop" : "Today's devotional, read aloud"}</p>
+                  <p style={{ color: BROWN, fontSize: 12, fontStyle: "italic", margin: "2px 0 0" }}>{planAudioState === "loading" ? "Preparing audio\u2026" : planAudioState === "playing" ? "Now playing — tap to stop" : "Today's devotional, read aloud"}</p>
                 </div>
               </div>
               {planAudioError && (<p style={{ color: "#B00020", fontSize: 12, fontFamily: "sans-serif", margin: "0 0 14px" }}>{planAudioError}</p>)}
               <div style={{ background: WHITE, border: `1px solid ${GOLD_MID}`, borderRadius: 14, padding: "16px", marginBottom: 16 }}>
-                <p style={{ color: NAVY_TRINITY, fontSize: 16, fontStyle: "italic", lineHeight: 1.6, margin: "0 0 10px" }}>{"\u201C" + fd.scripture + "\u201D"}</p>
+                <p style={{ color: NAVY_TRINITY, fontSize: 16, fontStyle: "italic", lineHeight: 1.6, margin: "0 0 10px" }}>{"“" + fd.scripture + "”"}</p>
                 <p style={{ color: GOLD, fontSize: 12, fontWeight: "bold", fontFamily: "sans-serif", letterSpacing: 0.5, textTransform: "uppercase", margin: 0 }}>{fd.ref} · KJV</p>
               </div>
               <div style={{ marginBottom: 16 }}>
@@ -4805,12 +4847,12 @@ const startQuiz = (level) => {
                 <div style={{ width: 38, height: 38, borderRadius: "50%", background: GOLD, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 15, color: CREAM }}>{planAudioState === "loading" ? "\u23F3" : planAudioState === "playing" ? "\u23F8" : "\u25B6"}</div>
                 <div style={{ flex: 1 }}>
                   <p style={{ color: NAVY_TRINITY, fontSize: 14, fontWeight: "bold", margin: 0 }}>Listen to today's reading</p>
-                  <p style={{ color: BROWN, fontSize: 12, fontStyle: "italic", margin: "2px 0 0" }}>{planAudioState === "loading" ? "Preparing audio\u2026" : planAudioState === "playing" ? "Now playing \u2014 tap to stop" : "Today's devotional, read aloud"}</p>
+                  <p style={{ color: BROWN, fontSize: 12, fontStyle: "italic", margin: "2px 0 0" }}>{planAudioState === "loading" ? "Preparing audio\u2026" : planAudioState === "playing" ? "Now playing — tap to stop" : "Today's devotional, read aloud"}</p>
                 </div>
               </div>
               {planAudioError && (<p style={{ color: "#B00020", fontSize: 12, fontFamily: "sans-serif", margin: "0 0 14px" }}>{planAudioError}</p>)}
               <div style={{ background: WHITE, border: `1px solid ${GOLD_MID}`, borderRadius: 14, padding: "16px", marginBottom: 16 }}>
-                <p style={{ color: NAVY_TRINITY, fontSize: 16, fontStyle: "italic", lineHeight: 1.6, margin: "0 0 10px" }}>{"\u201C" + fd.scripture + "\u201D"}</p>
+                <p style={{ color: NAVY_TRINITY, fontSize: 16, fontStyle: "italic", lineHeight: 1.6, margin: "0 0 10px" }}>{"“" + fd.scripture + "”"}</p>
                 <p style={{ color: GOLD, fontSize: 12, fontWeight: "bold", fontFamily: "sans-serif", letterSpacing: 0.5, textTransform: "uppercase", margin: 0 }}>{fd.ref} · KJV</p>
               </div>
               <div style={{ marginBottom: 16 }}>
@@ -4874,12 +4916,12 @@ const startQuiz = (level) => {
                 <div style={{ width: 38, height: 38, borderRadius: "50%", background: GOLD, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 15, color: CREAM }}>{planAudioState === "loading" ? "\u23F3" : planAudioState === "playing" ? "\u23F8" : "\u25B6"}</div>
                 <div style={{ flex: 1 }}>
                   <p style={{ color: NAVY_TRINITY, fontSize: 14, fontWeight: "bold", margin: 0 }}>Listen to today's reading</p>
-                  <p style={{ color: BROWN, fontSize: 12, fontStyle: "italic", margin: "2px 0 0" }}>{planAudioState === "loading" ? "Preparing audio\u2026" : planAudioState === "playing" ? "Now playing \u2014 tap to stop" : "Today's devotional, read aloud"}</p>
+                  <p style={{ color: BROWN, fontSize: 12, fontStyle: "italic", margin: "2px 0 0" }}>{planAudioState === "loading" ? "Preparing audio\u2026" : planAudioState === "playing" ? "Now playing — tap to stop" : "Today's devotional, read aloud"}</p>
                 </div>
               </div>
               {planAudioError && (<p style={{ color: "#B00020", fontSize: 12, fontFamily: "sans-serif", margin: "0 0 14px" }}>{planAudioError}</p>)}
               <div style={{ background: WHITE, border: `1px solid ${GOLD_MID}`, borderRadius: 14, padding: "16px", marginBottom: 16 }}>
-                <p style={{ color: NAVY_TRINITY, fontSize: 16, fontStyle: "italic", lineHeight: 1.6, margin: "0 0 10px" }}>{"\u201C" + fd.scripture + "\u201D"}</p>
+                <p style={{ color: NAVY_TRINITY, fontSize: 16, fontStyle: "italic", lineHeight: 1.6, margin: "0 0 10px" }}>{"“" + fd.scripture + "”"}</p>
                 <p style={{ color: GOLD, fontSize: 12, fontWeight: "bold", fontFamily: "sans-serif", letterSpacing: 0.5, textTransform: "uppercase", margin: 0 }}>{fd.ref} · KJV</p>
               </div>
               <div style={{ marginBottom: 16 }}>
