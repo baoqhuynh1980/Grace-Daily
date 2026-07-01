@@ -183,11 +183,14 @@ async function gdRequestReview() {
     if (gdReviewAsked) return;
     const isNativeApp = typeof window !== "undefined" && window.Capacitor && typeof window.Capacitor.isNativePlatform === "function" && window.Capacitor.isNativePlatform();
     if (!isNativeApp) return; // web version: do nothing (no native review popup exists in a browser)
-    const { InAppReview } = await import("@capacitor-community/in-app-review");
+    // Access the native plugin via Capacitor's runtime registry — no import, so the web bundler
+    // (Vercel/CRA) never tries to resolve the package. Only present on the real iOS build.
+    const InAppReview = window.Capacitor.Plugins && window.Capacitor.Plugins.InAppReview;
+    if (!InAppReview || typeof InAppReview.requestReview !== "function") return; // plugin not installed yet
     gdReviewAsked = true;
     await InAppReview.requestReview();
   } catch (e) {
-    // Plugin not installed yet, or not available — fail silently, never disrupt the blessing moment.
+    // Never disrupt the blessing moment — fail silently.
     console.log("App review prompt not available:", e && e.message);
   }
 }
