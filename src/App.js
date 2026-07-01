@@ -174,6 +174,24 @@ const GD_FX = {
 // Returns the fireworks celebration config for a finished plan, or null
 function gdFxFor(planKey) { return GD_FX[planKey] || null; }
 
+// Gently ask for an App Store review at a blessing moment.
+// Uses Apple's native review prompt (respectful — Apple itself caps how often it actually shows,
+// max ~3x/year per user, so it can never nag). Silently does nothing on web or if the plugin isn't present.
+let gdReviewAsked = false; // guard so we only request once per app session
+async function gdRequestReview() {
+  try {
+    if (gdReviewAsked) return;
+    const isNativeApp = typeof window !== "undefined" && window.Capacitor && typeof window.Capacitor.isNativePlatform === "function" && window.Capacitor.isNativePlatform();
+    if (!isNativeApp) return; // web version: do nothing (no native review popup exists in a browser)
+    const { InAppReview } = await import("@capacitor-community/in-app-review");
+    gdReviewAsked = true;
+    await InAppReview.requestReview();
+  } catch (e) {
+    // Plugin not installed yet, or not available — fail silently, never disrupt the blessing moment.
+    console.log("App review prompt not available:", e && e.message);
+  }
+}
+
 const fastingMilestones = [
   { count: 1, label: "First Fast 🌱", color: "#4CAF50", bg: "#F1F8E9" },
   { count: 3, label: "Growing Faster 🌿", color: "#388E3C", bg: "#E8F5E9" },
@@ -2102,6 +2120,13 @@ function WordSearchGame() {
   const [streakLoading, setStreakLoading] = useState(true);
   const [streakCelebration, setStreakCelebration] = useState(false);
   const [planFireworks, setPlanFireworks] = useState(null);
+  // When a devotional plan is completed (fireworks fire), gently ask for a review after the celebration.
+  // Fires ~6s in, after they've felt the "look what God did" moment. Apple caps actual frequency, so no nagging.
+  useEffect(() => {
+    if (!planFireworks) return;
+    const t = setTimeout(() => { gdRequestReview(); }, 6000);
+    return () => clearTimeout(t);
+  }, [planFireworks]);
   const [badgeView, setBadgeView] = useState(null);
   const [notifEnabled, setNotifEnabled] = useState(false);
   const [showNotifBanner, setShowNotifBanner] = useState(typeof Notification !== 'undefined' ? Notification.permission !== 'granted' : true);
@@ -3132,6 +3157,7 @@ function WordSearchGame() {
       await setDoc(doc(db, "streaks", user.uid), { count: newCount, lastLogged: today, longestStreak: newLongest });
       setStreak(newCount); setStreakLogged(true); setLongestStreakValue(newLongest);
       if ([3, 7, 14, 21, 30, 50, 100].includes(newCount)) { setStreakCelebration(true); setTimeout(() => setStreakCelebration(false), 6000); }
+      if (newCount === 7) { setTimeout(() => { gdRequestReview(); }, 4000); }
     } catch (err) { console.error(err); }
   };
 
