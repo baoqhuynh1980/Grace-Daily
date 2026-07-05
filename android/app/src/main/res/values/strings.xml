@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Grace Daily</string>
+    <string name="title_activity_main">Grace Daily</string>
+    <string name="package_name">com.faithdailywalk.gracedaily</string>
+    <string name="custom_url_scheme">com.faithdailywalk.gracedaily</string>
+</resources>

@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "657047930577",
+    "project_id": "grace-daily-6f520",
+    "storage_bucket": "grace-daily-6f520.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:657047930577:android:b628a4e7e35497635fa7f0",
+        "android_client_info": {
+          "package_name": "com.faithdailywalk.gracedaily"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "657047930577-923pn3lq7dtgv7uksqspn0h9ln38f4qi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDr50LS_sfSmvg8hO2iZtsfdFdorHHivXw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "657047930577-923pn3lq7dtgv7uksqspn0h9ln38f4qi.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "657047930577-2dmn34er92k99k3ae81vs6mu402nan3h.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.faithdailywalk.gracedaily",
+                "app_store_id": "6781708455"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
