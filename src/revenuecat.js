@@ -2,6 +2,8 @@ import { Purchases } from "@revenuecat/purchases-capacitor";
 
 // RevenueCat public iOS SDK key (safe to ship inside the app)
 const REVENUECAT_IOS_KEY = "appl_PMMVPTRQpzWmypIEisIWYlmbyUK";
+// RevenueCat public Android SDK key (safe to ship inside the app)
+const REVENUECAT_ANDROID_KEY = "goog_DxJgoCVzoOVXXAczYhxVquDYzlf";
 const ENTITLEMENT_ID = "premium";
 
 // True only inside the real native app (not the Safari / web version)
@@ -20,7 +22,17 @@ let configured = false;
 export const initRevenueCat = async () => {
   if (!isNative() || configured) return;
   try {
-    await Purchases.configure({ apiKey: REVENUECAT_IOS_KEY });
+    const isAndroid = (() => {
+      try {
+        return window.Capacitor &&
+          window.Capacitor.getPlatform &&
+          window.Capacitor.getPlatform() === "android";
+      } catch (e) {
+        return false;
+      }
+    })();
+    const apiKey = isAndroid ? REVENUECAT_ANDROID_KEY : REVENUECAT_IOS_KEY;
+    await Purchases.configure({ apiKey });
     configured = true;
   } catch (e) {
     console.error("RevenueCat configure error:", e);
